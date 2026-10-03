@@ -1,0 +1,52 @@
+<resources>
+  <string name="loading">Đang tải …</string>
+  <string name="may_contain_ads">Thao tác này có thể có quảng cáo</string>
+  <string name="open_settings">Mở Cài đặt</string>
+  <string name="no_internet_connection">Không có kết nối Internet. Vui lòng kiểm tra kết nối rồi thử lại.</string>
+
+  <!-- Ads -->
+  <string name="ad_loading">Đang tải quảng cáo…</string>
+  <string name="ad_label">Quảng cáo</string>
+
+  <!-- AodService -->
+  <string name="channel_service">Đồng hồ chạy nền</string>
+  <string name="notif_service_title">Hiện đồng hồ mỗi khi màn hình tắt</string>
+
+  <!-- Main -->
+  <string name="main_subtitle">Đồng hồ luôn bật cho những máy mà chế độ có sẵn tự tắt sau vài giây.</string>
+  <string name="opt_enabled">Hiện đồng hồ khi màn hình tắt</string>
+
+  <string name="section_permissions">Quyền</string>
+  <string name="section_options">Tùy chọn</string>
+  <string name="action_open">Mở</string>
+
+  <string name="perm_overlay_title">Hiển thị trên ứng dụng khác (bắt buộc)</string>
+  <string name="perm_overlay_desc">Cho phép app tự mở đồng hồ khi màn hình tắt.</string>
+  <string name="perm_lock_title">Xiaomi: hiển thị trên màn hình khóa (bắt buộc)</string>
+  <string name="perm_lock_desc">Trong Quyền khác, cho phép Hiển thị trên màn hình khóa. Thiếu quyền này đồng hồ bị giấu sau màn hình khóa.</string>
+  <string name="perm_popup_title">Xiaomi: cửa sổ pop-up khi chạy nền</string>
+  <string name="perm_popup_desc">Trong Quyền khác, cho phép Mở cửa sổ mới khi đang chạy nền, chỉ khi đồng hồ vẫn không hiện.</string>
+  <string name="perm_notif_title">Thông báo</string>
+  <string name="perm_notif_desc">Chỉ để hiện thông báo ứng dụng đang chạy.</string>
+
+  <string name="permission_state_granted">Đã cấp</string>
+  <string name="permission_state_missing">Chưa cấp</string>
+  <string name="permission_state_unknown">Không rõ</string>
+
+  <string name="opt_dim">Giảm độ sáng khi đồng hồ đang hiện</string>
+  <string name="opt_proximity">Tối màn hình khi máy ở trong túi hoặc bị úp</string>
+  <string name="opt_timeout_never">Tối màn hình sau: không bao giờ</string>
+  <string name="opt_timeout_value">Tối màn hình sau: %1$d phút</string>
+  <string name="opt_battery_off">Bỏ qua đồng hồ khi pin yếu: tắt</string>
+  <string name="opt_battery_value">Bỏ qua đồng hồ khi pin dưới %1$d%%</string>
+
+  <string name="action_preview">Xem thử</string>
+
+  <string name="wake_unknown">Đồng hồ chưa được hiện lần nào từ lúc màn hình tắt.</string>
+  <string name="wake_ok">Lần gần nhất: đồng hồ đã mở được trên màn hình khóa.</string>
+  <string name="wake_failed">Lần gần nhất: đồng hồ không mở được trên màn hình khóa. Hãy kiểm tra các quyền ở trên.</string>
+
+  <!-- AOD -->
+  <string name="aod_hint">Chạm 2 lần để thoát</string>
+  <string name="aod_battery_charging">Đang sạc · %1$d%%</string>
+</resources>

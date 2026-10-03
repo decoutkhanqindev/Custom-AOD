@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- Nền đen để không loé trắng trước khung Compose đầu tiên; màu giao diện nằm ở AppTheme. -->
+  <style name="Theme.App" parent="android:Theme.Material.NoActionBar">
+    <item name="android:windowBackground">@android:color/black</item>
+  </style>
+
+  <!-- AOD: không có animation cửa sổ, vẽ cả dưới vùng camera (cutout). -->
+  <style name="Base.Theme.App.Aod" parent="Theme.App">
+    <item name="android:windowAnimationStyle">@null</item>
+    <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+  </style>
+
+  <style name="Theme.App.Aod" parent="Base.Theme.App.Aod" />
+
+  <style name="AdTheme" parent="android:Theme.Material.Light.NoActionBar">
+    <item name="android:background">@android:color/white</item>
+    <item name="android:windowBackground">@android:color/white</item>
+    <item name="android:windowExitAnimation">@null</item>
+    <item name="android:windowEnterAnimation">@null</item>
+    <item name="android:windowTranslucentNavigation">true</item>
+  </style>
+</resources>
