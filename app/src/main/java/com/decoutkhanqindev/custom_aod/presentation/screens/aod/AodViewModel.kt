@@ -43,11 +43,13 @@ class AodViewModel(
     private var isDarkUntilUncovered = false
     private var isCovered = false
     private var timeoutJob: Job? = null
+    private var hintJob: Job? = null
 
     init {
         observeBattery()
         observeAudio()
         startMinuteTicks()
+        scheduleHintHide()
         if (!isPreview) {
             if (isProximityEnabled) observeProximity()
             armTimeout()
@@ -123,8 +125,23 @@ class AodViewModel(
         }
     }
 
+    private fun scheduleHintHide() {
+        hintJob?.cancel()
+        hintJob = viewModelScope.launch {
+            delay(HINT_VISIBLE_MILLIS)
+            updateState { copy(isHintVisible = false) }
+        }
+    }
+
     private fun onMinuteTick() {
-        if (!state.value.isDark) updateState { copy(shiftXDp = randomShiftX(), shiftYDp = randomShiftY()) }
+        val nowMillis = System.currentTimeMillis()
+        updateState {
+            if (isDark) {
+                copy(nowMillis = nowMillis)
+            } else {
+                copy(nowMillis = nowMillis, shiftXDp = randomShiftX(), shiftYDp = randomShiftY())
+            }
+        }
         if (isPreview) return
         val battery = state.value.battery ?: return
         if (!battery.isCharging && battery.percent in 0 until minBattery) goDark()
@@ -141,7 +158,8 @@ class AodViewModel(
     private fun lightUpAgain() {
         if (!state.value.isDark || !isDarkUntilUncovered) return
         isDarkUntilUncovered = false
-        updateState { copy(isDark = false) }
+        updateState { copy(isDark = false, isHintVisible = true) }
+        scheduleHintHide()
         armTimeout()
     }
 
@@ -149,11 +167,13 @@ class AodViewModel(
         private const val MINUTE_MILLIS = 60_000L
         private const val TICK_SLACK_MILLIS = 50L
         private const val COVER_DELAY_MILLIS = 3_000L
+        private const val HINT_VISIBLE_MILLIS = 3_000L
         private const val MAX_SHIFT_X_DP = 24
         private const val MAX_SHIFT_Y_DP = 64
 
         // Pin đọc đồng bộ từ broadcast sticky để khung đầu tiên đã có dòng pin, bố cục không bị nhảy.
         private fun initialState(batteryStateManager: BatteryStateManager): AodState = AodState(
+            nowMillis = System.currentTimeMillis(),
             battery = batteryStateManager.readLevelPercent()?.let { percent ->
                 BatteryUiModel(percent = percent, isCharging = batteryStateManager.readIsCharging() == true)
             },

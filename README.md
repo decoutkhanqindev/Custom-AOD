@@ -181,10 +181,10 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/aod/AodActivity.kt` | Host của màn AOD: cờ cửa sổ `FLAG_SHOW_WHEN_LOCKED`, `FLAG_TURN_SCREEN_ON`, `FLAG_KEEP_SCREEN_ON`; độ sáng; ẩn thanh hệ thống; chuyển sang đen khi ViewModel báo |
 | `presentation/aod/AodSession.kt` | Trạng thái dùng chung giữa service và Activity (Koin `single`) |
 | `presentation/aod/BootReceiver.kt` | Chạy lại service sau khi khởi động máy hoặc cập nhật app |
-| `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: pin, chống burn-in mỗi phút, hết giờ, trong túi, pin yếu, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần |
+| `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, pin yếu, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần |
 | `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (giờ, ngày, pin, gợi ý, dịch vị trí) và phần nối với ViewModel |
 | `presentation/screens/main/` | Màn hình cấp quyền và tùy chọn (MVI), hỏi quyền thông báo ở lần mở đầu tiên |
-| `presentation/model/` | `AodOptionsUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionUiModel`, `WakeResultValue` |
+| `presentation/model/` | `AodOptionsUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue` |
 | `presentation/components/AppLanguageProvider.kt` | Áp ngôn ngữ đã chọn cho `MainActivity` và `AodActivity` |
 | `presentation/MainActivity.kt` | Activity chính: consent, ngôn ngữ, theme, khởi động service |
 | `data/device/screen/ScreenStateManager.kt` | Sự kiện tắt màn hình / mở khóa, màn hình có đang sáng, có khóa bảo mật, wake lock bật lại màn hình |
@@ -193,7 +193,7 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `data/device/proximity/ProximityManager.kt` | Cảm biến tiệm cận |
 | `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, và quyền riêng của Xiaomi |
 | `data/local/datastore/DataStoreManager.kt` | Lưu tùy chọn AOD cùng các prefs của base |
-| `utils/ContextExt.kt` | `registerSystemReceiver` |
+| `utils/ContextExt.kt` | `registerSystemReceiver`; mở trang cài đặt: `openSettingsPage` (ROM không có trang đó thì mở Thông tin ứng dụng), `openOverlaySettings`, `openNotificationSettings`, `openMiuiPermissionEditor`; `packageUri` |
 | `res/values-v31/themes.xml` | Splash màu đen cho AOD trên Android 12+, thay vì icon app |
 | `res/xml/data_extraction_rules.xml` | Không sao lưu và không chuyển dữ liệu app sang máy mới (Android 12+) |
 
@@ -210,8 +210,8 @@ Từ FakeAOD sang Custom AOD:
 | `ui/SettingsScreen.kt` | `presentation/screens/main/` |
 | `ui/Theme.kt` | `presentation/theme/Theme.kt` + `Color.kt` |
 | `AodPrefs.kt` | Các key trong `DataStoreManager` |
-| `MiuiPerm.kt` | `PermissionManager` (đọc quyền) + `MainScreen` (mở trang "Quyền khác") |
-| `SystemPages.kt` | `utils/ContextExt.kt` (`registerSystemReceiver`) + `MainScreen` (mở trang cài đặt) |
+| `MiuiPerm.kt` | `PermissionManager` (đọc quyền) + `utils/ContextExt.kt` (`openMiuiPermissionEditor`, mở trang "Quyền khác") |
+| `SystemPages.kt` | `utils/ContextExt.kt` (`registerSystemReceiver`, `openSettingsPage`, `openOverlaySettings`, `openNotificationSettings`, `packageUri`) |
 | `MainActivity.kt` | `presentation/MainActivity.kt` của base, thêm khởi động service |
 
 ## Các quyết định thiết kế

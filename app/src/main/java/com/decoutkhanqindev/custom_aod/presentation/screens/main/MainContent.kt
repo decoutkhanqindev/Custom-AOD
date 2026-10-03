@@ -17,11 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,8 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.AnimationContentKey
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.PermissionStatusValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
@@ -138,8 +132,8 @@ private fun MainSettings(
                 stringResource(R.string.opt_timeout_value, state.options.timeoutMinutes)
             },
             value = state.options.timeoutMinutes,
-            step = TIMEOUT_STEP_MINUTES,
-            max = TIMEOUT_MAX_MINUTES,
+            step = AodOptionsUiModel.TIMEOUT_STEP_MINUTES,
+            max = AodOptionsUiModel.TIMEOUT_MAX_MINUTES,
             onValueChange = { onIntent(MainIntent.ChangeTimeout(it)) },
         )
 
@@ -150,8 +144,8 @@ private fun MainSettings(
                 stringResource(R.string.opt_battery_value, state.options.minBattery)
             },
             value = state.options.minBattery,
-            step = BATTERY_STEP_PERCENT,
-            max = BATTERY_MAX_PERCENT,
+            step = AodOptionsUiModel.BATTERY_STEP_PERCENT,
+            max = AodOptionsUiModel.BATTERY_MAX_PERCENT,
             onValueChange = { onIntent(MainIntent.ChangeMinBattery(it)) },
         )
 
@@ -213,30 +207,12 @@ private fun PermissionRow(
     permission: PermissionUiModel,
     onOpen: () -> Unit,
 ) {
-    val status = when {
-        permission.isGranted == true -> PermissionStatus(
-            icon = Icons.Default.Check,
-            color = MaterialTheme.colorScheme.primary,
-            descriptionRes = R.string.permission_state_granted,
-        )
-
-        permission.isGranted == null -> PermissionStatus(
-            icon = Icons.Default.QuestionMark,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            descriptionRes = R.string.permission_state_unknown,
-        )
-
-        permission.permission.isRequired -> PermissionStatus(
-            icon = Icons.Default.Close,
-            color = MaterialTheme.colorScheme.error,
-            descriptionRes = R.string.permission_state_missing,
-        )
-
-        else -> PermissionStatus(
-            icon = Icons.Default.Remove,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            descriptionRes = R.string.permission_state_missing,
-        )
+    val status = permission.status
+    val statusColor = when (status) {
+        PermissionStatusValue.GRANTED -> MaterialTheme.colorScheme.primary
+        PermissionStatusValue.MISSING_REQUIRED -> MaterialTheme.colorScheme.error
+        PermissionStatusValue.UNKNOWN,
+        PermissionStatusValue.MISSING_OPTIONAL -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Row(
@@ -250,7 +226,7 @@ private fun PermissionRow(
                 imageVector = status.icon,
                 contentDescription = stringResource(status.descriptionRes),
                 modifier = Modifier.size(20.dp),
-                tint = status.color,
+                tint = statusColor,
             )
         }
 
@@ -300,17 +276,6 @@ private fun StepSlider(
         )
     }
 }
-
-private class PermissionStatus(
-    val icon: ImageVector,
-    val color: Color,
-    @param:StringRes val descriptionRes: Int,
-)
-
-private const val TIMEOUT_STEP_MINUTES = 5
-private const val TIMEOUT_MAX_MINUTES = 120
-private const val BATTERY_STEP_PERCENT = 5
-private const val BATTERY_MAX_PERCENT = 50
 
 @Preview(widthDp = 360, heightDp = 900)
 @Composable

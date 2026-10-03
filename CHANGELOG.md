@@ -21,7 +21,7 @@ Lõi AOD của FakeAOD được đưa vào base [Android-Base](https://github.co
   - `ProximityManager`: `isNear`.
   - `PermissionManager`: quyền overlay, thông báo, và hai quyền riêng của Xiaomi.
 - Màn AOD theo MVI trong `presentation/screens/aod/`: `AodViewModel`, `AodContent`, `AodScreen`, `state/`.
-- Màn cài đặt theo MVI trong `presentation/screens/main/`, kèm `AodOptionsUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionUiModel`, `WakeResultValue`.
+- Màn cài đặt theo MVI trong `presentation/screens/main/`, kèm `AodOptionsUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`.
 - `AppLanguageProvider`, dùng chung cho `MainActivity` và `AodActivity`.
 - Trạng thái quyền hiện bằng Material icon có `contentDescription` (Đã cấp / Chưa cấp / Không rõ), thay cho ký tự ✓ ✕ ? –.
 - Bản dịch tiếng Việt cho các chuỗi của base.
@@ -40,13 +40,20 @@ Lõi AOD của FakeAOD được đưa vào base [Android-Base](https://github.co
   - `Handler` → coroutine. Kiểm tra sau khi mở đổi tên `launchCheck` → `checkLaunch()`, vẫn sau 2 giây.
   - `Log` → Timber.
 - `AodActivity`:
-  - Logic chuyển vào `AodViewModel`: pin, tick mỗi phút, hết giờ, tiệm cận 3 giây, âm thanh, chạm 2 lần.
+  - Logic chuyển vào `AodViewModel`: pin, tick mỗi phút (giờ hiện tại và dịch vị trí), ẩn dòng gợi ý sau 3 giây, hết giờ, tiệm cận 3 giây, âm thanh, chạm 2 lần.
+  - `AodContent` chỉ vẽ theo state, không còn tự đếm giờ (`produceState`) hay hẹn giờ ẩn dòng gợi ý.
   - Activity chỉ còn cờ cửa sổ, độ sáng, ẩn thanh hệ thống, và chuyển sang đen theo `state.isDark`.
 - `AodSession`: `object` → Koin `single`. `isCovered` đọc từ `ProximityManager`.
 - Các file khác:
   - `ProximityGate` → `ProximityManager` cộng `AodViewModel`.
-  - `MiuiPerm` → `PermissionManager` cộng `MainScreen`.
-  - `SystemPages` → `utils/ContextExt.kt` cộng `MainScreen`.
+  - `MiuiPerm` → `PermissionManager` (đọc quyền) cộng `utils/ContextExt.kt` (`openMiuiPermissionEditor`).
+  - `SystemPages` → `utils/ContextExt.kt` (`registerSystemReceiver`, `openSettingsPage`, `openOverlaySettings`, `openNotificationSettings`, `packageUri`).
+- File Compose không còn hằng số top-level:
+  - Pattern giờ, ngày → `strings.xml` (`translatable="false"`).
+  - Bước và giới hạn thanh trượt → companion của `AodOptionsUiModel`.
+  - Trạng thái quyền → `PermissionStatusValue`.
+  - Intent của trang "Quyền khác" (Xiaomi) → `utils/ContextExt.kt`.
+  - Thời lượng animation viết inline (`tween(durationMillis = …)`).
 - Hằng số `_MS` → `_MILLIS`, giữ nguyên giá trị.
 - Theme:
   - `FakeAodTheme` → `AppTheme` của base, cùng bảng màu. Màu thành token trong `Color.kt`.

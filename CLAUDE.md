@@ -60,14 +60,14 @@ com.decoutkhanqindev.custom_aod/
 │   │   ├── proximity/             #   ProximityManager      — cảm biến tiệm cận
 │   │   └── permission/            #   PermissionManager     — overlay, thông báo, quyền riêng của Xiaomi
 │   └── repository/                # XxxRepositoryImpl : XxxRepository
-├── utils/                         # CoroutineExt · NavExt (navigateTo) · ContextExt (showToast, registerSystemReceiver) · Tag
+├── utils/                         # CoroutineExt · NavExt (navigateTo) · ContextExt (showToast, registerSystemReceiver, mở trang cài đặt) · Tag
 └── presentation/
     ├── MainActivity.kt            # requestConsent, áp locale (AppLanguageProvider), AppTheme, start AodService
     ├── aod/                       # runtime AOD: AodActivity · AodService · AodSession · BootReceiver (mục 20)
     ├── base/BaseViewModel.kt      # MVI <State, Intent, Effect>
     ├── components/                # Modifiers · AppLottie · AppLanguageProvider · dialog/NoInternetDialog
     ├── effects/                   # LaunchedWithLifecycleEffect (collect flow theo lifecycle)
-    ├── model/                     # UiModel · LanguageValue · AnimationContentKey · PermissionValue · WakeResultValue
+    ├── model/                     # UiModel · LanguageValue · AnimationContentKey · PermissionValue · PermissionStatusValue · WakeResultValue
     ├── navigation/                # AppDestinations (NavKey) · AppNavDisplay (+ NoInternetDialog)
     ├── screens/<feature>/         # XxxScreen · XxxContent · XxxViewModel · state/{XxxState, XxxIntent, XxxEffect}
     │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, xem thử
@@ -261,7 +261,7 @@ Rule:
 | Package | lowercase, nhiều từ → snake_case | `ad_unit` |
 | Token màu | PascalCase mô tả giá trị, alpha `<Base>Alpha<percent>` | `WhiteAlpha30` |
 | String | snake_case theo nội dung; prefix màn khi trùng/mơ hồ | `no_internet_connection` |
-| Hằng số | `UPPER_SNAKE_CASE` `const val` (`companion object` trong class, `private const val` trong file) | `LOAD_TIMEOUT` |
+| Hằng số | `UPPER_SNAKE_CASE` `const val` (`companion object` trong class, `private const val` trong file **không phải Compose**; file Compose không có hằng số top-level — xem mục 15) | `LOAD_TIMEOUT` |
 
 ---
 
@@ -588,6 +588,7 @@ fun MainScreen() {
 | Điều hướng | `NavBackStack.navigateTo(dest, preserveState)` | `utils/NavExt.kt` |
 | Toast | `context.showToast(message)` | `utils/ContextExt.kt` |
 | Đăng ký receiver cho broadcast hệ thống (`RECEIVER_NOT_EXPORTED` từ Android 13; receiver `null` = đọc broadcast sticky) | `context.registerSystemReceiver(receiver, filter)` | `utils/ContextExt.kt` |
+| Mở trang cài đặt hệ thống (Context của Activity; ROM không có trang đó thì mở Thông tin ứng dụng) | `context.openSettingsPage(intent)` · `context.openOverlaySettings()` · `context.openNotificationSettings()` · `context.openMiuiPermissionEditor()` · `context.packageUri()` | `utils/ContextExt.kt` |
 | Áp ngôn ngữ đã chọn cho một Activity (`LocalConfiguration` / `LocalResources`) | `AppLanguageProvider(languageCode, languageManager) { }` | `components/AppLanguageProvider.kt` |
 | Tag log | `: Tag` → `Timber.tag(tag)` | `utils/Tag.kt` |
 | Khung màn MVI | copy `screens/main/` | `presentation/screens/main/` |
@@ -597,6 +598,12 @@ Quy tắc:
 - Component dùng chung không tự `koinInject`/`koinViewModel`; nhận data + callback qua tham số.
 - Không copy-paste: logic giữa ViewModel → UseCase; UI giữa màn → component; giá trị lặp → token/`const val`.
 - Không tạo top-level `val` trung gian dùng 1 lần → inline (trừ token theme, `const val` cho magic number, giá trị tính sẵn để khỏi tính lại mỗi frame).
+- **File Compose (Screen / Content / component) không khai báo `val`, `const val` hay class phụ ở top-level:**
+  - Số chỉ phục vụ UI viết inline, có tên tham số: `tween(durationMillis = 600)`, `20.dp`.
+  - Hằng số của logic → `companion object` của ViewModel (vd `HINT_VISIBLE_MILLIS`); của model → companion của UiModel (vd `AodOptionsUiModel.TIMEOUT_STEP_MINUTES`).
+  - Pattern định dạng → `strings.xml` với `translatable="false"`.
+  - Intent / hằng số của hệ thống → hàm trong `utils/ContextExt.kt`.
+  - Code cũ của base còn 2 chỗ chưa đổi: `ShimmerCosA` / `ShimmerSinA` trong `Modifiers.kt`, `NativeAdColors` trong `NativeAdView.kt`. Token theme trong `presentation/theme/` không tính.
 
 ## 16. Resources
 
@@ -710,7 +717,7 @@ hết giờ · trong túi · pin yếu ─▶ đen ─▶ giờ chờ của máy
 | `presentation/aod/AodActivity` | Host của `AodScreen`. Giữ mọi thao tác cửa sổ: cờ, độ sáng, ẩn thanh hệ thống, `renderDark()`. Áp ngôn ngữ bằng `AppLanguageProvider` |
 | `presentation/aod/AodSession` | Koin `single`, chỉ dùng trên main thread. `WeakReference` tới `AodActivity`; `isShowing`, `isCovered`, `shownAt`, sleep request; `finish()` đóng AOD ngay |
 | `presentation/aod/BootReceiver` | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` → start service nếu đang bật (`goAsync()` trong lúc đọc DataStore) |
-| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; dịch vị trí mỗi phút) · `AodContent` (đồng hồ) · `AodScreen` (collect effect, chuyển `isDark` cho Activity) |
+| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ và dịch vị trí; ẩn dòng gợi ý sau 3 giây) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ) · `AodScreen` (collect effect, chuyển `isDark` cho Activity) |
 | `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
 | `data/device/*` | `ScreenStateManager` · `BatteryStateManager` · `AudioStateManager` · `ProximityManager` · `PermissionManager` (mục 2) |
 | `DataStoreManager` | Tuỳ chọn AOD, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |

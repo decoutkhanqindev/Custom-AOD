@@ -6,4 +6,12 @@ import androidx.compose.runtime.Immutable
 data class PermissionUiModel(
     val permission: PermissionValue,
     val isGranted: Boolean?,
-)
+) {
+    val status: PermissionStatusValue
+        get() = when {
+            isGranted == true -> PermissionStatusValue.GRANTED
+            isGranted == null -> PermissionStatusValue.UNKNOWN
+            permission.isRequired -> PermissionStatusValue.MISSING_REQUIRED
+            else -> PermissionStatusValue.MISSING_OPTIONAL
+        }
+}

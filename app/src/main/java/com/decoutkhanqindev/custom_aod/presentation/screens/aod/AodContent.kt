@@ -17,14 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -46,8 +41,8 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.Grey5A
 import com.decoutkhanqindev.custom_aod.presentation.theme.Grey6E
 import com.decoutkhanqindev.custom_aod.presentation.theme.Grey8A
 import com.decoutkhanqindev.custom_aod.presentation.theme.GreyB4
-import kotlinx.coroutines.delay
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -59,12 +54,12 @@ fun AodContent(
     val currentOnIntent by rememberUpdatedState(onIntent)
     val shiftX by animateDpAsState(
         targetValue = state.shiftXDp.dp,
-        animationSpec = tween(durationMillis = SHIFT_ANIMATION_MILLIS),
+        animationSpec = tween(durationMillis = 1_500),
         label = "AodShiftX",
     )
     val shiftY by animateDpAsState(
         targetValue = state.shiftYDp.dp,
-        animationSpec = tween(durationMillis = SHIFT_ANIMATION_MILLIS),
+        animationSpec = tween(durationMillis = 1_500),
         label = "AodShiftY",
     )
 
@@ -86,7 +81,7 @@ fun AodContent(
                 modifier = Modifier.offset { IntOffset(x = shiftX.roundToPx(), y = shiftY.roundToPx()) },
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                AodClock()
+                AodClock(nowMillis = state.nowMillis)
 
                 state.battery?.let { battery ->
                     Spacer(modifier = Modifier.height(20.dp))
@@ -101,24 +96,23 @@ fun AodContent(
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))
-                AodExitHint()
+                AodExitHint(isVisible = state.isHintVisible)
             }
         }
     }
 }
 
 @Composable
-private fun AodClock() {
+private fun AodClock(nowMillis: Long) {
     val context = LocalContext.current
     val locale = LocalConfiguration.current.locales[0]
-    val now by rememberNow()
-    val timeFormatter = remember(context, locale) {
-        DateTimeFormatter.ofPattern(
-            if (DateFormat.is24HourFormat(context)) TIME_PATTERN_24H else TIME_PATTERN_12H,
-            locale,
-        )
-    }
-    val dateFormatter = remember(locale) { DateTimeFormatter.ofPattern(DATE_PATTERN, locale) }
+    val timePattern = stringResource(
+        if (DateFormat.is24HourFormat(context)) R.string.aod_time_pattern_24h else R.string.aod_time_pattern_12h,
+    )
+    val datePattern = stringResource(R.string.aod_date_pattern)
+    val timeFormatter = remember(timePattern, locale) { DateTimeFormatter.ofPattern(timePattern, locale) }
+    val dateFormatter = remember(datePattern, locale) { DateTimeFormatter.ofPattern(datePattern, locale) }
+    val now = remember(nowMillis) { Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault()) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
@@ -139,25 +133,10 @@ private fun AodClock() {
 }
 
 @Composable
-private fun rememberNow(): State<LocalDateTime> = produceState(initialValue = LocalDateTime.now()) {
-    while (true) {
-        delay(MINUTE_MILLIS - System.currentTimeMillis() % MINUTE_MILLIS + TICK_SLACK_MILLIS)
-        value = LocalDateTime.now()
-    }
-}
-
-@Composable
-private fun AodExitHint() {
-    var isVisible by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        delay(HINT_VISIBLE_MILLIS)
-        isVisible = false
-    }
-
+private fun AodExitHint(isVisible: Boolean) {
     val alpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = HINT_FADE_MILLIS),
+        animationSpec = tween(durationMillis = 600),
         label = "AodExitHint",
     )
 
@@ -169,20 +148,14 @@ private fun AodExitHint() {
     )
 }
 
-private const val TIME_PATTERN_24H = "HH:mm"
-private const val TIME_PATTERN_12H = "h:mm"
-private const val DATE_PATTERN = "EEE, d MMM"
-private const val MINUTE_MILLIS = 60_000L
-private const val TICK_SLACK_MILLIS = 50L
-private const val HINT_VISIBLE_MILLIS = 3_000L
-private const val HINT_FADE_MILLIS = 600
-private const val SHIFT_ANIMATION_MILLIS = 1_500
-
 @Preview(widthDp = 360, heightDp = 720)
 @Composable
 private fun AodContentPreview() {
     AodContent(
-        state = AodState(battery = BatteryUiModel(percent = 72, isCharging = false)),
+        state = AodState(
+            nowMillis = System.currentTimeMillis(),
+            battery = BatteryUiModel(percent = 72, isCharging = false),
+        ),
         onIntent = {},
     )
 }

@@ -5,8 +5,10 @@ import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
 
 @Immutable
 data class AodState(
+    val nowMillis: Long = 0L,
     val battery: BatteryUiModel? = null,
     val shiftXDp: Int = 0,
     val shiftYDp: Int = 0,
+    val isHintVisible: Boolean = true,
     val isDark: Boolean = false,
 )
