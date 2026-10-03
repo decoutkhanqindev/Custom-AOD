@@ -52,12 +52,12 @@ fun AodContent(
     modifier: Modifier = Modifier,
 ) {
     val currentOnIntent by rememberUpdatedState(onIntent)
-    val shiftX by animateDpAsState(
+    val shiftX = animateDpAsState(
         targetValue = state.shiftXDp.dp,
         animationSpec = tween(durationMillis = 1_500),
         label = "AodShiftX",
     )
-    val shiftY by animateDpAsState(
+    val shiftY = animateDpAsState(
         targetValue = state.shiftYDp.dp,
         animationSpec = tween(durationMillis = 1_500),
         label = "AodShiftY",
@@ -78,7 +78,12 @@ fun AodContent(
             exit = fadeOut(),
         ) {
             Column(
-                modifier = Modifier.offset { IntOffset(x = shiftX.roundToPx(), y = shiftY.roundToPx()) },
+                modifier = Modifier.offset {
+                    IntOffset(
+                        x = shiftX.value.roundToPx(),
+                        y = shiftY.value.roundToPx()
+                    )
+                },
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 AodClock(nowMillis = state.nowMillis)
@@ -110,9 +115,15 @@ private fun AodClock(nowMillis: Long) {
         if (DateFormat.is24HourFormat(context)) R.string.aod_time_pattern_24h else R.string.aod_time_pattern_12h,
     )
     val datePattern = stringResource(R.string.aod_date_pattern)
-    val timeFormatter = remember(timePattern, locale) { DateTimeFormatter.ofPattern(timePattern, locale) }
-    val dateFormatter = remember(datePattern, locale) { DateTimeFormatter.ofPattern(datePattern, locale) }
-    val now = remember(nowMillis) { Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault()) }
+    val timeFormatter = remember(timePattern, locale) {
+        DateTimeFormatter.ofPattern(timePattern, locale)
+    }
+    val dateFormatter = remember(datePattern, locale) {
+        DateTimeFormatter.ofPattern(datePattern, locale)
+    }
+    val now = remember(nowMillis) {
+        Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault())
+    }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
@@ -134,7 +145,7 @@ private fun AodClock(nowMillis: Long) {
 
 @Composable
 private fun AodExitHint(isVisible: Boolean) {
-    val alpha by animateFloatAsState(
+    val alpha = animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
         animationSpec = tween(durationMillis = 600),
         label = "AodExitHint",
@@ -142,7 +153,7 @@ private fun AodExitHint(isVisible: Boolean) {
 
     Text(
         text = stringResource(R.string.aod_hint),
-        modifier = Modifier.alpha(alpha),
+        modifier = Modifier.alpha(alpha.value),
         color = Grey5A,
         fontSize = 12.sp,
     )

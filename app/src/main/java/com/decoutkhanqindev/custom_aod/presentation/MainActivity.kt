@@ -48,10 +48,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val selectedLangCode by dataStoreManager.selectedLangCode.collectAsStateWithLifecycle()
 
-            AppLanguageProvider(
-                languageCode = LanguageValue.fromCode(selectedLangCode).code,
-                languageManager = languageManager,
-            ) {
+            AppLanguageProvider(languageCode = LanguageValue.fromCode(selectedLangCode).code) {
                 AppTheme {
                     AppNavDisplay(modifier = Modifier.fillMaxSize())
                 }

@@ -6,13 +6,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
+import org.koin.compose.koinInject
 
 @Composable
 fun AppLanguageProvider(
     languageCode: String,
-    languageManager: LanguageManager,
     content: @Composable () -> Unit,
 ) {
+    val languageManager: LanguageManager = koinInject()
     val configuration = remember(languageCode) {
         languageManager.configurationFor(languageCode)
     }

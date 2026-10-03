@@ -47,10 +47,7 @@ class AodActivity : ComponentActivity() {
         setContent {
             val selectedLangCode by dataStoreManager.selectedLangCode.collectAsStateWithLifecycle()
 
-            AppLanguageProvider(
-                languageCode = LanguageValue.fromCode(selectedLangCode).code,
-                languageManager = languageManager,
-            ) {
+            AppLanguageProvider(languageCode = LanguageValue.fromCode(selectedLangCode).code) {
                 AodScreen(
                     isPreview = isPreview,
                     onDarkChange = ::renderDark,
