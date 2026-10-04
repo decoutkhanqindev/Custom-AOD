@@ -103,6 +103,12 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
+        MainNotificationsSection(
+            options = state.notificationOptions,
+            isAccessGranted = state.isNotificationAccessGranted,
+            onIntent = onIntent,
+        )
+
         MainRulesSection(
             rules = state.rules,
             editingScheduleTime = state.editingScheduleTime,
@@ -132,7 +138,7 @@ private fun MainSettings(
     }
 }
 
-@Preview(widthDp = 360, heightDp = 1600)
+@Preview(widthDp = 360, heightDp = 1900)
 @Composable
 private fun MainContentPreview() {
     AppTheme {
@@ -146,6 +152,7 @@ private fun MainContentPreview() {
                     PermissionUiModel(permission = PermissionValue.MIUI_LOCK_SCREEN, isGranted = false),
                     PermissionUiModel(permission = PermissionValue.MIUI_BACKGROUND_POPUP, isGranted = null),
                     PermissionUiModel(permission = PermissionValue.NOTIFICATIONS, isGranted = false),
+                    PermissionUiModel(permission = PermissionValue.NOTIFICATION_ACCESS, isGranted = false),
                 ),
                 language = LanguageUiModel(language = LanguageValue.ENGLISH, displayName = "English"),
                 lastWakeMessageRes = WakeResultValue.OK.messageRes,

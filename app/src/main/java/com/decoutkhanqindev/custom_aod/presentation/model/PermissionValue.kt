@@ -32,4 +32,11 @@ enum class PermissionValue(
         descriptionRes = R.string.perm_notif_desc,
         isRequired = false,
     ),
+
+    // Chỉ cho icon thông báo, viền sáng và điều khiển nhạc; đồng hồ vẫn chạy khi thiếu.
+    NOTIFICATION_ACCESS(
+        titleRes = R.string.perm_notif_access_title,
+        descriptionRes = R.string.perm_notif_access_desc,
+        isRequired = false,
+    ),
 }

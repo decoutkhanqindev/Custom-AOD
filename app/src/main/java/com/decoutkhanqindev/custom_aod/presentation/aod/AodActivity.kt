@@ -9,6 +9,8 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.ui.ComposeUiFlags
+import androidx.compose.ui.ExperimentalComposeUiApi
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.components.AppLanguageProvider
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.AodScreen
@@ -23,7 +25,9 @@ class AodActivity : ComponentActivity() {
     private var normalBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isDark = false
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        ComposeUiFlags.isBypassUnfocusableComposeViewEnabled = false
         super.onCreate(savedInstanceState)
         // Cờ cửa sổ, không dùng android:turnScreenOn/setTurnScreenOn: màn hình chỉ sáng khi cửa sổ đã che màn hình khoá, nên màn hình khoá không loé lên và nhận diện khuôn mặt không chạy.
         @Suppress("DEPRECATION")

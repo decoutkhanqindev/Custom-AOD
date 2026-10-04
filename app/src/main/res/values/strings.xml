@@ -30,6 +30,8 @@
   <string name="perm_popup_desc">Under Other permissions, allow Open new windows while running in the background, only if the clock still does not appear.</string>
   <string name="perm_notif_title">Notifications</string>
   <string name="perm_notif_desc">Only shows the notification that the app is running.</string>
+  <string name="perm_notif_access_title">Notification access</string>
+  <string name="perm_notif_access_desc">Shows notification icons, the edge glow and music controls on the clock. The clock works without it.</string>
 
   <string name="permission_state_granted">Granted</string>
   <string name="permission_state_missing">Not granted</string>
@@ -40,6 +42,12 @@
   <string name="opt_proximity">Go dark in a pocket or face down</string>
   <string name="opt_timeout_never">Go dark after: never</string>
   <string name="opt_timeout_value">Go dark after: %1$d min</string>
+
+  <string name="section_notifications">Notifications on the clock</string>
+  <string name="notification_access_needed">Needs Notification access under Permissions.</string>
+  <string name="opt_notification_icons">Show notification icons</string>
+  <string name="opt_edge_glow">Glow the screen edges for new notifications</string>
+  <string name="opt_media_controls">Music controls</string>
 
   <string name="section_rules">When to show</string>
   <string name="opt_charging_rule">Power</string>
@@ -74,4 +82,9 @@
   <string name="aod_hint">Double-tap to exit</string>
   <string name="aod_battery" translatable="false">%1$d%%</string>
   <string name="aod_battery_charging">Charging · %1$d%%</string>
+  <string name="aod_notifications_overflow" translatable="false">+%1$d</string>
+  <string name="aod_media_previous">Previous</string>
+  <string name="aod_media_play">Play</string>
+  <string name="aod_media_pause">Pause</string>
+  <string name="aod_media_next">Next</string>
 </resources>

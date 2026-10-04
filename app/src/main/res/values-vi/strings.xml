@@ -28,6 +28,8 @@
   <string name="perm_popup_desc">Trong Quyền khác, cho phép Mở cửa sổ mới khi đang chạy nền, chỉ khi đồng hồ vẫn không hiện.</string>
   <string name="perm_notif_title">Thông báo</string>
   <string name="perm_notif_desc">Chỉ để hiện thông báo ứng dụng đang chạy.</string>
+  <string name="perm_notif_access_title">Truy cập thông báo</string>
+  <string name="perm_notif_access_desc">Để hiện biểu tượng thông báo, viền sáng và điều khiển nhạc trên đồng hồ. Đồng hồ vẫn chạy khi không có quyền này.</string>
 
   <string name="permission_state_granted">Đã cấp</string>
   <string name="permission_state_missing">Chưa cấp</string>
@@ -38,6 +40,12 @@
   <string name="opt_proximity">Tối màn hình khi máy ở trong túi hoặc bị úp</string>
   <string name="opt_timeout_never">Tối màn hình sau: không bao giờ</string>
   <string name="opt_timeout_value">Tối màn hình sau: %1$d phút</string>
+
+  <string name="section_notifications">Thông báo trên đồng hồ</string>
+  <string name="notification_access_needed">Cần quyền Truy cập thông báo ở mục Quyền.</string>
+  <string name="opt_notification_icons">Hiện biểu tượng thông báo</string>
+  <string name="opt_edge_glow">Viền sáng khi có thông báo mới</string>
+  <string name="opt_media_controls">Điều khiển nhạc</string>
 
   <string name="section_rules">Khi nào hiện</string>
   <string name="opt_charging_rule">Nguồn điện</string>
@@ -66,4 +74,8 @@
   <!-- AOD -->
   <string name="aod_hint">Chạm 2 lần để thoát</string>
   <string name="aod_battery_charging">Đang sạc · %1$d%%</string>
+  <string name="aod_media_previous">Bài trước</string>
+  <string name="aod_media_play">Phát</string>
+  <string name="aod_media_pause">Tạm dừng</string>
+  <string name="aod_media_next">Bài tiếp theo</string>
 </resources>

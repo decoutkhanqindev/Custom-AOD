@@ -4,6 +4,33 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-04 – Giai đoạn 2: thông báo trên đồng hồ
+
+Ba tính năng dùng chung quyền "Truy cập thông báo" (`NotificationListenerService`): icon thông báo, viền sáng khi có thông báo mới, điều khiển nhạc. Không thêm thư viện và không thêm `uses-permission`; listener chỉ được khai báo là service do hệ thống bind. Bản này build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 19–23).
+
+### Thêm
+
+- `AodNotificationListener` (`presentation/aod/`): `NotificationListenerService`, hệ thống chỉ bind khi user đã cấp quyền. Callback chỉ đọc danh sách thông báo đang có và `RankingMap` rồi chuyển cho manager.
+- `NotificationStateManager` (`data/device/notification/`):
+  - Lọc thông báo như màn hình chờ của hệ thống: bỏ thông báo của chính app, thường trực, tóm tắt nhóm, thông báo nhạc, im lặng, bị Không làm phiền ẩn khỏi màn hình chờ, ẩn trên màn hình khóa, của app bị tạm ngưng.
+  - Nạp sẵn icon trên một luồng nền, cache theo (package, resource), để khung đầu tiên của đồng hồ đã có icon.
+  - `alerts`: báo thông báo mới, hoặc cập nhật không đặt "chỉ báo một lần", khi không bị Không làm phiền chặn.
+  - `mediaSessionToken`: phiên nhạc của thông báo nhạc mới nhất.
+- `MediaStateManager` (`data/device/media/`): `MediaController` từ token đó (không cần quyền riêng), cho tên bài, nghệ sĩ, đang phát, và Phát/Tạm dừng, Bài trước, Bài tiếp theo.
+- Màn đồng hồ:
+  - Hàng icon dưới ngày, mỗi app một icon, tối đa 5, còn lại "+N". Chỉ icon, không nội dung.
+  - Viền sáng ở 4 cạnh, nhấp nháy khoảng 4 giây theo màu của app (không đặt hoặc quá tối thì dùng màu mint), chỉ khi đồng hồ không tối.
+  - Tên bài, nghệ sĩ và 3 nút nhạc; nút bị bỏ qua khi cảm biến tiệm cận đang bị che, như chạm 2 lần.
+- Màn cài đặt:
+  - Mục "Thông báo trên đồng hồ" với 3 công tắc, mặc định bật (keys `is_aod_notification_icons_enabled`, `is_aod_edge_glow_enabled`, `is_aod_media_controls_enabled`), kèm dòng nhắc khi chưa có quyền.
+  - Dòng quyền "Truy cập thông báo" (không bắt buộc), mở thẳng trang bật quyền của app (`openNotificationListenerSettings`, ROM không có trang đó thì mở danh sách).
+- `CLAUDE.md`: 2 manager mới và ngoại lệ của chúng (mục 2), luồng và thành phần (mục 20.1, 20.2), bất biến 20–24.
+
+### Thay đổi
+
+- `AodViewModel` nhận thêm `NotificationStateManager` và `MediaStateManager`. Chạm 2 lần và nút nhạc cùng bị bỏ qua khi cảm biến tiệm cận đang bị che.
+- Màn Main có thêm `MainNotificationsSection`; `MainState` có `notificationOptions` và `isNotificationAccessGranted`.
+
 ## [Chưa phát hành] – 2026-10-04 – Giai đoạn 1: quy tắc hiện, độ sáng, ô Cài đặt nhanh, ngôn ngữ
 
 Năm tính năng đầu trong danh sách còn thiếu so với Always On AMOLED ([COMPARISON.md](COMPARISON.md)). Không thêm quyền và thư viện nào. Bản này build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 1 và 14–18).

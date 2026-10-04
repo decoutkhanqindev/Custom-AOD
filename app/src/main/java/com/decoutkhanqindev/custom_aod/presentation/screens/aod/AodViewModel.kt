@@ -1,14 +1,21 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.aod
 
+import androidx.annotation.ColorInt
 import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.data.device.audio.AudioStateManager
 import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
+import com.decoutkhanqindev.custom_aod.data.device.media.MediaStateManager
+import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStateManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.currentAodNotificationOptions
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
+import com.decoutkhanqindev.custom_aod.presentation.model.glowColorArgb
+import com.decoutkhanqindev.custom_aod.presentation.model.toAodNotificationsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
@@ -32,6 +39,8 @@ class AodViewModel(
     private val batteryStateManager: BatteryStateManager,
     private val audioStateManager: AudioStateManager,
     private val proximityManager: ProximityManager,
+    private val notificationStateManager: NotificationStateManager,
+    private val mediaStateManager: MediaStateManager,
 ) : BaseViewModel<AodState, AodIntent, AodEffect>(
     initialState = initialState(batteryStateManager),
 ), Tag {
@@ -41,6 +50,7 @@ class AodViewModel(
     private val timeoutMinutes =
         dataStoreManager.aodTimeoutMinutes.value ?: DataStoreManager.DEFAULT_AOD_TIMEOUT_MINUTES
     private val rules = dataStoreManager.currentAodRules()
+    private val notificationOptions = dataStoreManager.currentAodNotificationOptions()
 
     // Tối vì bị che (khác với hết giờ, pin yếu, ngoài quy tắc): chỉ trường hợp này mới sáng lại khi lấy máy ra.
     private var isDarkUntilUncovered = false
@@ -48,11 +58,16 @@ class AodViewModel(
     private var isPlugged = batteryStateManager.readIsPlugged()
     private var timeoutJob: Job? = null
     private var hintJob: Job? = null
+    private var glowJob: Job? = null
 
     init {
         observeBattery()
         observePlugged()
         observeAudio()
+        // StateFlow nóng và viewModelScope chạy ngay trên main thread: icon và nhạc đã vào state trước khung đầu tiên.
+        if (notificationOptions.isIconsEnabled) observeNotifications()
+        if (notificationOptions.isEdgeGlowEnabled) observeAlerts()
+        if (notificationOptions.isMediaControlsEnabled) observeMedia()
         startMinuteTicks()
         scheduleHintHide()
         if (!isPreview) {
@@ -63,9 +78,13 @@ class AodViewModel(
 
     override fun onIntent(intent: AodIntent) {
         Timber.tag(tag).d("onIntent: $intent")
+        // Trong túi, vải cọ lên màn hình không được mở màn hình khoá hay bấm nút nhạc.
+        if (proximityManager.isNear.value) return
         when (intent) {
-            // Trong túi, vải cọ lên màn hình không được mở màn hình khoá.
-            is AodIntent.DoubleTap -> if (!proximityManager.isNear.value) requestClose()
+            is AodIntent.DoubleTap -> requestClose()
+            is AodIntent.MediaPlayPause -> mediaStateManager.playPause()
+            is AodIntent.MediaSkipPrevious -> mediaStateManager.skipToPrevious()
+            is AodIntent.MediaSkipNext -> mediaStateManager.skipToNext()
         }
     }
 
@@ -115,6 +134,36 @@ class AodViewModel(
         }
     }
 
+    private fun observeNotifications() {
+        viewModelScope.launch {
+            notificationStateManager.notifications.collectCatching(
+                action = { notifications ->
+                    updateState { copy(notifications = notifications.toAodNotificationsUiModel()) }
+                },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    // Đang tối thì không sáng viền: màn hình đen đang chờ giờ chờ của máy tắt.
+    private fun observeAlerts() {
+        viewModelScope.launch {
+            notificationStateManager.alerts.collectCatching(
+                action = { notification -> if (!state.value.isDark) glow(notification.glowColorArgb()) },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    private fun observeMedia() {
+        viewModelScope.launch {
+            mediaStateManager.playback.collectCatching(
+                action = { playback -> updateState { copy(media = playback?.toUiModel()) } },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
     private fun startMinuteTicks() {
         viewModelScope.launch {
             while (isActive) {
@@ -148,6 +197,15 @@ class AodViewModel(
                 delay(timeoutMinutes * MINUTE_MILLIS)
                 goDark()
             }
+        }
+    }
+
+    private fun glow(@ColorInt colorArgb: Int?) {
+        glowJob?.cancel()
+        updateState { copy(isGlowing = true, glowColorArgb = colorArgb) }
+        glowJob = viewModelScope.launch {
+            delay(GLOW_MILLIS)
+            updateState { copy(isGlowing = false) }
         }
     }
 
@@ -188,7 +246,8 @@ class AodViewModel(
         if (state.value.isDark) return
         isDarkUntilUncovered = isUntilUncovered
         timeoutJob?.cancel()
-        updateState { copy(isDark = true) }
+        glowJob?.cancel()
+        updateState { copy(isDark = true, isGlowing = false) }
     }
 
     // Lấy máy khỏi túi trước khi màn hình hết giờ chờ: hiện lại đồng hồ.
@@ -205,6 +264,7 @@ class AodViewModel(
         private const val TICK_SLACK_MILLIS = 50L
         private const val COVER_DELAY_MILLIS = 3_000L
         private const val HINT_VISIBLE_MILLIS = 3_000L
+        private const val GLOW_MILLIS = 4_000L
         private const val MAX_SHIFT_X_DP = 24
         private const val MAX_SHIFT_Y_DP = 64
 

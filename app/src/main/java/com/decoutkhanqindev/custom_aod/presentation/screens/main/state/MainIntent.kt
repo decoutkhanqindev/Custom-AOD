@@ -10,6 +10,9 @@ sealed interface MainIntent {
     data class ChangeBrightness(val percent: Int) : MainIntent
     data class ToggleProximity(val isEnabled: Boolean) : MainIntent
     data class ChangeTimeout(val minutes: Int) : MainIntent
+    data class ToggleNotificationIcons(val isEnabled: Boolean) : MainIntent
+    data class ToggleEdgeGlow(val isEnabled: Boolean) : MainIntent
+    data class ToggleMediaControls(val isEnabled: Boolean) : MainIntent
     data class ChangeChargingRule(val rule: ChargingRuleValue) : MainIntent
     data class ToggleSchedule(val isEnabled: Boolean) : MainIntent
     data class ShowScheduleTimePicker(val time: ScheduleTimeValue) : MainIntent

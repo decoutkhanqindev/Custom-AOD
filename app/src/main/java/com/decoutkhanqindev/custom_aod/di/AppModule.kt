@@ -3,6 +3,8 @@ package com.decoutkhanqindev.custom_aod.di
 import com.decoutkhanqindev.custom_aod.ads.AdsManager
 import com.decoutkhanqindev.custom_aod.data.device.audio.AudioStateManager
 import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
+import com.decoutkhanqindev.custom_aod.data.device.media.MediaStateManager
+import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStateManager
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
 import com.decoutkhanqindev.custom_aod.data.device.screen.ScreenStateManager
@@ -26,6 +28,8 @@ val managerModule = module {
     single { BatteryStateManager(androidApplication()) }
     single { AudioStateManager(androidApplication()) }
     single { ProximityManager(androidApplication()) }
+    single { NotificationStateManager(androidApplication()) }
+    single { MediaStateManager(androidApplication(), get()) }
 }
 
 val adsModule = module {
@@ -47,7 +51,7 @@ val useCaseModule = module {
 val viewModelModule = module {
     viewModel { MainViewModel(get(), get(), get()) }
     viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get()) }
-    viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get()) }
+    viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get(), get(), get()) }
 }
 
 val appModules = listOf(

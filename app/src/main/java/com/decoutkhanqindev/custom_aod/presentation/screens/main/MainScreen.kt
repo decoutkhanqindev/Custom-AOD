@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodActivity
+import com.decoutkhanqindev.custom_aod.presentation.aod.AodNotificationListener
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
 import com.decoutkhanqindev.custom_aod.presentation.navigation.LanguageDestination
@@ -42,6 +43,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                 is MainEffect.OpenOverlaySettings -> context.openOverlaySettings()
                 is MainEffect.OpenMiuiPermissionEditor -> context.openMiuiPermissionEditor()
                 is MainEffect.OpenNotificationSettings -> context.openNotificationSettings()
+                is MainEffect.OpenNotificationAccessSettings -> AodNotificationListener.openAccessSettings(context)
                 is MainEffect.RequestNotificationPermission ->
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)

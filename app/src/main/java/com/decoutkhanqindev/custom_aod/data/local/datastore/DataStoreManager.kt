@@ -82,6 +82,21 @@ class DataStoreManager(
     val aodScheduleEndMinute: StateFlow<Int?> =
         aodScheduleEndMinuteKey.asStateFlow(default = DEFAULT_AOD_SCHEDULE_END_MINUTE)
 
+    private val isAodNotificationIconsEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_NOTIFICATION_ICONS_ENABLED_KEY)
+    val isAodNotificationIconsEnabled: StateFlow<Boolean?> =
+        isAodNotificationIconsEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_NOTIFICATION_ICONS_ENABLED)
+
+    private val isAodEdgeGlowEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_EDGE_GLOW_ENABLED_KEY)
+    val isAodEdgeGlowEnabled: StateFlow<Boolean?> =
+        isAodEdgeGlowEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_EDGE_GLOW_ENABLED)
+
+    private val isAodMediaControlsEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_MEDIA_CONTROLS_ENABLED_KEY)
+    val isAodMediaControlsEnabled: StateFlow<Boolean?> =
+        isAodMediaControlsEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED)
+
     private val aodLastWakeKey: Preferences.Key<Int> = intPreferencesKey(AOD_LAST_WAKE_KEY)
     val aodLastWake: StateFlow<Int?> =
         aodLastWakeKey.asStateFlow(default = DEFAULT_AOD_LAST_WAKE)
@@ -139,6 +154,18 @@ class DataStoreManager(
         edit { prefs -> prefs[aodScheduleEndMinuteKey] = value }
     }
 
+    fun saveIsAodNotificationIconsEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodNotificationIconsEnabledKey] = value }
+    }
+
+    fun saveIsAodEdgeGlowEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodEdgeGlowEnabledKey] = value }
+    }
+
+    fun saveIsAodMediaControlsEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodMediaControlsEnabledKey] = value }
+    }
+
     fun saveAodLastWake(value: Int) {
         edit { prefs -> prefs[aodLastWakeKey] = value }
     }
@@ -185,6 +212,9 @@ class DataStoreManager(
         private const val IS_AOD_SCHEDULE_ENABLED_KEY = "is_aod_schedule_enabled"
         private const val AOD_SCHEDULE_START_MINUTE_KEY = "aod_schedule_start_minute"
         private const val AOD_SCHEDULE_END_MINUTE_KEY = "aod_schedule_end_minute"
+        private const val IS_AOD_NOTIFICATION_ICONS_ENABLED_KEY = "is_aod_notification_icons_enabled"
+        private const val IS_AOD_EDGE_GLOW_ENABLED_KEY = "is_aod_edge_glow_enabled"
+        private const val IS_AOD_MEDIA_CONTROLS_ENABLED_KEY = "is_aod_media_controls_enabled"
         private const val AOD_LAST_WAKE_KEY = "aod_last_wake"
         private const val IS_NOTIFICATIONS_ASKED_KEY = "is_notifications_asked"
         private const val DEFAULT_SELECTED_LANG_CODE = "en"
@@ -199,6 +229,9 @@ class DataStoreManager(
         const val DEFAULT_IS_AOD_SCHEDULE_ENABLED = true
         const val DEFAULT_AOD_SCHEDULE_START_MINUTE = 7 * 60
         const val DEFAULT_AOD_SCHEDULE_END_MINUTE = 23 * 60
+        const val DEFAULT_IS_AOD_NOTIFICATION_ICONS_ENABLED = true
+        const val DEFAULT_IS_AOD_EDGE_GLOW_ENABLED = true
+        const val DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED = true
         private const val DEFAULT_AOD_LAST_WAKE = 0
         private const val DEFAULT_IS_NOTIFICATIONS_ASKED = false
     }

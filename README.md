@@ -15,7 +15,7 @@ Tài liệu khác:
 
 ## Trạng thái kiểm thử
 
-Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy trên máy**. Lõi đã được viết lại theo MVI và manager, và giai đoạn 1 (quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ) mới được thêm (xem CHANGELOG), nên cần chạy lại toàn bộ mục "Kiểm tra trên máy thật".
+Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy trên máy**. Lõi đã được viết lại theo MVI và manager, giai đoạn 1 (quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ) và giai đoạn 2 (icon thông báo, viền sáng, điều khiển nhạc trên đồng hồ) mới được thêm (xem CHANGELOG), nên cần chạy lại toàn bộ mục "Kiểm tra trên máy thật".
 
 Kết quả của demo FakeAOD trước khi chuyển sang base:
 
@@ -28,7 +28,7 @@ Kết quả trên là của bản FakeAOD `targetSdk` 33. Bản `minSdk` 30 / `t
 
 Chưa kiểm tra:
 
-- Toàn bộ Custom AOD trên máy thật: Splash (consent, quảng cáo test), màn chọn ngôn ngữ, màn cài đặt, AOD, ô Cài đặt nhanh.
+- Toàn bộ Custom AOD trên máy thật: Splash (consent, quảng cáo test), màn chọn ngôn ngữ, màn cài đặt, AOD, ô Cài đặt nhanh, thông báo và nhạc trên đồng hồ.
 - Khởi động lại máy. Trên Xiaomi, app không xin quyền "Tự khởi chạy", xem mục "Giới hạn đã biết".
 - Khóa máy lâu, ví dụ qua đêm.
 - Cuộc gọi đến và báo thức reo khi đồng hồ đang hiện.
@@ -91,6 +91,9 @@ Lần đầu mở app trên Android 13 trở lên, app hỏi quyền thông báo
 | Xiaomi: Hiển thị trên màn hình khóa | Có | Thiếu quyền này, HyperOS giữ đồng hồ ở phía sau màn hình khóa |
 | Xiaomi: Mở cửa sổ mới khi chạy nền | Không | Trên HyperOS 1.0, đồng hồ vẫn mở được khi quyền này tắt. Chỉ bật nếu ROM khác chặn |
 | Thông báo | Không | Chỉ để hiện thông báo thường trực của service |
+| Truy cập thông báo | Không | Icon thông báo, viền sáng khi có thông báo mới và điều khiển nhạc trên đồng hồ. Thiếu quyền này đồng hồ vẫn chạy, chỉ không có 3 thứ đó |
+
+"Truy cập thông báo" là quyền đặc biệt, bật ở trang riêng của hệ thống (dòng "Truy cập thông báo" trong app mở thẳng trang đó). Từ Android 13, nếu APK được cài bằng cách mở file (không qua cửa hàng hay `adb install`), công tắc này có thể bị khóa ("Cài đặt bị hạn chế"): vào Thông tin ứng dụng › menu ⋮ › "Allow restricted settings" (tên tiếng Việt tùy máy) rồi bật lại.
 
 Không cần dịch vụ trợ năng, thông báo toàn màn hình, "Sửa đổi cài đặt hệ thống", "Không hạn chế pin" hay "Tự khởi chạy" của Xiaomi.
 
@@ -123,6 +126,8 @@ Danh sách sau khi gộp manifest của các thư viện (kiểm bằng `aapt2 d
 
 Thư viện androidx tự thêm một quyền nội bộ `com.decoutkhanqindev.custom_aod.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`.
 
+Hai service còn được bảo vệ bằng quyền của hệ thống, để chỉ hệ thống bind được. Đây không phải quyền app xin, nên không có trong danh sách trên: `AodTileService` (`BIND_QUICK_SETTINGS_TILE`), `AodNotificationListener` (`BIND_NOTIFICATION_LISTENER_SERVICE`).
+
 ## Cách dùng
 
 - **Mở app:** Splash xin consent (form UMP, chỉ hiện khi cần) rồi hiện quảng cáo xen kẽ (đang là id test của Google), sau đó vào màn hình chính. Splash cần mạng; mất mạng thì hộp thoại "Không có kết nối Internet" chặn màn hình.
@@ -137,6 +142,8 @@ Thư viện androidx tự thêm một quyền nội bộ `com.decoutkhanqindev.c
 - **Hết thời gian đã chọn, máy trong túi, pin yếu, hết khung giờ, hoặc cắm/rút sạc trái với quy tắc nguồn điện:** đồng hồ chuyển sang đen. Sau đó màn hình tự tắt theo thời gian chờ của máy.
 - **Ngoài khung giờ, sai quy tắc nguồn điện, hoặc pin dưới ngưỡng lúc màn hình tắt:** đồng hồ không hiện, màn hình tắt như bình thường.
 - **Nút "Xem thử" trong app:** hiện đồng hồ ngay mà không cần khóa máy.
+- **Thông báo** (cần quyền "Truy cập thông báo"): dưới ngày là icon của các app đang có thông báo, mỗi app một icon, tối đa 5, còn lại hiện "+N". Chỉ có icon, không có nội dung. Có thông báo mới khi đồng hồ đang hiện thì 4 cạnh màn hình sáng nhấp nháy khoảng 4 giây, theo màu của app đó.
+- **Nhạc** (cần quyền "Truy cập thông báo"): khi có app nhạc đang phát hoặc tạm dừng, đồng hồ hiện tên bài, nghệ sĩ và 3 nút Bài trước, Phát/Tạm dừng, Bài tiếp theo. Như chạm 2 lần, nút bị bỏ qua khi cảm biến tiệm cận đang bị che.
 
 Đồng hồ hiện giờ (theo định dạng 12 hoặc 24 giờ của máy), ngày, và phần trăm pin kèm trạng thái sạc. Dòng "Chạm 2 lần để thoát" hiện 3 giây rồi mờ đi. Mỗi phút, nội dung dịch sang một vị trí ngẫu nhiên để chống burn-in.
 
@@ -153,6 +160,14 @@ Lưu trong `DataStoreManager` (file `custom_aod_prefs`), mỗi tùy chọn một
 | Độ sáng | `aod_brightness_percent` | 1% | Từ 1 đến 100%, đặt `screenBrightness` của cửa sổ đồng hồ bằng phần trăm / 100. 1% bằng mức "giảm độ sáng" của bản trước |
 | Tối màn hình khi máy ở trong túi hoặc bị úp | `is_aod_proximity_enabled` | Bật | Cảm biến tiệm cận bị che liên tục 3 giây thì đồng hồ chuyển sang đen |
 | Tối màn hình sau | `aod_timeout_minutes` | Không bao giờ | Từ 0 (không bao giờ) đến 120 phút, mỗi nấc 5 phút |
+
+Mục "Thông báo trên đồng hồ", chỉ có tác dụng khi đã cấp quyền "Truy cập thông báo":
+
+| Tùy chọn | Key | Mặc định | Tác dụng |
+|---|---|---|---|
+| Hiện biểu tượng thông báo | `is_aod_notification_icons_enabled` | Bật | Icon của app có thông báo, như thanh trạng thái. Bỏ thông báo thường trực, im lặng, thông báo nhạc, và thông báo bị ẩn trên màn hình khóa hoặc bị Không làm phiền ẩn khỏi màn hình chờ |
+| Viền sáng khi có thông báo mới | `is_aod_edge_glow_enabled` | Bật | Chỉ khi đồng hồ đang hiện (không tối) và thông báo không bị Không làm phiền chặn |
+| Điều khiển nhạc | `is_aod_media_controls_enabled` | Bật | Lấy từ thông báo nhạc mới nhất, như trình phát trên màn hình khóa của hệ thống |
 
 Mục "Khi nào hiện" (quy tắc). Đồng hồ chỉ hiện khi đủ mọi quy tắc:
 
@@ -181,6 +196,8 @@ màn hình tắt ──▶ AodService ──startActivity──▶ AodActivity (
 hết giờ / trong túi / sai quy tắc (pin yếu, hết khung giờ, nguồn điện) ──▶ đen hoàn toàn ──▶ hết thời gian chờ của máy ──▶ màn hình tắt, không mở lại
 
 ô Cài đặt nhanh ──▶ AodTileService ──▶ bật/tắt AodService (bị chặn ──▶ mở app để khởi động)
+
+thông báo ──▶ AodNotificationListener ──▶ NotificationStateManager ──▶ icon, viền sáng, nhạc trên đồng hồ
 ```
 
 Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20.1](CLAUDE.md#201-luồng).
@@ -197,7 +214,8 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/aod/BootReceiver.kt` | Chạy lại service sau khi khởi động máy hoặc cập nhật app |
 | `presentation/aod/AodTileService.kt` | Ô Cài đặt nhanh bật/tắt đồng hồ; mở app khi hệ thống không cho khởi động service |
 | `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, quy tắc hiện, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần |
-| `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (giờ, ngày, pin, gợi ý, dịch vị trí) và phần nối với ViewModel |
+| `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (giờ, ngày, icon thông báo, pin, nhạc, gợi ý, viền sáng, dịch vị trí) và phần nối với ViewModel |
+| `presentation/aod/AodNotificationListener.kt` | Nhận thông báo từ hệ thống (khi đã cấp "Truy cập thông báo") và chuyển cho `NotificationStateManager` |
 | `presentation/screens/main/` | Màn hình cài đặt (MVI): quyền, tùy chọn, quy tắc hiện, ngôn ngữ, xem thử; hỏi quyền thông báo ở lần mở đầu tiên. Mỗi mục một file `MainXxxSection.kt` |
 | `presentation/screens/language/` | Màn chọn ngôn ngữ (MVI): lần mở đầu tiên và từ màn hình cài đặt |
 | `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue` |
@@ -208,7 +226,9 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `data/device/battery/BatteryStateManager.kt` | Phần trăm pin, trạng thái sạc, có đang cắm nguồn |
 | `data/device/audio/AudioStateManager.kt` | Đang có chuông, cuộc gọi hoặc báo thức |
 | `data/device/proximity/ProximityManager.kt` | Cảm biến tiệm cận |
-| `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, và quyền riêng của Xiaomi |
+| `data/device/notification/NotificationStateManager.kt` | Lọc thông báo hiện được trên đồng hồ, nạp sẵn icon, báo thông báo mới, giữ phiên nhạc của thông báo nhạc mới nhất |
+| `data/device/media/MediaStateManager.kt` | Bài đang phát và các nút điều khiển nhạc |
+| `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, truy cập thông báo, và quyền riêng của Xiaomi |
 | `data/local/datastore/DataStoreManager.kt` | Lưu tùy chọn AOD cùng các prefs của base |
 | `utils/ContextExt.kt` | `registerSystemReceiver`; mở trang cài đặt: `openSettingsPage` (ROM không có trang đó thì mở Thông tin ứng dụng), `openOverlaySettings`, `openNotificationSettings`, `openMiuiPermissionEditor`; `packageUri` |
 | `res/values-v31/themes.xml` | Splash màu đen cho AOD trên Android 12+, thay vì icon app |
@@ -246,6 +266,7 @@ Từ FakeAOD sang Custom AOD:
 - **Kiểm tra sau khi mở (`checkLaunch`):** 2 giây sau mỗi lần mở, service xem đồng hồ có đang hiện và màn hình có sáng không. Kết quả hiện ở dòng cuối màn hình app. Nếu không, service đóng Activity, vì trên Xiaomi thiếu "Hiển thị trên màn hình khóa" thì Activity bị giấu sau màn hình khóa và sẽ hiện ra sau lần mở khóa kế tiếp.
 - **Không tự tắt màn hình:** app thường không có cách tắt màn hình, việc đó cần dịch vụ trợ năng hoặc quyền quản trị thiết bị. Khi cần kết thúc (hết giờ, trong túi, sai quy tắc hiện), AOD chuyển sang đen hoàn toàn ở độ sáng thấp nhất và bỏ `FLAG_KEEP_SCREEN_ON`. Sau đó thời gian chờ của máy sẽ tắt màn hình. Lần tắt đó được đánh dấu là chủ ý, nên AOD không mở lại. Trong túi, cảm biến tiệm cận đang bị che thì service cũng không bật lại màn hình khóa.
 - **Độ sáng:** chỉnh bằng `screenBrightness` của cửa sổ AOD (1–100%, hoặc theo hệ thống khi tắt độ sáng riêng), không cần quyền "Sửa đổi cài đặt hệ thống" và không đổi độ sáng của máy. Độ sáng được đặt trong `onCreate`, trước khi cửa sổ hiện, để khung đầu tiên đã đúng mức. Pin cũng được đọc đồng bộ lúc mở để khung đầu tiên có ngay dòng pin.
+- **Thông báo trên đồng hồ:** app chỉ nhận được thông báo qua `NotificationListenerService` do hệ thống bind, nên cần quyền "Truy cập thông báo". Thông báo được lọc giống màn hình chờ của hệ thống, và chỉ hiện icon vì đồng hồ nằm trên màn hình khóa. Icon được nạp sẵn ở luồng nền mỗi khi có thông báo, nên khung đầu tiên của đồng hồ đã có icon. Nhạc lấy từ phiên nhạc trong thông báo nhạc mới nhất, giống trình phát trên màn hình khóa của hệ thống; không hiện ảnh bìa vì sáng và dễ burn-in. Viền sáng vẽ bằng gradient vì làm mờ (`blur`) cần Android 12.
 - **Quy tắc hiện ở một chỗ:** nguồn điện, khung giờ và ngưỡng pin nằm trong `AodRulesUiModel.allows()`. Service gọi hàm này lúc màn hình tắt để quyết định có mở AOD không; `AodViewModel` gọi lại khi pin, nguồn cắm đổi và mỗi phút để chuyển AOD đang hiện sang đen. Không đọc được trạng thái pin hay nguồn cắm thì không chặn AOD.
 - **Ô Cài đặt nhanh mở app trên Android 15:** từ Android 15, app có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có cửa sổ nổi hiển thị, và ô Cài đặt nhanh không được miễn. Khi `startForegroundService` bị chặn, ô mở app (`startActivityAndCollapse`, mở khóa trước nếu đang khóa) và `MainActivity` khởi động service từ tiền cảnh. Tắt AOD từ ô thì chỉ cần dừng service, không cần mở app.
 - **Cuộc gọi và báo thức:** màn hình cuộc gọi, báo thức là Activity mở sau nên tự nằm trên AOD, và `noHistory` đóng AOD khi đó. App còn theo dõi `AudioManager` (`AudioStateManager`) để đóng sớm hơn, và không mở AOD khi đang có chuông, cuộc gọi hay báo thức. Không cần quyền `READ_PHONE_STATE`.
@@ -271,6 +292,11 @@ Từ FakeAOD sang Custom AOD:
 16. Khung giờ: đặt Bắt đầu và Kết thúc quanh giờ hiện tại (ví dụ đang 10:05, đặt 09:00–10:07). Khóa máy trước 10:07 thì đồng hồ hiện, tới 10:07 thì chuyển sang đen; khóa máy sau 10:07 thì đồng hồ không hiện. Thử thêm khung qua nửa đêm (Bắt đầu sau Kết thúc). Tắt "Chỉ hiện trong khung giờ": hiện cả ngày.
 17. Ô Cài đặt nhanh: thêm ô "Custom AOD", chạm để tắt rồi bật. Công tắc trong app đổi theo. Trên Android 15 trở lên, bật từ ô thì app mở lên (đang khóa máy thì hỏi mở khóa trước), sau đó khóa máy thì đồng hồ hiện. Trên Android 12–14 đã cấp quyền overlay thì bật được mà không mở app.
 18. Đổi ngôn ngữ ở "Ứng dụng › Ngôn ngữ": nút "Xong" chỉ bật khi chọn khác ngôn ngữ đang dùng; đổi xong, màn hình chính, đồng hồ và thông báo của service đổi theo.
+19. Cấp "Truy cập thông báo" từ dòng trong mục Quyền: trang hệ thống mở đúng công tắc của app; quay về app, dòng này chuyển sang "Đã cấp" và dòng nhắc trong mục "Thông báo trên đồng hồ" biến mất.
+20. Icon thông báo: tự gửi tin nhắn tới máy (vd Zalo, Messenger), khóa máy: icon của app hiện dưới ngày. Có thông báo từ hơn 5 app thì hiện "+N". Xóa thông báo rồi khóa lại: icon mất. Thông báo im lặng, thông báo thường trực (vd đang tải xuống) và thông báo của chính app không hiện.
+21. Viền sáng: khi đồng hồ đang hiện, gửi tin nhắn tới máy: 4 cạnh sáng nhấp nháy khoảng 4 giây. Bật Không làm phiền rồi gửi lại: không sáng. Đồng hồ đã chuyển sang đen thì không sáng.
+22. Nhạc: phát nhạc (Spotify, YouTube Music…) rồi khóa máy: hiện tên bài, nghệ sĩ và 3 nút; bấm Tạm dừng/Phát và Bài tiếp theo phải điều khiển đúng app. Che cảm biến tiệm cận rồi bấm: không có tác dụng.
+23. Tắt từng công tắc trong "Thông báo trên đồng hồ": lần AOD sau không còn phần tương ứng. Thu hồi "Truy cập thông báo": icon và nhạc biến mất, đồng hồ vẫn chạy.
 
 Lưu ý khi test trên máy ảo hoặc ngay sau khi vừa dùng app: trong 10 giây sau khi app vừa mở hoặc đóng một Activity, Android cho phép mở Activity từ nền mà không cần quyền gì (log ghi `BAL_ALLOW_GRACE_PERIOD`). Vì vậy đồng hồ có thể hiện dù chưa bật "Hiển thị trên ứng dụng khác". Muốn test đúng thì về màn hình chính, đợi hơn 10 giây rồi mới khóa máy.
 
@@ -302,6 +328,9 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
 - **Mã quyền của Xiaomi** (10020, 10021) không có tài liệu chính thức và có thể đổi theo phiên bản HyperOS. Khi đó app hiện dấu "?" thay vì trạng thái.
 - **Màn hình cài đặt cần mạng** (Splash chờ consent, hộp thoại mất mạng của base). AOD không cần mạng.
 - **Ô Cài đặt nhanh trên Android 15 trở lên** phải mở app mỗi lần bật AOD (xem "Các quyết định thiết kế"), đang khóa máy thì phải mở khóa trước.
+- **Thông báo bật lên (heads-up)** của hệ thống vẫn có thể hiện đè lên đồng hồ khi có thông báo mới; app không chặn được.
+- **Icon thông báo vẫn hiện khi đã tắt "Hiện thông báo trên màn hình khóa" của hệ thống** (chỉ icon, không nội dung). Thông báo hoặc kênh đặt ẩn hẳn trên màn hình khóa thì không hiện; riêng tùy chỉnh theo kênh chỉ đọc được từ Android 12. Muốn ẩn hết thì tắt "Hiện biểu tượng thông báo".
+- **Trên Xiaomi, phần thông báo cũng cần app đang chạy:** app bị đóng mà không có "Tự khởi chạy" thì hệ thống có thể không bind lại `AodNotificationListener` cho tới khi mở app.
 - **Form consent có thể hiện trên AOD** nếu nó tải xong đúng lúc AOD đang mở (rất hiếm), xem CLAUDE.md › 20.5.
 
 ## targetSdk 37
@@ -328,6 +357,7 @@ Nếu đưa lên Google Play:
 - Khai báo loại foreground service `specialUse` trong Play Console, gồm mô tả chức năng, ảnh hưởng nếu service bị hoãn hoặc bị ngắt, và video minh họa.
 - `targetSdk` 37 đã đạt yêu cầu tối thiểu 36 mà Play áp dụng từ 31/08/2026.
 - Có quảng cáo: khai báo "Chứa quảng cáo" và mục Data safety cho mã quảng cáo (`AD_ID`) mà Google Mobile Ads dùng.
+- `NotificationListenerService` đọc được mọi thông báo: mô tả trên Play nên nói rõ chức năng dùng nó (icon, viền sáng, nhạc trên đồng hồ), và chính sách quyền riêng tư nên ghi rằng dữ liệu thông báo chỉ được xử lý trên máy, không gửi đi đâu.
 
 ## Dựng từ Android-Base
 
@@ -367,8 +397,8 @@ admob.test.device.ids=HASH_1,HASH_2
 
 Các tính năng Always On AMOLED có mà app này chưa có được liệt kê trong [COMPARISON.md](COMPARISON.md). Ưu tiên gợi ý:
 
-- Hiện biểu tượng thông báo bằng `NotificationListenerService`.
 - Nhiều kiểu mặt đồng hồ, cho chọn font, màu và ảnh nền.
+- Tùy chọn hiện nội dung thông báo mới nhất (tên app, tiêu đề) cho ai không ngại hiện trên màn hình khóa.
 - Nhận diện cuộc gọi chắc chắn hơn bằng `READ_PHONE_STATE` và `TelephonyCallback`, nếu chấp nhận thêm một quyền.
 
-Đã làm ở giai đoạn 1: quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ.
+Đã làm ở giai đoạn 1: quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Giai đoạn 2: icon thông báo, viền sáng, điều khiển nhạc.

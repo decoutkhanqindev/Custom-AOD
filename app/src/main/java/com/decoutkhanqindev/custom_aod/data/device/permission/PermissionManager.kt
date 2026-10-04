@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
 import android.provider.Settings
+import androidx.core.app.NotificationManagerCompat
 
 class PermissionManager(
     private val app: Application,
@@ -24,6 +25,10 @@ class PermissionManager(
     fun needsNotificationPermission(): Boolean =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             app.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+
+    // "Truy cập thông báo" là quyền đặc biệt user bật trong Cài đặt, không có checkSelfPermission.
+    fun isNotificationListenerEnabled(): Boolean =
+        app.packageName in NotificationManagerCompat.getEnabledListenerPackages(app)
 
     fun isMiuiShowWhenLockedAllowed(): Boolean? = isMiuiOpAllowed(OP_MIUI_SHOW_WHEN_LOCKED)
 

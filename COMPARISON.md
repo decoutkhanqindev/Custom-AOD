@@ -47,7 +47,7 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | Kết thúc AOD (hết giờ, trong túi) | Bản 2017: `DevicePolicyManager.lockNow()` hoặc root [2017]. Bản hiện tại không có Device Admin [máy]; cách làm chưa rõ | Đồng hồ chuyển sang đen, rồi để thời gian chờ của máy tắt màn hình |
 | Cảm biến tiệm cận | Bản 2017: `PROXIMITY_SCREEN_OFF_WAKE_LOCK` [2017] | `ProximityManager` + `AodViewModel`: bị che 3 giây thì đen, lấy ra thì sáng lại |
 | Cuộc gọi | `CallReceiver` (`PHONE_STATE`, `NEW_OUTGOING_CALL`) cộng quyền `READ_PHONE_STATE` [máy] | `noHistory` cộng `AudioStateManager` (theo dõi `AudioManager`), không cần quyền |
-| Thông báo trên AOD | `NotificationListenerService` [máy] | Chưa có |
+| Thông báo trên AOD | `NotificationListenerService` [máy] | `AodNotificationListener` (`NotificationListenerService`) + `NotificationStateManager`: icon theo app, viền sáng, điều khiển nhạc qua phiên nhạc của thông báo nhạc |
 | Độ sáng | Không còn khai báo `WRITE_SETTINGS`, dù mô tả Play vẫn nhắc tới [Play] | `screenBrightness` của cửa sổ: 1–100%, hoặc theo hệ thống |
 | Quy tắc khi nào hiện | ? | `AodRulesUiModel.allows()` (nguồn điện, khung giờ, ngưỡng pin), kiểm lúc màn hình tắt và trong lúc AOD hiện |
 | Kiểm tra sau khi mở AOD | ? | `checkLaunch` sau 2 giây: ghi kết quả, dọn AOD bị giấu sau màn hình khóa |
@@ -69,7 +69,7 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | Quyền của AppLovin | ✓ | – | |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | ✓ | – | Custom AOD chạy được ở chế độ pin mặc định của HyperOS [FakeAOD] |
 | `READ_PHONE_STATE` | ✓ | – | Custom AOD nhận biết cuộc gọi qua `AudioManager` |
-| `BIND_NOTIFICATION_LISTENER_SERVICE` | ✓ | – | Thông báo trên AOD |
+| `BIND_NOTIFICATION_LISTENER_SERVICE` | ✓ | ✓ | Thông báo trên AOD. Ở Custom AOD đây là quyền bảo vệ service listener (chỉ hệ thống bind được), không phải quyền app xin, nên `aapt2` không đếm vào tổng |
 | `CAMERA` | ✓ | – | Đèn pin. `CameraManager.setTorchMode()` không cần quyền này |
 | `READ_CALENDAR`, `PACKAGE_USAGE_STATS`, `ACCESS_NOTIFICATION_POLICY`, `REORDER_TASKS`, `VIBRATE` | ✓ | – | Phục vụ các tính năng Custom AOD chưa có |
 | `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` | ✓ | – | Ảnh nền. Photo Picker không cần quyền |
@@ -106,9 +106,9 @@ Quyền riêng của Xiaomi:
 | Hiển thị | Giờ (12/24 giờ theo máy) | ✓ | ✓ |
 | | Ngày | ✓ | ✓ |
 | | Pin và trạng thái sạc | ✓ | ✓ |
-| | Thông báo: icon và nội dung | ✓ [Play] | ✗ |
-| | Viền sáng (edge glow) khi có thông báo mới | ✓ [Play] | ✗ |
-| | Điều khiển nhạc | ✓ [Play] | ✗ |
+| | Thông báo: icon và nội dung | ✓ [Play] | ⚠️ chỉ icon, mỗi app một icon (không hiện nội dung trên màn hình khóa) |
+| | Viền sáng (edge glow) khi có thông báo mới | ✓ [Play] | ✓ (theo màu của app, khoảng 4 giây) |
+| | Điều khiển nhạc | ✓ [Play] | ✓ (tên bài, nghệ sĩ, Bài trước / Phát–Tạm dừng / Bài tiếp theo) |
 | | Memo luôn hiện | ✓ [Play] | ✗ |
 | | Ghi chú, vẽ nhanh | ✓ [Play] | ✗ |
 | | Thời tiết | ✓ [Play] | ✗ |
@@ -154,8 +154,8 @@ Quyền riêng của Xiaomi:
 - **Ít quyền hơn:** 12 so với 31. Trong 12 quyền, 6 cho AOD và 6 cho quảng cáo và mạng của base. Không có analytics, Premium hay quyền điện thoại.
 - **Khác có chủ ý:** nút nguồn đưa về màn hình khóa thay vì mở lại AOD.
 - **Giai đoạn 1 (2026-10-04) đã thêm**, không cần quyền mới: luật theo sạc, lịch theo giờ, chỉnh mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Chưa chạy trên máy.
-- **Khoảng trống lớn nhất còn lại là tính năng hiển thị và tùy biến.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
-  1. Thông báo trên AOD (cần `NotificationListenerService`, thêm một quyền đặc biệt).
-  2. 3–4 mặt đồng hồ, chọn font và màu.
-  3. Cử chỉ vuốt và điều khiển nhạc (nhạc dùng chung `NotificationListenerService`).
-  4. Widget bật/tắt, tự giảm sáng theo cảm biến ánh sáng.
+- **Giai đoạn 2 (2026-10-04) đã thêm**, cần quyền đặc biệt "Truy cập thông báo": icon thông báo, viền sáng, điều khiển nhạc. Khác đối thủ: chỉ hiện icon, không hiện nội dung thông báo. Chưa chạy trên máy.
+- **Khoảng trống lớn nhất còn lại là giao diện và tương tác.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
+  1. 3–4 mặt đồng hồ, chọn font, màu, cỡ chữ, ảnh nền.
+  2. Cử chỉ vuốt, phím âm lượng, đèn pin, tự giảm sáng theo cảm biến ánh sáng.
+  3. Widget bật/tắt, tùy chọn hiện nội dung thông báo.

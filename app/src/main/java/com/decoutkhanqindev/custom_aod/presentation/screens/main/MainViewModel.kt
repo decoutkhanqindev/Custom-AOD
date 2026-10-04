@@ -5,6 +5,7 @@ import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
@@ -54,6 +55,9 @@ class MainViewModel(
             is MainIntent.ChangeBrightness -> dataStoreManager.saveAodBrightnessPercent(intent.percent)
             is MainIntent.ToggleProximity -> dataStoreManager.saveIsAodProximityEnabled(intent.isEnabled)
             is MainIntent.ChangeTimeout -> dataStoreManager.saveAodTimeoutMinutes(intent.minutes)
+            is MainIntent.ToggleNotificationIcons -> dataStoreManager.saveIsAodNotificationIconsEnabled(intent.isEnabled)
+            is MainIntent.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(intent.isEnabled)
+            is MainIntent.ToggleMediaControls -> dataStoreManager.saveIsAodMediaControlsEnabled(intent.isEnabled)
             is MainIntent.ChangeChargingRule -> dataStoreManager.saveAodChargingRule(intent.rule.code)
             is MainIntent.ToggleSchedule -> dataStoreManager.saveIsAodScheduleEnabled(intent.isEnabled)
             is MainIntent.ShowScheduleTimePicker -> updateState { copy(editingScheduleTime = intent.time) }
@@ -71,9 +75,13 @@ class MainViewModel(
 
     private fun observeSettings() {
         viewModelScope.launch {
-            combine(optionsFlow(), rulesFlow()) { options, rules -> options to rules }.collectCatching(
-                action = { (options, rules) ->
-                    updateState { copy(isLoading = false, options = options, rules = rules) }
+            combine(optionsFlow(), notificationOptionsFlow(), rulesFlow()) { options, notificationOptions, rules ->
+                Triple(options, notificationOptions, rules)
+            }.collectCatching(
+                action = { (options, notificationOptions, rules) ->
+                    updateState {
+                        copy(isLoading = false, options = options, notificationOptions = notificationOptions, rules = rules)
+                    }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
@@ -93,6 +101,18 @@ class MainViewModel(
             brightnessPercent = brightnessPercent,
             isProximityEnabled = isProximityEnabled,
             timeoutMinutes = timeoutMinutes,
+        )
+    }
+
+    private fun notificationOptionsFlow(): Flow<AodNotificationOptionsUiModel> = combine(
+        dataStoreManager.isAodNotificationIconsEnabled.filterNotNull(),
+        dataStoreManager.isAodEdgeGlowEnabled.filterNotNull(),
+        dataStoreManager.isAodMediaControlsEnabled.filterNotNull(),
+    ) { isIconsEnabled, isEdgeGlowEnabled, isMediaControlsEnabled ->
+        AodNotificationOptionsUiModel(
+            isIconsEnabled = isIconsEnabled,
+            isEdgeGlowEnabled = isEdgeGlowEnabled,
+            isMediaControlsEnabled = isMediaControlsEnabled,
         )
     }
 
@@ -150,6 +170,12 @@ class MainViewModel(
                 )
             }
             add(PermissionUiModel(PermissionValue.NOTIFICATIONS, permissionManager.areNotificationsEnabled()))
+            add(
+                PermissionUiModel(
+                    PermissionValue.NOTIFICATION_ACCESS,
+                    permissionManager.isNotificationListenerEnabled(),
+                ),
+            )
         }
         updateState { copy(permissions = permissions.toImmutableList()) }
     }
@@ -192,6 +218,8 @@ class MainViewModel(
                 } else {
                     MainEffect.OpenNotificationSettings
                 }
+
+            PermissionValue.NOTIFICATION_ACCESS -> MainEffect.OpenNotificationAccessSettings
         }
         viewModelScope.launch { sendEffect(effect) }
     }

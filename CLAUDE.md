@@ -58,20 +58,22 @@ com.decoutkhanqindev.custom_aod/
 │   │   ├── battery/               #   BatteryStateManager   — % pin, đang sạc, đang cắm nguồn
 │   │   ├── audio/                 #   AudioStateManager     — chuông / cuộc gọi / báo thức
 │   │   ├── proximity/             #   ProximityManager      — cảm biến tiệm cận
-│   │   └── permission/            #   PermissionManager     — overlay, thông báo, quyền riêng của Xiaomi
+│   │   ├── notification/          #   NotificationStateManager — thông báo hiện được trên AOD, thông báo mới, token phiên nhạc
+│   │   ├── media/                 #   MediaStateManager     — bài đang phát + điều khiển (từ token của thông báo nhạc)
+│   │   └── permission/            #   PermissionManager     — overlay, thông báo, truy cập thông báo, quyền riêng của Xiaomi
 │   └── repository/                # XxxRepositoryImpl : XxxRepository
 ├── utils/                         # CoroutineExt · NavExt (navigateTo) · ContextExt (showToast, registerSystemReceiver, mở trang cài đặt) · Tag
 └── presentation/
     ├── MainActivity.kt            # requestConsent, áp locale (AppLanguageProvider), AppTheme, start AodService
-    ├── aod/                       # runtime AOD: AodActivity · AodService · AodSession · BootReceiver · AodTileService (mục 20)
+    ├── aod/                       # runtime AOD: AodActivity · AodService · AodSession · BootReceiver · AodTileService · AodNotificationListener (mục 20)
     ├── base/BaseViewModel.kt      # MVI <State, Intent, Effect>
     ├── components/                # Modifiers · AppLottie · AppLanguageProvider · SettingsRows · dialog/NoInternetDialog
     ├── effects/                   # LaunchedWithLifecycleEffect (collect flow theo lifecycle)
-    ├── model/                     # UiModel (AodOptions, AodRules, AodSchedule, Language…) · LanguageValue · AnimationContentKey · ChargingRuleValue · ScheduleTimeValue · PermissionValue · PermissionStatusValue · WakeResultValue
+    ├── model/                     # UiModel (AodOptions, AodNotificationOptions, AodRules, AodSchedule, AodNotifications, Media, Language…) · LanguageValue · AnimationContentKey · ChargingRuleValue · ScheduleTimeValue · PermissionValue · PermissionStatusValue · WakeResultValue
     ├── navigation/                # AppDestinations (NavKey) · AppNavDisplay (+ NoInternetDialog)
     ├── screens/<feature>/         # XxxScreen · XxxContent · XxxViewModel · state/{XxxState, XxxIntent, XxxEffect}
     │   ├── language/              #   chọn ngôn ngữ: lần đầu mở app (Splash → Language → Main) và từ màn Main
-    │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, quy tắc hiện, ngôn ngữ, xem thử (+ MainXxxSection)
+    │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, thông báo trên đồng hồ, quy tắc hiện, ngôn ngữ, xem thử (+ MainXxxSection)
     │   └── aod/                   #   đồng hồ AOD, host là AodActivity (không nằm trong NavDisplay)
     └── theme/                     # Color · Theme · Type (bảng màu tối của FakeAOD)
 ```
@@ -132,14 +134,16 @@ Manager = hạ tầng runtime **không phải nghiệp vụ** (prefs của app-s
 
 | Manager | Vị trí | Cung cấp |
 |---|---|---|
-| `DataStoreManager` | `data/local/datastore/` | `selectedLangCode`, `isFirstOpen`, tuỳ chọn AOD (`isAodEnabled`, `isAodCustomBrightness`, `aodBrightnessPercent`, `isAodProximityEnabled`, `aodTimeoutMinutes`), quy tắc hiện (`aodMinBattery`, `aodChargingRule`, `isAodScheduleEnabled`, `aodScheduleStartMinute`, `aodScheduleEndMinute`), `aodLastWake`, `isNotificationsAsked` — mỗi key 1 `StateFlow<T?>` + `saveXxx()`; `DEFAULT_*` của tuỳ chọn AOD là `const` public để nơi đọc đồng bộ có giá trị dự phòng |
+| `DataStoreManager` | `data/local/datastore/` | `selectedLangCode`, `isFirstOpen`, tuỳ chọn AOD (`isAodEnabled`, `isAodCustomBrightness`, `aodBrightnessPercent`, `isAodProximityEnabled`, `aodTimeoutMinutes`), thông báo trên đồng hồ (`isAodNotificationIconsEnabled`, `isAodEdgeGlowEnabled`, `isAodMediaControlsEnabled`), quy tắc hiện (`aodMinBattery`, `aodChargingRule`, `isAodScheduleEnabled`, `aodScheduleStartMinute`, `aodScheduleEndMinute`), `aodLastWake`, `isNotificationsAsked` — mỗi key 1 `StateFlow<T?>` + `saveXxx()`; `DEFAULT_*` của tuỳ chọn AOD là `const` public để nơi đọc đồng bộ có giá trị dự phòng |
 | `LanguageManager` | `data/local/locale/` | `deviceLanguageCode()`, `configurationFor(code)`, `resourcesFor(config)`, `displayNameOf(code, displayIn)` |
 | `NetworkManager` | `data/network/connectivity/` | `isAvailable: StateFlow<Boolean>` |
 | `ScreenStateManager` | `data/device/screen/` | `events: SharedFlow<String>` (action `SCREEN_OFF` / `USER_PRESENT`), `isInteractive`, `isDeviceSecure`, `wakeUp(holdMillis)` |
 | `BatteryStateManager` | `data/device/battery/` | `levelPercent: StateFlow<Int?>`, `isCharging: StateFlow<Boolean?>`, `isPlugged: StateFlow<Boolean?>` (`EXTRA_PLUGGED`: cắm nguồn kể cả khi pin đầy / giới hạn sạc), `readLevelPercent()`, `readIsCharging()`, `readIsPlugged()` |
 | `AudioStateManager` | `data/device/audio/` | `isBusy: StateFlow<Boolean?>` (chuông / cuộc gọi / báo thức), `isBusyNow()` |
 | `ProximityManager` | `data/device/proximity/` | `isNear: StateFlow<Boolean>` |
-| `PermissionManager` | `data/device/permission/` | `isXiaomi`, `canDrawOverlays()`, `areNotificationsEnabled()`, `needsNotificationPermission()`, `isMiuiShowWhenLockedAllowed()`, `isMiuiBackgroundStartAllowed()` |
+| `NotificationStateManager` | `data/device/notification/` | `notifications: StateFlow<List<ActiveNotification>>` (thông báo hiện được trên AOD, mới nhất trước, icon đã nạp sẵn), `alerts: SharedFlow<ActiveNotification>` (thông báo mới, cho viền sáng), `mediaSessionToken: StateFlow<MediaSession.Token?>`; nhận dữ liệu qua `onListenerConnected` · `onNotificationPosted` · `onNotificationsChanged` · `onListenerDisconnected` |
+| `MediaStateManager` | `data/device/media/` | `playback: StateFlow<MediaPlayback?>` (tên bài, nghệ sĩ, đang phát, có bài trước/tiếp), `playPause()`, `skipToPrevious()`, `skipToNext()` |
+| `PermissionManager` | `data/device/permission/` | `isXiaomi`, `canDrawOverlays()`, `areNotificationsEnabled()`, `needsNotificationPermission()`, `isNotificationListenerEnabled()`, `isMiuiShowWhenLockedAllowed()`, `isMiuiBackgroundStartAllowed()` |
 | `AdsManager` | `ads/` | consent, init MobileAds, current activity, `isAdShowing`, placement (mục 4) |
 
 Rule:
@@ -153,6 +157,9 @@ Rule:
 - Manager tín hiệu thiết bị (`data/device/`) dùng `WhileSubscribed(replayExpirationMillis = 0)`: receiver/cảm biến chỉ đăng ký khi có người collect và giá trị về mặc định khi hết người collect (không đọc nhầm giá trị của lần AOD trước). Hai ngoại lệ có chủ ý so với "StateFlow nóng":
   - Sự kiện không được gộp → `SharedFlow` (`ScreenStateManager.events`): một lần tắt rồi bật lại màn hình ngay phải tới đủ cả `SCREEN_OFF`.
   - Nơi cần giá trị **đúng lúc này** (service lúc `SCREEN_OFF`, khung đầu tiên của AOD) đọc đồng bộ: `isInteractive`, `isBusyNow()`, `readLevelPercent()`… thay vì giữ receiver chạy suốt (`BATTERY_CHANGED` gửi rất thường xuyên).
+- `NotificationStateManager` và `MediaStateManager` là ngoại lệ có chủ ý:
+  - Không dùng `WhileSubscribed`: app không tự đăng ký nhận thông báo được, chỉ `AodNotificationListener` do hệ thống bind mới nhận, nên listener **đẩy** dữ liệu vào manager (`MutableStateFlow` nóng); `MediaStateManager` nóng theo `mediaSessionToken`. Nhờ vậy khung đầu tiên của AOD có ngay icon và bài nhạc.
+  - API trả data class của data layer (`ActiveNotification`, `MediaPlayback`) vì một thông báo không biểu diễn được bằng primitive. Không phải model của presentation; ViewModel vẫn map sang UiModel.
 
 **DataStoreManager**
 - **Mỗi key 1 `StateFlow`, chỉ primitive, chỉ giá trị đã lưu** (không gộp data class — `StateFlow` so sánh cả object, consumer phải `distinctUntilChanged` lại). Không enum, không mapper trong store.
@@ -612,7 +619,7 @@ fun MainScreen() {
 | Điều hướng | `NavBackStack.navigateTo(dest, preserveState)` | `utils/NavExt.kt` |
 | Toast | `context.showToast(message)` | `utils/ContextExt.kt` |
 | Đăng ký receiver cho broadcast hệ thống (`RECEIVER_NOT_EXPORTED` từ Android 13; receiver `null` = đọc broadcast sticky) | `context.registerSystemReceiver(receiver, filter)` | `utils/ContextExt.kt` |
-| Mở trang cài đặt hệ thống (Context của Activity; ROM không có trang đó thì mở Thông tin ứng dụng) | `context.openSettingsPage(intent)` · `context.openOverlaySettings()` · `context.openNotificationSettings()` · `context.openMiuiPermissionEditor()` · `context.packageUri()` | `utils/ContextExt.kt` |
+| Mở trang cài đặt hệ thống (Context của Activity; ROM không có trang đó thì mở Thông tin ứng dụng) | `context.openSettingsPage(intent)` · `context.openOverlaySettings()` · `context.openNotificationSettings()` · `context.openNotificationListenerSettings(component)` · `context.openMiuiPermissionEditor()` · `context.packageUri()` | `utils/ContextExt.kt` |
 | Áp ngôn ngữ đã chọn cho một Activity (`LocalConfiguration` / `LocalResources`) | `setContent { AppLanguageProvider { … } }` — tự `koinInject` `DataStoreManager` (`selectedLangCode`) và `LanguageManager` | `components/AppLanguageProvider.kt` |
 | Tag log | `: Tag` → `Timber.tag(tag)` | `utils/Tag.kt` |
 | Khung màn MVI | copy `screens/main/` | `presentation/screens/main/` |
@@ -735,6 +742,9 @@ nút nguồn khi AOD hiện ─▶ SCREEN_OFF ─▶ AodService: ScreenStateMana
 chạm 2 lần · mở khoá (USER_PRESENT) · cuộc gọi · báo thức ─▶ đóng AOD
 hết giờ · trong túi · sai quy tắc hiện ─▶ đen ─▶ giờ chờ của máy tắt màn hình ─▶ SCREEN_OFF có sleep request ─▶ không mở lại
 ô Cài đặt nhanh ─▶ AodTileService: lưu isAodEnabled, start/stop AodService (start bị chặn ─▶ mở app để MainActivity start)
+thông báo ─▶ AodNotificationListener (hệ thống bind) ─▶ NotificationStateManager: lọc, nạp icon ─▶ notifications · alerts · mediaSessionToken
+mediaSessionToken ─▶ MediaStateManager ─▶ playback
+AodViewModel: icon (notifications) · viền sáng (alerts, khi không tối) · nhạc (playback; nút ─▶ transportControls)
 ```
 
 ### 20.2 Thành phần
@@ -745,12 +755,14 @@ hết giờ · trong túi · sai quy tắc hiện ─▶ đen ─▶ giờ chờ
 | `presentation/aod/AodActivity` | Host của `AodScreen`. Giữ mọi thao tác cửa sổ: cờ, độ sáng, ẩn thanh hệ thống, `renderDark()`. Áp ngôn ngữ bằng `AppLanguageProvider` |
 | `presentation/aod/AodSession` | Koin `single`, chỉ dùng trên main thread. `WeakReference` tới `AodActivity`; `isShowing`, `isCovered`, `shownAt`, sleep request; `finish()` đóng AOD ngay |
 | `presentation/aod/BootReceiver` | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` → start service nếu đang bật (`goAsync()` trong lúc đọc DataStore) |
+| `presentation/aod/AodNotificationListener` | `NotificationListenerService`, hệ thống chỉ bind khi user đã cấp "Truy cập thông báo". Callback (main thread) chỉ đọc `activeNotifications` + `RankingMap` rồi chuyển cho `NotificationStateManager`; `openAccessSettings(context)` mở trang cấp quyền |
+| `NotificationStateManager` · `MediaStateManager` | Lọc thông báo như màn hình chờ của hệ thống, nạp icon ở luồng nền, báo thông báo mới; điều khiển nhạc bằng `MediaController` từ token của thông báo nhạc (mục 2) |
 | `presentation/aod/AodTileService` | Ô Cài đặt nhanh (`TOGGLEABLE_TILE`): hiện và đảo `isAodEnabled`, start/stop service; `AodService.start()` trả `false` → mở app bằng `startActivityAndCollapse` (đang khoá → `unlockAndRun` trước) |
 | `presentation/model/AodRulesUiModel` | Quy tắc hiện: `minBattery`, `chargingRule` (`ChargingRuleValue`), `schedule` (`AodScheduleUiModel`). `allows()` dùng chung cho `AodService.shouldEnter()` và `AodViewModel.checkRules()`; `DataStoreManager.currentAodRules()` đọc snapshot đồng bộ |
-| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ, dịch vị trí và kiểm quy tắc hiện; ẩn dòng gợi ý sau 3 giây) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ) · `AodScreen` (collect effect, chuyển `isDark` cho Activity) |
-| `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn (độ sáng, tiệm cận, hết giờ), quy tắc hiện (nguồn điện, khung giờ, ngưỡng pin), ngôn ngữ, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
+| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ, dịch vị trí và kiểm quy tắc hiện; ẩn dòng gợi ý sau 3 giây; icon thông báo, viền sáng 4 giây, nút nhạc) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ) · `AodScreen` (collect effect, chuyển `isDark` cho Activity) |
+| `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn (độ sáng, tiệm cận, hết giờ), thông báo trên đồng hồ (icon, viền sáng, nhạc), quy tắc hiện (nguồn điện, khung giờ, ngưỡng pin), ngôn ngữ, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
 | `data/device/*` | `ScreenStateManager` · `BatteryStateManager` · `AudioStateManager` · `ProximityManager` · `PermissionManager` (mục 2) |
-| `DataStoreManager` | Tuỳ chọn và quy tắc hiện của AOD, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |
+| `DataStoreManager` | Tuỳ chọn, thông báo trên đồng hồ và quy tắc hiện của AOD, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |
 
 ### 20.3 Bất biến
 
@@ -773,6 +785,11 @@ hết giờ · trong túi · sai quy tắc hiện ─▶ đen ─▶ giờ chờ
 17. **Quy tắc hiện kiểm ở 2 nơi bằng cùng `AodRulesUiModel.allows()`:** `AodService.shouldEnter()` lúc `SCREEN_OFF` (đọc đồng bộ `readLevelPercent()`, `readIsCharging()`, `readIsPlugged()`, giờ hiện tại) và `AodViewModel.checkRules()` khi pin hoặc nguồn cắm đổi và mỗi phút. AOD đang hiện mà sai quy tắc → `goDark()` chứ không đóng: đóng lúc màn hình đang sáng sẽ lộ màn hình khoá. Không đọc được trạng thái (`null`) thì không chặn. Xem thử không kiểm quy tắc.
 18. **"Đang cắm nguồn" theo `EXTRA_PLUGGED`**, không theo `isCharging`: pin đầy hoặc máy giới hạn sạc (dừng ở 80%) vẫn là đang cắm. Ngưỡng pin vẫn bỏ qua khi `isCharging` như FakeAOD.
 19. **Khung giờ lưu theo phút trong ngày** (`aodScheduleStartMinute`, `aodScheduleEndMinute`, giờ địa phương): bắt đầu < kết thúc → `[bắt đầu, kết thúc)`; bắt đầu > kết thúc → qua nửa đêm; bằng nhau → cả ngày; tắt khung giờ → luôn hiện. Mặc định bật, 07:00–23:00.
+20. **Thông báo trên AOD được lọc như màn hình chờ của hệ thống** (`NotificationStateManager.isShownOnAmbient`): bỏ thông báo của chính app, thường trực (`isOngoing`, `FLAG_FOREGROUND_SERVICE`), tóm tắt nhóm, thông báo nhạc (đã có điều khiển nhạc), im lặng (importance dưới `DEFAULT`), bị Không làm phiền ẩn khỏi màn hình chờ (`SUPPRESSED_EFFECT_AMBIENT`), ẩn trên màn hình khoá (`VISIBILITY_SECRET`; tuỳ chỉnh theo kênh chỉ đọc được từ Android 12), của app bị tạm ngưng. Chỉ hiện **icon, mỗi app một icon** (tối đa 5, còn lại "+N"), không hiện nội dung: AOD nằm trên màn hình khoá.
+21. **Icon nạp sẵn trong manager**, trên 1 luồng nền (`limitedParallelism(1)`: giữ thứ tự callback, nạp resource của app khác không chặn main thread), cache theo (package, resource). Listener được hệ thống cho thấy package của app gửi thông báo, nên `Icon.loadDrawable` đọc được resource của app đó.
+22. **Viền sáng** khi `alerts` phát: thông báo mới, hoặc cập nhật không đặt `FLAG_ONLY_ALERT_ONCE`, và không bị Không làm phiền chặn (`matchesInterruptionFilter`). Chỉ khi AOD không tối (tối = đang chờ máy tắt màn hình); tắt sau 4 giây hoặc khi chuyển sang tối. Vẽ bằng gradient ở 4 cạnh, không dùng `Modifier.blur` (cần API 31, minSdk là 30). Màu là `Notification.color` của app; không đặt hoặc quá tối thì dùng `Mint`.
+23. **Nhạc lấy từ token của thông báo nhạc mới nhất** (`EXTRA_MEDIA_SESSION`), cách trình phát trên màn hình khoá của hệ thống chọn phiên nhạc; dùng token không cần quyền riêng. Chỉ có tên bài, nghệ sĩ và 3 nút, không có ảnh bìa (sáng, dễ burn-in). Nút nhạc bị bỏ qua khi cảm biến tiệm cận bị che, như chạm 2 lần.
+24. **Listener không khai báo `default_filter_types`:** thông báo nhạc thường thuộc loại im lặng hoặc thường trực, lọc theo loại thì mất điều khiển nhạc.
 
 ### 20.4 Chỗ khác MVI / Manager chuẩn, có lý do
 
@@ -780,6 +797,7 @@ hết giờ · trong túi · sai quy tắc hiện ─▶ đen ─▶ giờ chờ
 - `AodService` không có UI nên không có ViewModel: logic quyết định nằm trong service, mọi truy cập hệ thống đi qua manager.
 - Domain chưa dùng: tuỳ chọn AOD là prefs nên dùng thẳng `DataStoreManager` (như `isDark` của DexReader, `showCanChiOnCell` của Lịch Việt); bọc Repository/UseCase chỉ forward manager là banned (mục 18).
 - `BootReceiver` là `KoinComponent` (mục 12).
+- `AodNotificationListener` nằm ở `presentation/aod/` như các thành phần hệ thống khác (lấy manager bằng `by inject()`), còn lọc và nạp icon nằm trong `NotificationStateManager`, vì data layer không được dùng Koin như service locator.
 - `AodContent` không bọc `AppTheme` (mục 14).
 - `SettingsSwitchRow` dùng `Modifier.toggleable(role = Role.Switch)` và `SettingsRadioRow` dùng `Modifier.selectable(role = Role.RadioButton)`, không dùng `Modifier.onClick`: TalkBack đọc được trạng thái bật/tắt, đã chọn. Dòng chỉ để bấm (`SettingsValueRow`) vẫn dùng `Modifier.onClick`.
 - `AodTileService` gọi `startActivityAndCollapse(Intent)` (deprecated) dưới API 34 với `@Suppress("DEPRECATION", "StartActivityAndCollapseDeprecated")`: bản nhận `PendingIntent` chỉ có từ API 34, bản nhận `Intent` chỉ ném lỗi từ Android 14.
@@ -791,7 +809,7 @@ hết giờ · trong túi · sai quy tắc hiện ─▶ đen ─▶ giờ chờ
 
 ### 20.6 Thêm tính năng cho AOD
 
-- Tín hiệu mới (thông báo, sạc…) → manager mới trong `data/device/<tên>/` theo mục 2.
+- Tín hiệu mới → manager mới trong `data/device/<tên>/` theo mục 2. Cần thêm dữ liệu từ thông báo (vd nội dung) → thêm vào `NotificationStateManager`, không đăng ký listener thứ hai.
 - Tuỳ chọn mới → key trong `DataStoreManager` + field trong `AodOptionsUiModel` + Intent của màn Main + đọc snapshot trong `AodViewModel` (hoặc `AodActivity` nếu là thao tác cửa sổ).
 - Quy tắc "khi nào hiện" mới → key trong `DataStoreManager` + field trong `AodRulesUiModel` (`allows()` và `currentAodRules()`) + Intent của màn Main: service và màn AOD tự áp dụng, không viết lại điều kiện ở chỗ khác.
 - Danh sách tính năng còn thiếu so với Always On AMOLED: [COMPARISON.md](COMPARISON.md).
