@@ -9,19 +9,14 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
-import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.components.AppLanguageProvider
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.AodScreen
 import org.koin.android.ext.android.inject
 
 class AodActivity : ComponentActivity() {
 
     private val dataStoreManager: DataStoreManager by inject()
-    private val languageManager: LanguageManager by inject()
     private val session: AodSession by inject()
 
     private var isPreview = false
@@ -45,9 +40,7 @@ class AodActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setBrightness(normalBrightness())
         setContent {
-            val selectedLangCode by dataStoreManager.selectedLangCode.collectAsStateWithLifecycle()
-
-            AppLanguageProvider(languageCode = LanguageValue.fromCode(selectedLangCode).code) {
+            AppLanguageProvider {
                 AodScreen(
                     isPreview = isPreview,
                     onDarkChange = ::renderDark,

@@ -22,7 +22,7 @@ Lõi AOD của FakeAOD được đưa vào base [Android-Base](https://github.co
   - `PermissionManager`: quyền overlay, thông báo, và hai quyền riêng của Xiaomi.
 - Màn AOD theo MVI trong `presentation/screens/aod/`: `AodViewModel`, `AodContent`, `AodScreen`, `state/`.
 - Màn cài đặt theo MVI trong `presentation/screens/main/`, kèm `AodOptionsUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`.
-- `AppLanguageProvider`, dùng chung cho `MainActivity` và `AodActivity`.
+- `AppLanguageProvider`, dùng chung cho `MainActivity` và `AodActivity`. Component tự lấy `DataStoreManager` và `LanguageManager` qua `koinInject`, Activity chỉ cần `AppLanguageProvider { … }`.
 - Trạng thái quyền hiện bằng Material icon có `contentDescription` (Đã cấp / Chưa cấp / Không rõ), thay cho ký tự ✓ ✕ ? –.
 - Bản dịch tiếng Việt cho các chuỗi của base.
 - `CLAUDE.md` mục 20 "AOD core": luồng, thành phần, các điểm không được đổi và lý do, ngoại lệ so với MVI chuẩn, lưu ý về ads.

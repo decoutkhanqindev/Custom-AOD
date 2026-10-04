@@ -8,18 +8,14 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.ComposeUiFlags
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.decoutkhanqindev.custom_aod.ads.AdsManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
-import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
 import com.decoutkhanqindev.custom_aod.presentation.components.AppLanguageProvider
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.navigation.AppNavDisplay
 import com.decoutkhanqindev.custom_aod.presentation.theme.AppTheme
 import kotlinx.coroutines.flow.filterNotNull
@@ -30,7 +26,6 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
 
     private val dataStoreManager: DataStoreManager by inject()
-    private val languageManager: LanguageManager by inject()
     private val adsManager: AdsManager by inject()
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -46,9 +41,7 @@ class MainActivity : ComponentActivity() {
         )
         startAodServiceIfEnabled()
         setContent {
-            val selectedLangCode by dataStoreManager.selectedLangCode.collectAsStateWithLifecycle()
-
-            AppLanguageProvider(languageCode = LanguageValue.fromCode(selectedLangCode).code) {
+            AppLanguageProvider {
                 AppTheme {
                     AppNavDisplay(modifier = Modifier.fillMaxSize())
                 }

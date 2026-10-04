@@ -29,11 +29,6 @@ fun MainScreen() {
     ) { isGranted ->
         viewModel.onIntent(MainIntent.NotificationPermissionResult(isGranted))
     }
-    val firstLaunchNotificationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        viewModel.onIntent(MainIntent.FirstLaunchNotificationPermissionResult(isGranted))
-    }
 
     LaunchedWithLifecycleEffect {
         viewModel.effect.collect { effect ->
@@ -55,7 +50,7 @@ fun MainScreen() {
     LifecycleResumeEffect(state.isNotificationPermissionPending) {
         if (!state.isNotificationPermissionPending) return@LifecycleResumeEffect onPauseOrDispose { }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            firstLaunchNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
         viewModel.onIntent(MainIntent.NotificationPermissionRequested)
         onPauseOrDispose { }

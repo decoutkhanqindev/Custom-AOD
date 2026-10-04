@@ -145,7 +145,7 @@ Rule:
 - Mỗi manager = **1 class cụ thể** `XxxManager` trong `data/<area>/<tên>/` — không interface + `Impl`, không base class chỉ có 1 lớp con. Koin `single { XxxManager(androidApplication()) }`. API chỉ dùng primitive/ISO code (không nhận/trả enum của presentation).
 - Manager là **state holder**: tự tạo scope `CoroutineScope(SupervisorJob() + Dispatchers.IO/Default)`, expose `StateFlow` nóng. Không trả `Result` qua biên manager — lỗi xử lý trong manager (`recoverCatching` → giá trị mặc định, `withContextCatching` → log).
 - Nơi dùng:
-  - Composable: `val xxxManager: XxxManager = koinInject()` ngay tại nơi dùng — **chỉ ở Screen** (hoặc host như `AppNavDisplay`), Content nhận giá trị qua tham số. Không tự viết CompositionLocal để truyền manager. Activity: `by inject()`.
+  - Composable: `val xxxManager: XxxManager = koinInject()` ngay tại nơi dùng — **chỉ ở Screen** (hoặc host bọc cả màn như `AppNavDisplay`, `AppLanguageProvider`), Content nhận giá trị qua tham số. Không tự viết CompositionLocal để truyền manager. Activity: `by inject()`.
   - ViewModel: inject manager qua constructor (vd refetch khi `selectedLangCode` đổi).
   - Repository: inject manager (vd đọc `selectedLangCode.filterNotNull().first()` — **1 lần mỗi hàm**, không đọc trong vòng map).
 - Signal hạ tầng mới (pin, mạng tính phí…) → manager mới cùng pattern, KHÔNG làm domain repository/UseCase/`object` singleton trong `utils/`.
@@ -589,13 +589,13 @@ fun MainScreen() {
 | Toast | `context.showToast(message)` | `utils/ContextExt.kt` |
 | Đăng ký receiver cho broadcast hệ thống (`RECEIVER_NOT_EXPORTED` từ Android 13; receiver `null` = đọc broadcast sticky) | `context.registerSystemReceiver(receiver, filter)` | `utils/ContextExt.kt` |
 | Mở trang cài đặt hệ thống (Context của Activity; ROM không có trang đó thì mở Thông tin ứng dụng) | `context.openSettingsPage(intent)` · `context.openOverlaySettings()` · `context.openNotificationSettings()` · `context.openMiuiPermissionEditor()` · `context.packageUri()` | `utils/ContextExt.kt` |
-| Áp ngôn ngữ đã chọn cho một Activity (`LocalConfiguration` / `LocalResources`) | `AppLanguageProvider(languageCode, languageManager) { }` | `components/AppLanguageProvider.kt` |
+| Áp ngôn ngữ đã chọn cho một Activity (`LocalConfiguration` / `LocalResources`) | `setContent { AppLanguageProvider { … } }` — tự `koinInject` `DataStoreManager` (`selectedLangCode`) và `LanguageManager` | `components/AppLanguageProvider.kt` |
 | Tag log | `: Tag` → `Timber.tag(tag)` | `utils/Tag.kt` |
 | Khung màn MVI | copy `screens/main/` | `presentation/screens/main/` |
 
 Quy tắc:
 - Trước khi viết composable/util mới → kiểm tra bảng trên. Dùng ở ≥ 2 nơi → `components/` (UI) hoặc `utils/` (không UI); 1 nơi → `private` trong file đó.
-- Component dùng chung không tự `koinInject`/`koinViewModel`; nhận data + callback qua tham số.
+- Component dùng chung không tự `koinInject`/`koinViewModel`; nhận data + callback qua tham số. Ngoại lệ: host bọc cả màn của Activity (`AppNavDisplay`, `AppLanguageProvider`) được `koinInject` manager.
 - Không copy-paste: logic giữa ViewModel → UseCase; UI giữa màn → component; giá trị lặp → token/`const val`.
 - Không tạo top-level `val` trung gian dùng 1 lần → inline (trừ token theme, `const val` cho magic number, giá trị tính sẵn để khỏi tính lại mỗi frame).
 - **File Compose (Screen / Content / component) không khai báo `val`, `const val` hay class phụ ở top-level:**

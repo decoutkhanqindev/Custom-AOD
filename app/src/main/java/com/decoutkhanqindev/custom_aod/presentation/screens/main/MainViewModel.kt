@@ -27,6 +27,9 @@ class MainViewModel(
     initialState = MainState(),
 ), Tag {
 
+    // Hộp thoại quyền thông báo đang mở là lần hỏi tự động lúc mở app lần đầu (bị từ chối thì để yên) hay do user bấm dòng "Thông báo".
+    private var isFirstLaunchNotificationRequest = false
+
     init {
         observeOptions()
         observeLastWake()
@@ -44,15 +47,8 @@ class MainViewModel(
             is MainIntent.ChangeMinBattery -> dataStoreManager.saveAodMinBattery(intent.percent)
             is MainIntent.OpenPermission -> openPermission(intent.permission)
             is MainIntent.RefreshPermissions -> refreshPermissions()
-            is MainIntent.NotificationPermissionRequested ->
-                updateState { copy(isNotificationPermissionPending = false) }
-
-            is MainIntent.NotificationPermissionResult ->
-                onNotificationPermissionResult(isGranted = intent.isGranted, isFirstLaunch = false)
-
-            is MainIntent.FirstLaunchNotificationPermissionResult ->
-                onNotificationPermissionResult(isGranted = intent.isGranted, isFirstLaunch = true)
-
+            is MainIntent.NotificationPermissionRequested -> onFirstLaunchNotificationPermissionRequested()
+            is MainIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
             is MainIntent.Preview -> viewModelScope.launch { sendEffect(MainEffect.OpenPreview) }
         }
     }
@@ -134,6 +130,7 @@ class MainViewModel(
 
             PermissionValue.NOTIFICATIONS ->
                 if (permissionManager.needsNotificationPermission()) {
+                    isFirstLaunchNotificationRequest = false
                     MainEffect.RequestNotificationPermission
                 } else {
                     MainEffect.OpenNotificationSettings
@@ -142,8 +139,15 @@ class MainViewModel(
         viewModelScope.launch { sendEffect(effect) }
     }
 
+    private fun onFirstLaunchNotificationPermissionRequested() {
+        isFirstLaunchNotificationRequest = true
+        updateState { copy(isNotificationPermissionPending = false) }
+    }
+
     // Đã cho phép thì start lại service để nó đăng lại thông báo; bị từ chối từ dòng "Thông báo" thì mở trang cài đặt (sau 2 lần từ chối hệ thống không hiện hộp thoại nữa).
-    private fun onNotificationPermissionResult(isGranted: Boolean, isFirstLaunch: Boolean) {
+    private fun onNotificationPermissionResult(isGranted: Boolean) {
+        val isFirstLaunch = isFirstLaunchNotificationRequest
+        isFirstLaunchNotificationRequest = false
         viewModelScope.launch {
             when {
                 isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(MainEffect.StartAodService)

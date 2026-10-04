@@ -12,6 +12,5 @@ sealed interface MainIntent {
     data object RefreshPermissions : MainIntent
     data object NotificationPermissionRequested : MainIntent
     data class NotificationPermissionResult(val isGranted: Boolean) : MainIntent
-    data class FirstLaunchNotificationPermissionResult(val isGranted: Boolean) : MainIntent
     data object Preview : MainIntent
 }
