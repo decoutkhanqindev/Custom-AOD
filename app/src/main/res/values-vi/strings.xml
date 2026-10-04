@@ -70,6 +70,25 @@
   <string name="background_remove">Bỏ ảnh nền</string>
   <string name="background_save_failed">Không dùng được ảnh này.</string>
 
+  <string name="section_extras">Thông tin thêm trên đồng hồ</string>
+  <string name="opt_memo">Ghi nhớ</string>
+  <string name="memo_add">Thêm</string>
+  <string name="memo_edit">Sửa</string>
+  <string name="memo_hint">Ghi chú ngắn dưới đồng hồ</string>
+  <string name="opt_drawing">Hình vẽ nhanh</string>
+  <string name="drawing_draw">Vẽ</string>
+  <string name="drawing_redraw">Vẽ lại</string>
+  <string name="drawing_remove">Bỏ hình vẽ</string>
+  <string name="drawing_hint">Vẽ bằng ngón tay</string>
+  <string name="drawing_save_failed">Không lưu được hình vẽ.</string>
+  <string name="opt_calendar">Sự kiện hôm nay</string>
+  <string name="opt_calendar_desc">Các sự kiện sắp tới trong hôm nay từ lịch của bạn. Cần quyền đọc lịch.</string>
+  <string name="calendar_permission_denied">Chưa được cấp quyền đọc lịch. Bạn có thể cấp trong cài đặt hệ thống của ứng dụng.</string>
+  <string name="opt_weather">Thời tiết</string>
+  <string name="opt_weather_desc">Lấy từ Open-Meteo theo vị trí gần đúng. Cần quyền vị trí.</string>
+  <string name="opt_weather_fahrenheit">Hiện nhiệt độ theo °F</string>
+  <string name="location_permission_denied">Chưa được cấp quyền vị trí. Bạn có thể cấp trong cài đặt hệ thống của ứng dụng.</string>
+
   <string name="section_notifications">Thông báo trên đồng hồ</string>
   <string name="notification_access_needed">Cần quyền Truy cập thông báo ở mục Quyền.</string>
   <string name="opt_notification_icons">Hiện biểu tượng thông báo</string>
@@ -116,6 +135,8 @@
   <string name="action_ok">OK</string>
   <string name="action_cancel">Hủy</string>
   <string name="action_back">Quay lại</string>
+  <string name="action_save">Lưu</string>
+  <string name="action_clear">Xóa hết</string>
 
   <string name="wake_unknown">Đồng hồ chưa được hiện lần nào từ lúc màn hình tắt.</string>
   <string name="wake_ok">Lần gần nhất: đồng hồ đã mở được trên màn hình khóa.</string>
@@ -129,4 +150,14 @@
   <string name="aod_media_pause">Tạm dừng</string>
   <string name="aod_media_next">Bài tiếp theo</string>
   <string name="aod_flashlight_on">Đèn pin đang bật</string>
+  <string name="aod_event_all_day">Cả ngày</string>
+  <string name="aod_drawing">Hình vẽ</string>
+  <string name="weather_clear">Trời quang</string>
+  <string name="weather_partly_cloudy">Mây rải rác</string>
+  <string name="weather_cloudy">Nhiều mây</string>
+  <string name="weather_fog">Sương mù</string>
+  <string name="weather_drizzle">Mưa phùn</string>
+  <string name="weather_rain">Mưa</string>
+  <string name="weather_snow">Tuyết</string>
+  <string name="weather_thunderstorm">Dông</string>
 </resources>

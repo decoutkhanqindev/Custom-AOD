@@ -4,6 +4,30 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-04 – Giai đoạn 5: thông tin thêm trên đồng hồ
+
+Thời tiết, sự kiện hôm nay, ghi nhớ, hình vẽ nhanh. Thêm 2 quyền hỏi lúc chạy, chỉ hỏi khi bật tùy chọn tương ứng (`READ_CALENDAR`, `ACCESS_COARSE_LOCATION`), và thư viện Retrofit 3.0.0 + converter kotlinx-serialization, kotlinx-serialization-json 1.11.0 cho API thời tiết Open-Meteo. Lần đầu dùng tầng domain (UseCase, Repository). Bỏ qua widget và Tasker. Bản này build được (`assembleDebug`, R8 của bản release), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 35–39).
+
+### Thêm
+
+- Thời tiết (`is_aod_weather_enabled`, `is_aod_weather_fahrenheit`): icon trời và nhiệt độ cạnh ngày, °C hoặc °F. `DeviceLocationManager` (`data/device/location/`) lấy vị trí gần đúng một lần; `OpenMeteoApiService` (`data/network/api/`) nhận toạ độ đã làm tròn 2 chữ số thập phân; `WeatherRepositoryImpl` lưu bản mới vào DataStore (`weather_temperature_celsius`, `weather_code`, `is_weather_day`, `weather_updated_at_millis`) để đồng hồ hiện ngay mà không chờ mạng. `RefreshWeatherUseCase` chỉ gọi mạng khi bản đã lưu cũ từ 30 phút; AOD đang hiện thử lại mỗi 10 phút; bản cũ từ 3 giờ không hiện. Mã thời tiết WMO gom thành 8 nhóm (`WeatherCondition`), icon ngày và đêm.
+- Sự kiện hôm nay (`is_aod_calendar_enabled`): tối đa 2 sự kiện còn lại trong ngày từ `CalendarContract.Instances` (`CalendarRepositoryImpl`, `GetUpcomingEventsUseCase`), sự kiện cả ngày so theo ngày ghi trên lịch. AOD đọc lúc mở và mỗi 15 phút, sự kiện đã kết thúc rời đồng hồ ở tick mỗi phút.
+- Ghi nhớ (`aod_memo`, tối đa 120 ký tự, hiện tối đa 3 dòng) và hình vẽ nhanh (file `aod_drawing.png`, PNG nền trong suốt, tô theo màu đồng hồ).
+- Màn cài đặt: mục "Thông tin thêm trên đồng hồ" (`MainExtrasSection`), hộp thoại nhập ghi nhớ có bộ đếm ký tự, khung vẽ (Lưu, Xóa hết, Hủy). Bật lịch hoặc thời tiết thì hỏi quyền, chỉ lưu "bật" khi được cấp; bật thời tiết thì tải ngay. `SettingsValueRow` có thêm dòng mô tả (hiện nội dung ghi nhớ).
+- Tầng domain: `Weather`, `WeatherCondition`, `CalendarEvent`; `WeatherRepository`, `CalendarRepository`; `ObserveWeatherUseCase`, `RefreshWeatherUseCase`, `GetUpcomingEventsUseCase`. Koin: `networkModule` (`Json`, `Retrofit`, `OpenMeteoApiService`), `repositoryModule`, `useCaseModule`.
+- `CLAUDE.md`: tầng domain và data (mục 1, 9), manager mới (mục 2), thư viện (mục 7.1), DI (mục 12), quy tắc RepositoryImpl dùng `withContextCatching` và không có exception riêng của domain (mục 9, 13, 13.1, 18 kèm lệnh grep chặn `withContext(` thô), bất biến 33–37, cách thêm thông tin cho đồng hồ (mục 20.6).
+
+### Thay đổi
+
+- `BackgroundImageManager` (`data/local/background/`) → `AodImageManager` (`data/local/image/`), giữ cả ảnh nền lẫn hình vẽ: `hasImage`, `saveImage`, `loadImage`, `removeImage` → `hasBackground`, `saveBackground`, `loadBackground`, `removeBackground`; thêm `hasDrawing`, `saveDrawing`, `loadDrawing`, `removeDrawing`.
+- `PermissionManager`: thêm `hasCalendarPermission()`, `hasCoarseLocationPermission()`.
+- `AodViewModel` nhận thêm 3 UseCase; `MainViewModel` nhận thêm `RefreshWeatherUseCase`.
+- Splash: icon app (glyph đồng hồ màu mint) ở chính giữa màn hình, cỡ 144dp như icon của splash hệ thống từ Android 12, tên app nằm ngay dưới; thêm preview.
+
+### Xóa
+
+- `Placeholder.kt` của `domain/model`, `domain/repository`, `domain/usecase`, `data/repository`.
+
 ## [Chưa phát hành] – 2026-10-04 – Giai đoạn 4: thao tác và cảm biến
 
 Gán hành động cho thao tác và phím, đèn pin, tự giảm sáng theo cảm biến ánh sáng, nhấc máy để hiện lại đồng hồ. Không thêm quyền và thư viện: đèn pin dùng `setTorchMode`, không cần quyền `CAMERA`. Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 29–34).

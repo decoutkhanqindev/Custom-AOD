@@ -5,18 +5,27 @@ import androidx.annotation.ColorInt
 import androidx.compose.runtime.Immutable
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class AodState(
     val nowMillis: Long = 0L,
     val appearance: AodAppearanceUiModel = AodAppearanceUiModel(),
     val interaction: AodInteractionUiModel = AodInteractionUiModel(),
+    val extras: AodExtrasUiModel = AodExtrasUiModel(),
     val background: Bitmap? = null,
+    val drawing: Bitmap? = null,
+    val weather: WeatherUiModel? = null,
+    val events: ImmutableList<CalendarEventUiModel> = persistentListOf(),
     val battery: BatteryUiModel? = null,
     val notifications: AodNotificationsUiModel = AodNotificationsUiModel(),
     val media: MediaUiModel? = null,

@@ -75,6 +75,7 @@ Phiên bản đang dùng, khai báo trong `gradle/libs.versions.toml`:
 | DataStore Preferences | 1.2.1 |
 | Google Mobile Ads / UMP | 25.5.0 / 4.0.0 |
 | Timber · Lottie · kotlinx-collections-immutable | 5.0.1 · 6.7.1 · 0.5.2 |
+| Retrofit (+ converter kotlinx-serialization) · kotlinx-serialization-json | 3.0.0 · 1.11.0 |
 | `compileSdk` / `minSdk` / `targetSdk` | 37 / 30 / 37 (Android 17 / Android 11 / Android 17) |
 
 Từ AGP 9, Kotlin được tích hợp sẵn nên project không có plugin `org.jetbrains.kotlin.android`.
@@ -92,8 +93,12 @@ Lần đầu mở app trên Android 13 trở lên, app hỏi quyền thông báo
 | Xiaomi: Mở cửa sổ mới khi chạy nền | Không | Trên HyperOS 1.0, đồng hồ vẫn mở được khi quyền này tắt. Chỉ bật nếu ROM khác chặn |
 | Thông báo | Không | Chỉ để hiện thông báo thường trực của service |
 | Truy cập thông báo | Không | Icon thông báo, viền sáng khi có thông báo mới và điều khiển nhạc trên đồng hồ. Thiếu quyền này đồng hồ vẫn chạy, chỉ không có 3 thứ đó |
+| Lịch | Không | Sự kiện hôm nay trên đồng hồ. Chỉ hỏi khi bật "Sự kiện hôm nay" |
+| Vị trí (gần đúng) | Không | Thời tiết trên đồng hồ. Chỉ hỏi khi bật "Thời tiết"; không cần vị trí chính xác, không cần vị trí khi chạy nền |
 
 "Truy cập thông báo" là quyền đặc biệt, bật ở trang riêng của hệ thống (dòng "Truy cập thông báo" trong app mở thẳng trang đó). Từ Android 13, nếu APK được cài bằng cách mở file (không qua cửa hàng hay `adb install`), công tắc này có thể bị khóa ("Cài đặt bị hạn chế"): vào Thông tin ứng dụng › menu ⋮ › "Allow restricted settings" (tên tiếng Việt tùy máy) rồi bật lại.
+
+Lịch và Vị trí không nằm trong danh sách quyền ở đầu màn hình: app hỏi bằng hộp thoại của hệ thống khi bật tùy chọn tương ứng ở mục "Thông tin thêm trên đồng hồ", và chỉ bật tùy chọn khi được cấp. Từ chối thì công tắc vẫn tắt kèm một dòng nhắc; nếu đã chọn "Không hỏi lại" thì cấp trong Thông tin ứng dụng › Quyền.
 
 Không cần dịch vụ trợ năng, thông báo toàn màn hình, "Sửa đổi cài đặt hệ thống", "Không hạn chế pin" hay "Tự khởi chạy" của Xiaomi.
 
@@ -120,7 +125,9 @@ Danh sách sau khi gộp manifest của các thư viện (kiểm bằng `aapt2 d
 | `POST_NOTIFICATIONS` | Hỏi lúc chạy (Android 13+) | Thông báo thường trực của service |
 | `WAKE_LOCK` | Tự cấp | Bật lại màn hình khóa khi bấm nguồn lúc đồng hồ đang hiện |
 | `RECEIVE_BOOT_COMPLETED` | Tự cấp | `BootReceiver` chạy lại service sau khi khởi động máy |
-| `INTERNET`, `ACCESS_NETWORK_STATE` | Tự cấp | Quảng cáo và consent (AdMob, UMP), `NetworkManager` của base |
+| `READ_CALENDAR` | Hỏi lúc chạy, khi bật "Sự kiện hôm nay" | `CalendarRepositoryImpl` đọc sự kiện hôm nay (`CalendarContract.Instances`) |
+| `ACCESS_COARSE_LOCATION` | Hỏi lúc chạy, khi bật "Thời tiết" | `DeviceLocationManager` lấy vị trí gần đúng để tải thời tiết |
+| `INTERNET`, `ACCESS_NETWORK_STATE` | Tự cấp | Quảng cáo và consent (AdMob, UMP), thời tiết (Open-Meteo), `NetworkManager` của base |
 | `com.google.android.gms.permission.AD_ID` | Tự cấp, do Google Mobile Ads thêm | Mã quảng cáo |
 | `ACCESS_ADSERVICES_AD_ID`, `ACCESS_ADSERVICES_ATTRIBUTION`, `ACCESS_ADSERVICES_TOPICS` | Tự cấp, do Google Mobile Ads thêm | Privacy Sandbox trên Android |
 
@@ -133,7 +140,7 @@ Hai service còn được bảo vệ bằng quyền của hệ thống, để ch
 - **Mở app:** Splash xin consent (form UMP, chỉ hiện khi cần) rồi hiện quảng cáo xen kẽ (đang là id test của Google), sau đó vào màn hình chính. Splash cần mạng; mất mạng thì hộp thoại "Không có kết nối Internet" chặn màn hình.
 - **Lần đầu mở app:** sau Splash là màn chọn ngôn ngữ, đã chọn sẵn ngôn ngữ của máy (ngôn ngữ của máy chưa có bản dịch thì chọn English). Bấm "Xong" để vào màn hình chính; những lần mở sau đi thẳng vào màn hình chính. Đổi lại ở mục "Ứng dụng › Ngôn ngữ" của màn hình chính.
 - **Ô Cài đặt nhanh "Custom AOD":** thêm vào bằng cách kéo bảng Cài đặt nhanh xuống rồi bấm sửa. Chạm để bật hoặc tắt đồng hồ (giống công tắc trong app). Từ Android 15, và trên Android 12–14 khi chưa cấp "Hiển thị trên ứng dụng khác", hệ thống không cho service khởi động từ ô này, nên khi bật, app sẽ mở lên để khởi động service (đang khóa máy thì phải mở khóa trước). Tắt thì không cần mở app.
-- **Màn hình tắt** (nút nguồn hoặc hết thời gian chờ): khoảng 1 giây sau, đồng hồ hiện lên. Phần này không cần mạng.
+- **Màn hình tắt** (nút nguồn hoặc hết thời gian chờ): khoảng 1 giây sau, đồng hồ hiện lên. Phần này không cần mạng; riêng thời tiết dùng mạng để tải bản mới, không có mạng thì hiện bản đã tải.
 - **Bấm nút nguồn khi đồng hồ đang hiện:** màn hình nháy tắt rồi sáng lên màn hình khóa, giống AOD thật. Bấm nguồn lần nữa thì màn hình tắt và đồng hồ hiện lại.
 - **Bấm nguồn bật màn hình lại ngay sau khi vừa tắt:** vào màn hình khóa, đồng hồ không chen vào.
 - **Chạm 2 lần:** thoát đồng hồ, về màn hình khóa (mặc định, đổi được). Mở khóa bằng khuôn mặt hoặc vân tay từ đây.
@@ -147,6 +154,7 @@ Hai service còn được bảo vệ bằng quyền của hệ thống, để ch
 - **Nút "Xem thử" trong app:** hiện đồng hồ ngay mà không cần khóa máy.
 - **Thông báo** (cần quyền "Truy cập thông báo"): dưới ngày là icon của các app đang có thông báo, mỗi app một icon, tối đa 5, còn lại hiện "+N". Chỉ có icon, không có nội dung. Có thông báo mới khi đồng hồ đang hiện thì 4 cạnh màn hình sáng nhấp nháy khoảng 4 giây, theo màu của app đó.
 - **Nhạc** (cần quyền "Truy cập thông báo"): khi có app nhạc đang phát hoặc tạm dừng, đồng hồ hiện tên bài, nghệ sĩ và 3 nút Bài trước, Phát/Tạm dừng, Bài tiếp theo. Như chạm 2 lần, nút bị bỏ qua khi cảm biến tiệm cận đang bị che.
+- **Thông tin thêm** (mục "Thông tin thêm trên đồng hồ", mặc định tắt hết): thời tiết hiện tại (icon trời và nhiệt độ) cạnh ngày; tối đa 2 sự kiện còn lại trong hôm nay từ lịch của máy (giờ bắt đầu hoặc "Cả ngày", rồi tên sự kiện); một ghi nhớ ngắn; một hình vẽ nhanh bằng ngón tay, hiện theo màu đồng hồ.
 - **Giao diện đồng hồ:** 4 mặt (Số, Số xếp chồng, Kim, Kim tối giản), 4 font, 8 màu, cỡ 60–150%, ảnh nền tự chọn. Bật "Luôn xoay ngang" để dùng làm đồng hồ đêm khi dựng máy: đồng hồ bên trái, ngày, pin và nhạc bên phải.
 
 Đồng hồ hiện giờ (theo định dạng 12 hoặc 24 giờ của máy), ngày, và phần trăm pin kèm trạng thái sạc. Dòng "Chạm 2 lần để thoát" hiện 3 giây rồi mờ đi. Mỗi phút, nội dung dịch sang một vị trí ngẫu nhiên để chống burn-in.
@@ -183,6 +191,18 @@ Mục "Giao diện đồng hồ":
 | Cỡ đồng hồ | `aod_clock_size_percent` | 100% | Từ 60 đến 150%, mỗi nấc 10% |
 | Luôn xoay ngang (đồng hồ đêm) | `is_aod_landscape` | Tắt | Đồng hồ luôn nằm ngang theo chiều dựng máy |
 | Ảnh nền | (file `aod_background.jpg` trong bộ nhớ riêng của app) | Không có | Chọn bằng Photo Picker, không cần quyền đọc ảnh. App lưu một bản sao đã thu về cỡ màn hình; ảnh hiện mờ 50% sau đồng hồ |
+
+Mục "Thông tin thêm trên đồng hồ":
+
+| Tùy chọn | Key | Mặc định | Tác dụng |
+|---|---|---|---|
+| Ghi nhớ | `aod_memo` | Trống | Tối đa 120 ký tự. Hiện dưới ngày, tối đa 3 dòng, cùng font đồng hồ |
+| Hình vẽ nhanh | (file `aod_drawing.png` trong bộ nhớ riêng của app) | Không có | Vẽ bằng ngón tay trong khung vuông. Hiện cỡ 120dp, tô theo màu đồng hồ |
+| Sự kiện hôm nay | `is_aod_calendar_enabled` | Tắt | Tối đa 2 sự kiện còn lại trong hôm nay (sự kiện cả ngày trước), từ các lịch đang hiện trong ứng dụng Lịch, bỏ sự kiện đã từ chối. Cần quyền Lịch |
+| Thời tiết | `is_aod_weather_enabled` | Tắt | Icon trời và nhiệt độ hiện tại cạnh ngày, từ Open-Meteo theo vị trí gần đúng. Cần quyền Vị trí |
+| Hiện nhiệt độ theo °F | `is_aod_weather_fahrenheit` | Tắt | Chỉ hiện khi đã bật Thời tiết |
+
+Bản thời tiết tải gần nhất lưu ở `weather_temperature_celsius`, `weather_code` (mã WMO), `is_weather_day`, `weather_updated_at_millis`, để đồng hồ hiện ngay mà không chờ mạng.
 
 Mục "Thao tác và cảm biến":
 
@@ -226,6 +246,9 @@ hết giờ / trong túi / sai quy tắc (pin yếu, hết khung giờ, nguồn 
 ô Cài đặt nhanh ──▶ AodTileService ──▶ bật/tắt AodService (bị chặn ──▶ mở app để khởi động)
 
 thông báo ──▶ AodNotificationListener ──▶ NotificationStateManager ──▶ icon, viền sáng, nhạc trên đồng hồ
+
+đồng hồ mở ──▶ thời tiết đã lưu hiện ngay ──▶ cũ từ 30 phút: vị trí gần đúng ──▶ Open-Meteo ──▶ lưu ──▶ đồng hồ cập nhật
+đồng hồ mở, mỗi 15 phút ──▶ CalendarContract ──▶ sự kiện còn lại trong hôm nay
 ```
 
 Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20.1](CLAUDE.md#201-luồng).
@@ -241,12 +264,12 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/aod/AodSession.kt` | Trạng thái dùng chung giữa service và Activity (Koin `single`) |
 | `presentation/aod/BootReceiver.kt` | Chạy lại service sau khi khởi động máy hoặc cập nhật app |
 | `presentation/aod/AodTileService.kt` | Ô Cài đặt nhanh bật/tắt đồng hồ; mở app khi hệ thống không cho khởi động service |
-| `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, quy tắc hiện, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần |
-| `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (4 mặt, ngày, icon thông báo, pin, nhạc, gợi ý, viền sáng, ảnh nền, bố cục ngang, dịch vị trí) và phần nối với ViewModel |
+| `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, quy tắc hiện, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần, thời tiết (tải lại khi bản đã lưu cũ), sự kiện lịch |
+| `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (4 mặt, ngày, thời tiết, sự kiện, ghi nhớ, hình vẽ, icon thông báo, pin, nhạc, gợi ý, viền sáng, ảnh nền, bố cục ngang, dịch vị trí) và phần nối với ViewModel |
 | `presentation/aod/AodNotificationListener.kt` | Nhận thông báo từ hệ thống (khi đã cấp "Truy cập thông báo") và chuyển cho `NotificationStateManager` |
-| `presentation/screens/main/` | Màn hình cài đặt (MVI): quyền, tùy chọn, quy tắc hiện, ngôn ngữ, xem thử; hỏi quyền thông báo ở lần mở đầu tiên. Mỗi mục một file `MainXxxSection.kt` |
+| `presentation/screens/main/` | Màn hình cài đặt (MVI): quyền, tùy chọn, thông tin thêm (ô nhập ghi nhớ, khung vẽ, lịch, thời tiết; hỏi quyền Lịch và Vị trí khi bật), quy tắc hiện, ngôn ngữ, xem thử; hỏi quyền thông báo ở lần mở đầu tiên. Mỗi mục một file `MainXxxSection.kt` |
 | `presentation/screens/language/` | Màn chọn ngôn ngữ (MVI): lần mở đầu tiên và từ màn hình cài đặt |
-| `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue` |
+| `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`, `AodExtrasUiModel`, `WeatherUiModel` (ẩn bản cũ từ 3 giờ), `WeatherConditionValue`, `CalendarEventUiModel` |
 | `presentation/components/AppLanguageProvider.kt` | Áp ngôn ngữ đã chọn cho `MainActivity` và `AodActivity` |
 | `presentation/components/SettingsRows.kt` | Các dòng cài đặt dùng chung: tiêu đề mục, công tắc, radio, dòng giá trị, thanh trượt |
 | `presentation/MainActivity.kt` | Activity chính: consent, ngôn ngữ, theme, khởi động service |
@@ -256,12 +279,19 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `data/device/proximity/ProximityManager.kt` | Cảm biến tiệm cận |
 | `data/device/notification/NotificationStateManager.kt` | Lọc thông báo hiện được trên đồng hồ, nạp sẵn icon, báo thông báo mới, giữ phiên nhạc của thông báo nhạc mới nhất |
 | `data/device/media/MediaStateManager.kt` | Bài đang phát và các nút điều khiển nhạc |
-| `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, truy cập thông báo, và quyền riêng của Xiaomi |
+| `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, truy cập thông báo, lịch, vị trí gần đúng, và quyền riêng của Xiaomi |
 | `data/local/datastore/DataStoreManager.kt` | Lưu tùy chọn AOD cùng các prefs của base |
-| `data/local/background/BackgroundImageManager.kt` | Lưu, đọc, xóa ảnh nền (bản sao đã thu nhỏ) |
+| `data/local/image/AodImageManager.kt` | Lưu, đọc, xóa ảnh nền (bản sao JPEG đã thu nhỏ) và hình vẽ nhanh (PNG nền trong suốt) |
 | `data/device/flashlight/FlashlightManager.kt` | Bật/tắt và theo dõi đèn pin |
 | `data/device/light/AmbientLightManager.kt` | Cảm biến ánh sáng |
 | `data/device/pickup/PickupGestureManager.kt` | Cảm biến nhấc máy |
+| `data/device/location/DeviceLocationManager.kt` | Vị trí gần đúng một lần cho thời tiết (fused hoặc nhà cung cấp mạng, chờ tối đa 10 giây rồi dùng vị trí đã biết gần nhất) |
+| `data/network/api/OpenMeteoApiService.kt` · `response/` | API thời tiết Open-Meteo (Retrofit + kotlinx-serialization) |
+| `data/mapper/WeatherConditionMapper.kt` | Mã thời tiết WMO → `WeatherCondition` |
+| `data/repository/WeatherRepositoryImpl.kt` | Lấy vị trí, gọi Open-Meteo với toạ độ đã làm tròn, lưu bản mới vào DataStore; lỗi thì giữ bản cũ |
+| `data/repository/CalendarRepositoryImpl.kt` | Đọc sự kiện hôm nay từ `CalendarContract.Instances`; đọc lỗi thì trả rỗng |
+| `domain/` | `Weather`, `WeatherCondition`, `CalendarEvent`; `WeatherRepository`, `CalendarRepository`; `ObserveWeatherUseCase`, `RefreshWeatherUseCase` (chỉ gọi mạng khi bản đã lưu cũ từ 30 phút), `GetUpcomingEventsUseCase` |
+| `di/AppModule.kt` | Các module Koin, gồm `networkModule` (`Json`, `Retrofit`, `OpenMeteoApiService`), repository và use case |
 | `utils/ContextExt.kt` | `registerSystemReceiver`; mở trang cài đặt: `openSettingsPage` (ROM không có trang đó thì mở Thông tin ứng dụng), `openOverlaySettings`, `openNotificationSettings`, `openNotificationListenerSettings`, `openMiuiPermissionSettings`; `packageUri` |
 | `res/values-v31/themes.xml` | Splash màu đen cho AOD trên Android 12+, thay vì icon app |
 | `res/xml/data_extraction_rules.xml` | Không sao lưu và không chuyển dữ liệu app sang máy mới (Android 12+) |
@@ -301,10 +331,13 @@ Từ FakeAOD sang Custom AOD:
 - **Thông báo trên đồng hồ:** app chỉ nhận được thông báo qua `NotificationListenerService` do hệ thống bind, nên cần quyền "Truy cập thông báo". Thông báo được lọc giống màn hình chờ của hệ thống, và chỉ hiện icon vì đồng hồ nằm trên màn hình khóa. Icon được nạp sẵn ở luồng nền mỗi khi có thông báo, nên khung đầu tiên của đồng hồ đã có icon. Nhạc lấy từ phiên nhạc trong thông báo nhạc mới nhất, giống trình phát trên màn hình khóa của hệ thống; không hiện ảnh bìa vì sáng và dễ burn-in. Viền sáng vẽ bằng gradient vì làm mờ (`blur`) cần Android 12.
 - **Thao tác, đèn pin, cảm biến:** mỗi thao tác lưu một hành động, AOD đọc một lần lúc mở. Phím âm lượng chỉ bị app giữ lại khi đã gán hành động. Đèn pin dùng `setTorchMode`, nên không cần quyền camera. Tự giảm sáng có hai ngưỡng lệch nhau và phải giữ 2 giây để bóng tay hay đèn chớp không làm màn hình nhấp nháy. Nhấc máy chỉ dùng cảm biến nhấc máy chuẩn của Android: nó chạy trên chip cảm biến nên chờ lúc màn hình tắt gần như không tốn pin. App không đoán cảm biến riêng của từng hãng. Không chờ nhấc máy khi đồng hồ tối vì nằm trong túi, để đi bộ không làm sáng màn hình.
 - **Giao diện đồng hồ:** đọc một lần lúc mở AOD, để khung đầu tiên đã đúng mặt, font, màu, cỡ. Hướng ngang được đặt trước khi cửa sổ hiện. Bố cục ngang hay dọc theo kích thước thật của màn hình, nên tự xoay của hệ thống cũng hiển thị đúng. Ảnh nền là bản sao đã thu nhỏ, vì Photo Picker chỉ cho đọc ảnh tạm thời; nó được giải mã ở luồng nền rồi hiện dần, không làm chậm lúc đồng hồ hiện. Font là các họ font có sẵn của hệ thống, không thêm file font.
+- **Thời tiết:** dùng Open-Meteo vì không cần API key hay tài khoản. Vị trí gần đúng (Wi-Fi, mạng di động) đủ cho thời tiết, nhanh và ít tốn pin hơn GPS; toạ độ được làm tròn 2 chữ số thập phân (khoảng 1 km) trước khi gửi. Bản đã tải lưu trong DataStore, nên đồng hồ có thời tiết ngay từ khung đầu, không chờ mạng. App chỉ gọi mạng khi bản đã lưu cũ từ 30 phút, và chỉ lúc app ở tiền cảnh (đồng hồ đang hiện, hoặc lúc bật tùy chọn), nên không cần quyền vị trí nền hay job chạy nền. Đồng hồ hiện lâu (đồng hồ đêm lúc sạc) thì cứ 10 phút thử tải lại; bản cũ từ 3 giờ không hiện nữa để khỏi hiện sai.
+- **Sự kiện lịch:** đọc thẳng `CalendarContract.Instances` của máy (đã gồm sự kiện lặp lại), không cần tài khoản hay mạng. Chỉ hiện giờ và tên sự kiện vì đồng hồ nằm trên màn hình khóa. Sự kiện cả ngày được lưu theo nửa đêm UTC, nên app so theo ngày ghi trên lịch chứ không theo mốc giờ, để không lệch ngày ở múi giờ khác UTC.
+- **Ghi nhớ và hình vẽ:** ghi nhớ là một tùy chọn trong DataStore. Hình vẽ lưu PNG nền trong suốt, nét trắng; lúc hiện mới tô theo màu đồng hồ, nên đổi màu đồng hồ không phải vẽ lại.
 - **Quy tắc hiện ở một chỗ:** nguồn điện, khung giờ và ngưỡng pin nằm trong `AodRulesUiModel.allows()`. Service gọi hàm này lúc màn hình tắt để quyết định có mở AOD không; `AodViewModel` gọi lại khi pin, nguồn cắm đổi và mỗi phút để chuyển AOD đang hiện sang đen. Không đọc được trạng thái pin hay nguồn cắm thì không chặn AOD.
 - **Ô Cài đặt nhanh mở app trên Android 15:** từ Android 15, app có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có cửa sổ nổi hiển thị, và ô Cài đặt nhanh không được miễn. Khi `startForegroundService` bị chặn, ô mở app (`startActivityAndCollapse`, mở khóa trước nếu đang khóa) và `MainActivity` khởi động service từ tiền cảnh. Tắt AOD từ ô thì chỉ cần dừng service, không cần mở app.
 - **Cuộc gọi và báo thức:** màn hình cuộc gọi, báo thức là Activity mở sau nên tự nằm trên AOD, và `noHistory` đóng AOD khi đó. App còn theo dõi `AudioManager` (`AudioStateManager`) để đóng sớm hơn, và không mở AOD khi đang có chuông, cuộc gọi hay báo thức. Không cần quyền `READ_PHONE_STATE`.
-- **Kiến trúc theo base:** tùy chọn là prefs nên nằm thẳng trong `DataStoreManager` (base cấm bọc manager bằng Repository/UseCase chỉ để chuyển tiếp). Mọi tín hiệu thiết bị đi qua manager trong `data/device/`; các manager này chỉ đăng ký receiver hoặc cảm biến khi có người dùng tới, để service chạy nền không nhận `BATTERY_CHANGED` liên tục. Logic của màn đồng hồ nằm trong `AodViewModel`; mọi thao tác với cửa sổ nằm ở `AodActivity`, vì ViewModel không được giữ `Context`. Chi tiết và các ngoại lệ ở [CLAUDE.md › 20](CLAUDE.md#20-aod-core).
+- **Kiến trúc theo base:** tùy chọn là prefs nên nằm thẳng trong `DataStoreManager` (base cấm bọc manager bằng Repository/UseCase chỉ để chuyển tiếp). Thời tiết và sự kiện là dữ liệu từ nguồn ngoài app nên đi đủ đường ViewModel → UseCase → Repository; lỗi của nguồn dữ liệu được Repository xử lý tại chỗ (ghi log, giữ bản cũ hoặc trả rỗng), không có lớp exception riêng. Mọi tín hiệu thiết bị đi qua manager trong `data/device/`; các manager này chỉ đăng ký receiver hoặc cảm biến khi có người dùng tới, để service chạy nền không nhận `BATTERY_CHANGED` liên tục. Logic của màn đồng hồ nằm trong `AodViewModel`; mọi thao tác với cửa sổ nằm ở `AodActivity`, vì ViewModel không được giữ `Context`. Chi tiết và các ngoại lệ ở [CLAUDE.md › 20](CLAUDE.md#20-aod-core).
 
 ## Kiểm tra trên máy thật
 
@@ -342,13 +375,18 @@ Từ FakeAOD sang Custom AOD:
 32. Đèn pin: bật từ đồng hồ, mở khóa: đèn vẫn sáng như khi bật từ thanh thông báo. Bật đèn từ thanh thông báo rồi khóa máy: đồng hồ hiện icon đèn pin.
 33. Tự giảm sáng: đặt độ sáng 50%, khóa máy ở phòng sáng rồi che tay lên cảm biến ánh sáng (hoặc vào phòng tối): sau khoảng 2 giây đồng hồ giảm sáng; ra chỗ sáng thì sáng lại. Vẫy tay nhanh qua cảm biến không làm nhấp nháy.
 34. Nhấc máy: đặt "Tối màn hình sau" 5 phút, để máy nằm yên tới khi đồng hồ tối và màn hình tắt, rồi nhấc máy: đồng hồ hiện lại. Để máy trong túi tới khi tối rồi đi bộ: màn hình không sáng. Máy không hỗ trợ thì công tắc bị tắt kèm dòng giải thích.
+35. Ghi nhớ: bấm "Thêm", dán một đoạn dài: ô nhập dừng ở 120 ký tự, bộ đếm "120/120". "Lưu": dòng Ghi nhớ hiện nội dung, nút đổi thành "Sửa". Khóa máy: ghi nhớ hiện dưới ngày, tối đa 3 dòng, căn giữa. Xóa hết nội dung rồi lưu: lần AOD sau không còn ghi nhớ.
+36. Hình vẽ nhanh: bấm "Vẽ", vẽ vài nét và một chấm; "Xóa hết" làm trống khung; vẽ lại rồi "Lưu". Khóa máy: hình hiện dưới ghi nhớ theo màu đồng hồ. Đổi màu đồng hồ: hình đổi màu theo. "Bỏ hình vẽ": lần AOD sau không còn hình.
+37. Sự kiện hôm nay: trong ứng dụng Lịch, tạo một sự kiện bắt đầu sau 30 phút, một sự kiện cả ngày hôm nay và một sự kiện ngày mai. Bật "Sự kiện hôm nay": hộp thoại xin quyền Lịch hiện; cho phép thì công tắc bật. Khóa máy: hiện "Cả ngày" kèm tên, rồi giờ kèm tên của sự kiện sau 30 phút; không có sự kiện ngày mai. Để đồng hồ hiện tới khi sự kiện kết thúc: dòng đó tự mất. Từ chối quyền: công tắc vẫn tắt và có dòng nhắc.
+38. Thời tiết: bật "Thời tiết": hộp thoại xin vị trí (chọn "Gần đúng" cũng được); cho phép thì công tắc bật và hiện thêm "Hiện nhiệt độ theo °F". Khóa máy khi có mạng và đang bật định vị: icon trời và nhiệt độ hiện cạnh ngày (ban đêm là icon trăng). Bật °F: lần AOD sau đổi sang °F. Tắt mạng rồi khóa máy: vẫn hiện bản đã tải. Thu hồi quyền vị trí: công tắc về tắt.
+39. Thời tiết khi đồng hồ hiện lâu: cắm sạc, để đồng hồ hiện hơn 30 phút khi có mạng: log có lần tải mới, nhiệt độ cập nhật mà không cần khóa lại máy.
 
 Lưu ý khi test trên máy ảo hoặc ngay sau khi vừa dùng app: trong 10 giây sau khi app vừa mở hoặc đóng một Activity, Android cho phép mở Activity từ nền mà không cần quyền gì (log ghi `BAL_ALLOW_GRACE_PERIOD`). Vì vậy đồng hồ có thể hiện dù chưa bật "Hiển thị trên ứng dụng khác". Muốn test đúng thì về màn hình chính, đợi hơn 10 giây rồi mới khóa máy.
 
 Xem log khi có vấn đề:
 
 ```
-adb logcat -s AodService AodViewModel AodTileService MainViewModel ActivityTaskManager PowerManagerService
+adb logcat -s AodService AodViewModel AodTileService MainViewModel WeatherRepositoryImpl CalendarRepositoryImpl DeviceLocationManager ActivityTaskManager PowerManagerService
 ```
 
 Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
@@ -371,7 +409,7 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
 - **Có một thông báo thường trực** của foreground service, ở mức thấp.
 - **Trên Xiaomi, app không tự chạy lại** sau khi bị đóng (vuốt khỏi đa nhiệm, khởi động lại máy, cập nhật app), vì app không xin quyền "Tự khởi chạy". HyperOS chặn việc khởi động lại service (log: `MIUILOG- Reject RestartService ... AodService`). AOD chỉ chạy lại khi mở app. Muốn tự chạy lại thì người dùng bật "Tự khởi chạy" trong cài đặt app. `BootReceiver` vẫn được giữ cho các máy Android khác.
 - **Mã quyền của Xiaomi** (10020, 10021) không có tài liệu chính thức và có thể đổi theo phiên bản HyperOS. Khi đó app hiện dấu "?" thay vì trạng thái.
-- **Màn hình cài đặt cần mạng** (Splash chờ consent, hộp thoại mất mạng của base). AOD không cần mạng.
+- **Màn hình cài đặt cần mạng** (Splash chờ consent, hộp thoại mất mạng của base). AOD không cần mạng, trừ thời tiết.
 - **Ô Cài đặt nhanh trên Android 15 trở lên** phải mở app mỗi lần bật AOD (xem "Các quyết định thiết kế"), đang khóa máy thì phải mở khóa trước.
 - **Thông báo bật lên (heads-up)** của hệ thống vẫn có thể hiện đè lên đồng hồ khi có thông báo mới; app không chặn được.
 - **Icon thông báo vẫn hiện khi đã tắt "Hiện thông báo trên màn hình khóa" của hệ thống** (chỉ icon, không nội dung). Thông báo hoặc kênh đặt ẩn hẳn trên màn hình khóa thì không hiện; riêng tùy chỉnh theo kênh chỉ đọc được từ Android 12. Muốn ẩn hết thì tắt "Hiện biểu tượng thông báo".
@@ -381,6 +419,9 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
 - **Đèn pin bật từ đồng hồ không tự tắt** khi đồng hồ đóng, giống ô Đèn pin của hệ thống.
 - **Font tùy ROM:** "Viết tay" hay "Có chân" là họ font chung, mỗi hãng gán một font khác nhau; máy không có font mỏng thì dùng độ đậm gần nhất.
 - **Trên Xiaomi, phần thông báo cũng cần app đang chạy:** app bị đóng mà không có "Tự khởi chạy" thì hệ thống có thể không bind lại `AodNotificationListener` cho tới khi mở app.
+- **Thời tiết cần mạng và định vị** lúc đồng hồ đang hiện để có bản mới; không có thì giữ bản đã tải, tối đa 3 giờ. Chỉ có thời tiết hiện tại, không có dự báo. Icon ngày/đêm theo lần tải gần nhất nên quanh lúc mặt trời mọc, lặn có thể trễ tới khoảng 30 phút.
+- **Sự kiện** chỉ lấy từ lịch đã đồng bộ về máy (ứng dụng Lịch), tối đa 2, không hiện địa điểm. Sự kiện vừa thêm hiện ở lần AOD sau, hoặc sau tối đa 15 phút nếu đồng hồ đang hiện.
+- **Hình vẽ nhanh** chỉ có một màu và không xoá từng nét; mở lại khung vẽ là vẽ hình mới.
 - **Form consent có thể hiện trên AOD** nếu nó tải xong đúng lúc AOD đang mở (rất hiếm), xem CLAUDE.md › 20.5.
 
 ## targetSdk 37
@@ -407,6 +448,7 @@ Nếu đưa lên Google Play:
 - Khai báo loại foreground service `specialUse` trong Play Console, gồm mô tả chức năng, ảnh hưởng nếu service bị hoãn hoặc bị ngắt, và video minh họa.
 - `targetSdk` 37 đã đạt yêu cầu tối thiểu 36 mà Play áp dụng từ 31/08/2026.
 - Có quảng cáo: khai báo "Chứa quảng cáo" và mục Data safety cho mã quảng cáo (`AD_ID`) mà Google Mobile Ads dùng.
+- Thời tiết gửi toạ độ gần đúng (đã làm tròn khoảng 1 km) tới Open-Meteo: mục Data safety khai báo "Vị trí gần đúng", chia sẻ với bên thứ ba để lấy thời tiết; chính sách quyền riêng tư nêu tên Open-Meteo. API miễn phí của Open-Meteo dành cho dùng phi thương mại và dữ liệu theo giấy phép CC BY 4.0 (cần ghi nguồn): app có quảng cáo thì kiểm lại điều khoản và gói trả phí trước khi phát hành. Lịch chỉ đọc trên máy, không gửi đi đâu.
 - `NotificationListenerService` đọc được mọi thông báo: mô tả trên Play nên nói rõ chức năng dùng nó (icon, viền sáng, nhạc trên đồng hồ), và chính sách quyền riêng tư nên ghi rằng dữ liệu thông báo chỉ được xử lý trên máy, không gửi đi đâu.
 
 ## Dựng từ Android-Base

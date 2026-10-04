@@ -110,6 +110,16 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
+        MainExtrasSection(
+            extras = state.extras,
+            hasDrawing = state.hasDrawing,
+            isEditingMemo = state.isEditingMemo,
+            isDrawingPadVisible = state.isDrawingPadVisible,
+            hasCalendarPermission = state.hasCalendarPermission,
+            hasLocationPermission = state.hasLocationPermission,
+            onIntent = onIntent,
+        )
+
         MainNotificationsSection(
             options = state.notificationOptions,
             isAccessGranted = state.isNotificationAccessGranted,
@@ -154,7 +164,7 @@ private fun MainSettings(
     }
 }
 
-@Preview(widthDp = 360, heightDp = 3300)
+@Preview(widthDp = 360, heightDp = 3800)
 @Composable
 private fun MainContentPreview() {
     AppTheme {

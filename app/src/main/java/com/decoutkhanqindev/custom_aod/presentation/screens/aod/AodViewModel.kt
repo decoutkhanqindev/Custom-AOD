@@ -9,14 +9,19 @@ import com.decoutkhanqindev.custom_aod.data.device.light.AmbientLightManager
 import com.decoutkhanqindev.custom_aod.data.device.media.MediaStateManager
 import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStateManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
-import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
+import com.decoutkhanqindev.custom_aod.data.local.image.AodImageManager
+import com.decoutkhanqindev.custom_aod.domain.usecase.GetUpcomingEventsUseCase
+import com.decoutkhanqindev.custom_aod.domain.usecase.ObserveWeatherUseCase
+import com.decoutkhanqindev.custom_aod.domain.usecase.RefreshWeatherUseCase
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodAppearance
+import com.decoutkhanqindev.custom_aod.presentation.model.currentAodExtras
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodInteraction
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodNotificationOptions
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
@@ -29,6 +34,7 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import com.decoutkhanqindev.custom_aod.utils.collectLatestCatching
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
@@ -50,9 +56,12 @@ class AodViewModel(
     private val proximityManager: ProximityManager,
     private val notificationStateManager: NotificationStateManager,
     private val mediaStateManager: MediaStateManager,
-    private val backgroundImageManager: BackgroundImageManager,
+    private val aodImageManager: AodImageManager,
     private val flashlightManager: FlashlightManager,
     private val ambientLightManager: AmbientLightManager,
+    private val observeWeatherUseCase: ObserveWeatherUseCase,
+    private val refreshWeatherUseCase: RefreshWeatherUseCase,
+    private val getUpcomingEventsUseCase: GetUpcomingEventsUseCase,
 ) : BaseViewModel<AodState, AodIntent, AodEffect>(
     initialState = initialState(dataStoreManager, batteryStateManager),
 ), Tag {
@@ -71,6 +80,8 @@ class AodViewModel(
     private var timeoutJob: Job? = null
     private var hintJob: Job? = null
     private var glowJob: Job? = null
+    private var nextEventsReloadMillis = 0L
+    private var nextWeatherRefreshMillis = 0L
 
     init {
         observeBattery()
@@ -81,6 +92,12 @@ class AodViewModel(
         if (notificationOptions.isEdgeGlowEnabled) observeAlerts()
         if (notificationOptions.isMediaControlsEnabled) observeMedia()
         loadBackground()
+        loadDrawing()
+        if (state.value.extras.isWeatherEnabled) {
+            observeWeather()
+            refreshWeather()
+        }
+        if (state.value.extras.isCalendarEnabled) loadEvents()
         if (flashlightManager.isAvailable) observeFlashlight()
         if (state.value.interaction.isAutoDimEnabled && ambientLightManager.isAvailable) observeAmbientLight()
         startMinuteTicks()
@@ -227,8 +244,72 @@ class AodViewModel(
     // Giải mã ảnh nền tốn vài chục ms: đồng hồ hiện trước, ảnh nền hiện dần sau, không chặn khung đầu tiên.
     private fun loadBackground() {
         viewModelScope.launch {
-            val background = backgroundImageManager.loadImage() ?: return@launch
+            val background = aodImageManager.loadBackground() ?: return@launch
             updateState { copy(background = background) }
+        }
+    }
+
+    private fun loadDrawing() {
+        viewModelScope.launch {
+            val drawing = aodImageManager.loadDrawing() ?: return@launch
+            updateState { copy(drawing = drawing) }
+        }
+    }
+
+    private fun observeWeather() {
+        viewModelScope.launch {
+            observeWeatherUseCase().collectCatching(
+                action = { savedWeather ->
+                    val nowMillis = System.currentTimeMillis()
+                    updateState {
+                        copy(
+                            weather = savedWeather
+                                ?.toUiModel(isFahrenheit = extras.isWeatherFahrenheit)
+                                ?.takeIf { it.isFreshAt(nowMillis) },
+                        )
+                    }
+                },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    // Bản đã lưu hiện ngay, bản mới tải ngầm lúc AOD hiện (app đang ở tiền cảnh nên được dùng vị trí); lỗi thì giữ bản cũ.
+    private fun refreshWeather() {
+        val nowMillis = System.currentTimeMillis()
+        nextWeatherRefreshMillis = nowMillis + WEATHER_RETRY_MILLIS
+        viewModelScope.launch {
+            refreshWeatherUseCase(nowMillis = nowMillis)
+                .onFailure { e -> Timber.tag(tag).w("Could not refresh the weather: ${e.message}") }
+        }
+    }
+
+    // AOD có thể hiện liền nhiều giờ (đồng hồ đêm lúc sạc): thử tải lại mỗi WEATHER_RETRY_MILLIS (UseCase chỉ gọi mạng khi bản đã lưu đủ cũ), bản quá cũ thì rời đồng hồ.
+    private fun updateWeather(nowMillis: Long) {
+        if (nowMillis >= nextWeatherRefreshMillis) refreshWeather()
+        updateState { copy(weather = weather?.takeIf { it.isFreshAt(nowMillis) }) }
+    }
+
+    // Đọc lại mỗi EVENTS_RELOAD_MILLIS để có sự kiện mới thêm; giữa hai lần đọc, sự kiện đã kết thúc rời đồng hồ ở tick mỗi phút.
+    private fun loadEvents() {
+        val nowMillis = System.currentTimeMillis()
+        nextEventsReloadMillis = nowMillis + EVENTS_RELOAD_MILLIS
+        viewModelScope.launch {
+            getUpcomingEventsUseCase(
+                nowMillis = nowMillis,
+                endOfDayMillis = CalendarEventUiModel.endOfDayMillis(nowMillis),
+                limit = CalendarEventUiModel.MAX_EVENTS,
+            )
+                .onSuccess { events -> updateState { copy(events = events.map { it.toUiModel() }.toImmutableList()) } }
+                .onFailure { e -> Timber.tag(tag).w("Could not load calendar events: ${e.message}") }
+        }
+    }
+
+    private fun updateEvents(nowMillis: Long) {
+        if (nowMillis >= nextEventsReloadMillis) {
+            loadEvents()
+        } else {
+            updateState { copy(events = events.filter { event -> event.endMillis > nowMillis }.toImmutableList()) }
         }
     }
 
@@ -297,6 +378,8 @@ class AodViewModel(
                 copy(nowMillis = nowMillis, shiftXDp = randomShiftX(), shiftYDp = randomShiftY())
             }
         }
+        if (state.value.extras.isWeatherEnabled) updateWeather(nowMillis)
+        if (state.value.extras.isCalendarEnabled) updateEvents(nowMillis)
         checkRules()
     }
 
@@ -339,6 +422,8 @@ class AodViewModel(
         private const val LIGHT_SETTLE_MILLIS = 2_000L
         private const val DIM_LUX = 5f
         private const val UNDIM_LUX = 20f
+        private const val EVENTS_RELOAD_MILLIS = 15 * 60_000L
+        private const val WEATHER_RETRY_MILLIS = 10 * 60_000L
         private const val MAX_SHIFT_X_DP = 24
         private const val MAX_SHIFT_Y_DP = 64
 
@@ -350,6 +435,7 @@ class AodViewModel(
             nowMillis = System.currentTimeMillis(),
             appearance = dataStoreManager.currentAodAppearance(),
             interaction = dataStoreManager.currentAodInteraction(),
+            extras = dataStoreManager.currentAodExtras(),
             battery = batteryStateManager.readLevelPercent()?.let { percent ->
                 BatteryUiModel(percent = percent, isCharging = batteryStateManager.readIsCharging() == true)
             },

@@ -72,6 +72,26 @@
   <string name="background_remove">Remove background image</string>
   <string name="background_save_failed">Could not use this image.</string>
 
+  <string name="section_extras">Extras on the clock</string>
+  <string name="opt_memo">Memo</string>
+  <string name="memo_add">Add</string>
+  <string name="memo_edit">Edit</string>
+  <string name="memo_hint">A short note under the clock</string>
+  <string name="memo_length" translatable="false">%1$d/%2$d</string>
+  <string name="opt_drawing">Quick drawing</string>
+  <string name="drawing_draw">Draw</string>
+  <string name="drawing_redraw">Redraw</string>
+  <string name="drawing_remove">Remove drawing</string>
+  <string name="drawing_hint">Draw with your finger</string>
+  <string name="drawing_save_failed">Could not save the drawing.</string>
+  <string name="opt_calendar">Today\'s events</string>
+  <string name="opt_calendar_desc">Upcoming events for today from your calendar. Needs calendar access.</string>
+  <string name="calendar_permission_denied">Calendar access was not allowed. You can allow it in the app\'s system settings.</string>
+  <string name="opt_weather">Weather</string>
+  <string name="opt_weather_desc">From Open-Meteo, using your approximate location. Needs location access.</string>
+  <string name="opt_weather_fahrenheit">Show the temperature in °F</string>
+  <string name="location_permission_denied">Location access was not allowed. You can allow it in the app\'s system settings.</string>
+
   <string name="section_notifications">Notifications on the clock</string>
   <string name="notification_access_needed">Needs Notification access under Permissions.</string>
   <string name="opt_notification_icons">Show notification icons</string>
@@ -120,6 +140,8 @@
   <string name="action_ok">OK</string>
   <string name="action_cancel">Cancel</string>
   <string name="action_back">Back</string>
+  <string name="action_save">Save</string>
+  <string name="action_clear">Clear</string>
 
   <string name="wake_unknown">The clock has not been shown from a screen-off yet.</string>
   <string name="wake_ok">Last time: the clock opened over the lock screen.</string>
@@ -141,4 +163,15 @@
   <string name="aod_media_pause">Pause</string>
   <string name="aod_media_next">Next</string>
   <string name="aod_flashlight_on">Flashlight on</string>
+  <string name="aod_weather_temperature" translatable="false">%1$d°</string>
+  <string name="aod_event_all_day">All day</string>
+  <string name="aod_drawing">Drawing</string>
+  <string name="weather_clear">Clear</string>
+  <string name="weather_partly_cloudy">Partly cloudy</string>
+  <string name="weather_cloudy">Cloudy</string>
+  <string name="weather_fog">Fog</string>
+  <string name="weather_drizzle">Drizzle</string>
+  <string name="weather_rain">Rain</string>
+  <string name="weather_snow">Snow</string>
+  <string name="weather_thunderstorm">Thunderstorm</string>
 </resources>

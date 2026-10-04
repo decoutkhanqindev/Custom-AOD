@@ -37,6 +37,16 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
     ) { isGranted ->
         viewModel.onIntent(MainIntent.NotificationPermissionResult(isGranted))
     }
+    val calendarPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        viewModel.onIntent(MainIntent.CalendarPermissionResult(isGranted))
+    }
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        viewModel.onIntent(MainIntent.LocationPermissionResult(isGranted))
+    }
     val backgroundPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
@@ -52,11 +62,19 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                 is MainEffect.OpenOverlaySettings -> context.openOverlaySettings()
                 is MainEffect.OpenMiuiPermissionSettings -> context.openMiuiPermissionSettings()
                 is MainEffect.OpenNotificationSettings -> context.openNotificationSettings()
-                is MainEffect.OpenNotificationAccessSettings -> AodNotificationListener.openAccessSettings(context)
+                is MainEffect.OpenNotificationAccessSettings ->
+                    AodNotificationListener.openAccessSettings(context)
+
                 is MainEffect.RequestNotificationPermission ->
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
+
+                is MainEffect.RequestCalendarPermission ->
+                    calendarPermissionLauncher.launch(Manifest.permission.READ_CALENDAR)
+
+                is MainEffect.RequestLocationPermission ->
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
 
                 is MainEffect.NavigateToLanguage -> backStack.add(LanguageDestination(isFirstOpen = false))
                 is MainEffect.OpenBackgroundPicker ->

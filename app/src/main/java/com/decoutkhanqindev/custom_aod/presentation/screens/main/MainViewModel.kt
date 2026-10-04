@@ -1,17 +1,20 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main
 
+import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.data.device.flashlight.FlashlightManager
 import com.decoutkhanqindev.custom_aod.data.device.light.AmbientLightManager
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.data.device.pickup.PickupGestureManager
-import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
+import com.decoutkhanqindev.custom_aod.data.local.image.AodImageManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
+import com.decoutkhanqindev.custom_aod.domain.usecase.RefreshWeatherUseCase
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
@@ -48,10 +51,11 @@ class MainViewModel(
     private val dataStoreManager: DataStoreManager,
     private val permissionManager: PermissionManager,
     private val languageManager: LanguageManager,
-    private val backgroundImageManager: BackgroundImageManager,
+    private val aodImageManager: AodImageManager,
     flashlightManager: FlashlightManager,
     ambientLightManager: AmbientLightManager,
     pickupGestureManager: PickupGestureManager,
+    private val refreshWeatherUseCase: RefreshWeatherUseCase,
 ) : BaseViewModel<MainState, MainIntent, MainEffect>(
     initialState = MainState(
         isFlashlightAvailable = flashlightManager.isAvailable,
@@ -66,6 +70,8 @@ class MainViewModel(
     init {
         observeSettings()
         observeBackground()
+        observeExtras()
+        observeDrawing()
         observeLanguage()
         observeLastWake()
         checkFirstLaunchNotificationPermission()
@@ -86,7 +92,19 @@ class MainViewModel(
             is MainIntent.ToggleLandscape -> dataStoreManager.saveIsAodLandscape(intent.isEnabled)
             is MainIntent.OpenBackgroundPicker -> viewModelScope.launch { sendEffect(MainEffect.OpenBackgroundPicker) }
             is MainIntent.BackgroundPickerResult -> onBackgroundPickerResult(intent.uri)
-            is MainIntent.RemoveBackground -> backgroundImageManager.removeImage()
+            is MainIntent.RemoveBackground -> aodImageManager.removeBackground()
+            is MainIntent.ShowMemoEditor -> updateState { copy(isEditingMemo = true) }
+            is MainIntent.DismissMemoEditor -> updateState { copy(isEditingMemo = false) }
+            is MainIntent.ChangeMemo -> changeMemo(intent.memo)
+            is MainIntent.ShowDrawingPad -> updateState { copy(isDrawingPadVisible = true) }
+            is MainIntent.DismissDrawingPad -> updateState { copy(isDrawingPadVisible = false) }
+            is MainIntent.ChangeDrawing -> changeDrawing(intent.drawing)
+            is MainIntent.RemoveDrawing -> aodImageManager.removeDrawing()
+            is MainIntent.ToggleCalendar -> toggleCalendar(intent.isEnabled)
+            is MainIntent.CalendarPermissionResult -> onCalendarPermissionResult(intent.isGranted)
+            is MainIntent.ToggleWeather -> toggleWeather(intent.isEnabled)
+            is MainIntent.LocationPermissionResult -> onLocationPermissionResult(intent.isGranted)
+            is MainIntent.ToggleWeatherFahrenheit -> dataStoreManager.saveIsAodWeatherFahrenheit(intent.isEnabled)
             is MainIntent.ShowGestureActionPicker -> updateState { copy(editingGesture = intent.gesture) }
             is MainIntent.DismissGestureActionPicker -> updateState { copy(editingGesture = null) }
             is MainIntent.ChangeGestureAction -> changeGestureAction(intent.gesture, intent.action)
@@ -227,8 +245,38 @@ class MainViewModel(
 
     private fun observeBackground() {
         viewModelScope.launch {
-            backgroundImageManager.hasImage.filterNotNull().collectCatching(
-                action = { hasImage -> updateState { copy(hasBackground = hasImage) } },
+            aodImageManager.hasBackground.filterNotNull().collectCatching(
+                action = { hasBackground -> updateState { copy(hasBackground = hasBackground) } },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    private fun observeExtras() {
+        viewModelScope.launch {
+            combine(
+                dataStoreManager.aodMemo.filterNotNull(),
+                dataStoreManager.isAodCalendarEnabled.filterNotNull(),
+                dataStoreManager.isAodWeatherEnabled.filterNotNull(),
+                dataStoreManager.isAodWeatherFahrenheit.filterNotNull(),
+            ) { memo, isCalendarEnabled, isWeatherEnabled, isWeatherFahrenheit ->
+                AodExtrasUiModel(
+                    memo = memo,
+                    isCalendarEnabled = isCalendarEnabled,
+                    isWeatherEnabled = isWeatherEnabled,
+                    isWeatherFahrenheit = isWeatherFahrenheit,
+                )
+            }.collectCatching(
+                action = { extras -> updateState { copy(extras = extras) } },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    private fun observeDrawing() {
+        viewModelScope.launch {
+            aodImageManager.hasDrawing.filterNotNull().collectCatching(
+                action = { hasDrawing -> updateState { copy(hasDrawing = hasDrawing) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -277,7 +325,13 @@ class MainViewModel(
                 ),
             )
         }
-        updateState { copy(permissions = permissions.toImmutableList()) }
+        updateState {
+            copy(
+                permissions = permissions.toImmutableList(),
+                hasCalendarPermission = permissionManager.hasCalendarPermission(),
+                hasLocationPermission = permissionManager.hasCoarseLocationPermission(),
+            )
+        }
     }
 
     // Chỉ hỏi một lần ở lần mở app đầu tiên, để thông báo của foreground service hiện ngay từ đầu (Google Play muốn service đó dễ nhận biết).
@@ -302,7 +356,7 @@ class MainViewModel(
         if (uri == null) return
         viewModelScope.launch {
             updateState { copy(isSavingBackground = true) }
-            val isSaved = backgroundImageManager.saveImage(uri)
+            val isSaved = aodImageManager.saveBackground(uri)
             updateState { copy(isSavingBackground = false) }
             if (!isSaved) sendEffect(MainEffect.ShowMessage(R.string.background_save_failed))
         }
@@ -311,6 +365,64 @@ class MainViewModel(
     private fun changeGestureAction(gesture: AodGestureValue, action: AodActionValue) {
         dataStoreManager.saveGestureAction(gesture, action)
         updateState { copy(editingGesture = null) }
+    }
+
+    private fun changeMemo(memo: String) {
+        dataStoreManager.saveAodMemo(memo.trim().take(AodExtrasUiModel.MEMO_MAX_LENGTH))
+        updateState { copy(isEditingMemo = false) }
+    }
+
+    private fun changeDrawing(drawing: Bitmap) {
+        updateState { copy(isDrawingPadVisible = false) }
+        viewModelScope.launch {
+            if (!aodImageManager.saveDrawing(drawing)) sendEffect(MainEffect.ShowMessage(R.string.drawing_save_failed))
+        }
+    }
+
+    // Bật lịch hay thời tiết khi chưa có quyền thì hỏi quyền trước; chỉ lưu "bật" khi đã được cấp, để AOD không chờ dữ liệu không bao giờ có.
+    private fun toggleCalendar(isEnabled: Boolean) {
+        if (isEnabled && !permissionManager.hasCalendarPermission()) {
+            viewModelScope.launch { sendEffect(MainEffect.RequestCalendarPermission) }
+        } else {
+            dataStoreManager.saveIsAodCalendarEnabled(isEnabled)
+        }
+    }
+
+    private fun onCalendarPermissionResult(isGranted: Boolean) {
+        updateState { copy(hasCalendarPermission = isGranted) }
+        if (isGranted) {
+            dataStoreManager.saveIsAodCalendarEnabled(true)
+        } else {
+            viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.calendar_permission_denied)) }
+        }
+    }
+
+    private fun toggleWeather(isEnabled: Boolean) {
+        when {
+            !isEnabled -> dataStoreManager.saveIsAodWeatherEnabled(false)
+            !permissionManager.hasCoarseLocationPermission() ->
+                viewModelScope.launch { sendEffect(MainEffect.RequestLocationPermission) }
+
+            else -> enableWeather()
+        }
+    }
+
+    private fun onLocationPermissionResult(isGranted: Boolean) {
+        updateState { copy(hasLocationPermission = isGranted) }
+        if (isGranted) {
+            enableWeather()
+        } else {
+            viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.location_permission_denied)) }
+        }
+    }
+
+    // Tải ngay lúc bật (màn cài đặt đang mở nên được dùng vị trí): lần AOD đầu tiên đã có thời tiết.
+    private fun enableWeather() {
+        dataStoreManager.saveIsAodWeatherEnabled(true)
+        viewModelScope.launch {
+            refreshWeatherUseCase(nowMillis = System.currentTimeMillis(), isForced = true)
+                .onFailure { e -> Timber.tag(tag).w("Could not refresh the weather: ${e.message}") }
+        }
     }
 
     private fun changeScheduleTime(time: ScheduleTimeValue, minuteOfDay: Int) {

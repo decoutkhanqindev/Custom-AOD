@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FlashlightOn
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -77,6 +78,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -86,12 +88,16 @@ import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.WeatherConditionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
 import com.decoutkhanqindev.custom_aod.presentation.theme.Black
@@ -100,6 +106,8 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.Grey6E
 import com.decoutkhanqindev.custom_aod.presentation.theme.Grey8A
 import com.decoutkhanqindev.custom_aod.presentation.theme.GreyB4
 import com.decoutkhanqindev.custom_aod.presentation.theme.Mint
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -233,7 +241,17 @@ private fun AodDetails(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(8.dp))
 
-        AodDate(nowMillis = state.nowMillis, fontFamily = state.appearance.font.fontFamily)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AodDate(nowMillis = state.nowMillis, fontFamily = state.appearance.font.fontFamily)
+
+            AodWeather(weather = state.weather, fontFamily = state.appearance.font.fontFamily)
+        }
+
+        AodEvents(events = state.events)
+
+        AodMemo(memo = state.extras.memo, fontFamily = state.appearance.font.fontFamily)
+
+        AodDrawing(drawing = state.drawing, color = state.appearance.color.color)
 
         AodNotificationIcons(notifications = state.notifications)
 
@@ -288,7 +306,7 @@ private fun AodDigitalClock(
     nowMillis: Long,
     appearance: AodAppearanceUiModel,
 ) {
-    val now = rememberZonedNow(nowMillis)
+    val now = rememberZonedDateTime(nowMillis)
     val timeFormatter = rememberTimeFormatter()
 
     Text(
@@ -305,7 +323,7 @@ private fun AodStackedClock(
     nowMillis: Long,
     appearance: AodAppearanceUiModel,
 ) {
-    val now = rememberZonedNow(nowMillis)
+    val now = rememberZonedDateTime(nowMillis)
     val hourFormatter = rememberFormatter(
         if (is24HourFormat()) R.string.aod_hour_pattern_24h else R.string.aod_hour_pattern_12h,
     )
@@ -339,7 +357,7 @@ private fun AodAnalogClock(
     appearance: AodAppearanceUiModel,
     hasTicks: Boolean,
 ) {
-    val now = rememberZonedNow(nowMillis)
+    val now = rememberZonedDateTime(nowMillis)
     val timeDescription = now.format(rememberTimeFormatter())
     val color = appearance.color.color
 
@@ -390,7 +408,7 @@ private fun AodDate(
     nowMillis: Long,
     fontFamily: FontFamily,
 ) {
-    val now = rememberZonedNow(nowMillis)
+    val now = rememberZonedDateTime(nowMillis)
     val dateFormatter = rememberFormatter(R.string.aod_date_pattern)
 
     Text(
@@ -399,6 +417,140 @@ private fun AodDate(
         fontSize = 16.sp,
         fontFamily = fontFamily,
     )
+}
+
+@Composable
+private fun AodWeather(
+    weather: WeatherUiModel?,
+    fontFamily: FontFamily,
+) {
+    AnimatedContent(
+        targetState = weather,
+        contentKey = { it != null },
+        label = "AodWeather",
+    ) { target ->
+        if (target != null) {
+            Row(
+                modifier = Modifier.padding(start = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = target.icon,
+                    contentDescription = stringResource(target.condition.labelRes),
+                    modifier = Modifier.size(18.dp),
+                    tint = Grey8A,
+                )
+
+                Text(
+                    text = stringResource(R.string.aod_weather_temperature, target.temperature),
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = Grey8A,
+                    fontSize = 16.sp,
+                    fontFamily = fontFamily,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
+    val timeFormatter = rememberTimeFormatter()
+
+    AnimatedContent(
+        targetState = events,
+        contentKey = { it.isEmpty() },
+        label = "AodEvents",
+    ) { target ->
+        if (target.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .animateContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                target.forEach { event ->
+                    key(event.beginMillis, event.title) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Event,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = Grey6E,
+                            )
+
+                            Text(
+                                text = if (event.isAllDay) {
+                                    stringResource(R.string.aod_event_all_day)
+                                } else {
+                                    rememberZonedDateTime(event.beginMillis).format(timeFormatter)
+                                },
+                                modifier = Modifier.padding(start = 6.dp),
+                                color = Grey6E,
+                                fontSize = 13.sp,
+                            )
+
+                            Text(
+                                text = event.title,
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .widthIn(max = 220.dp),
+                                color = Grey8A,
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AodMemo(
+    memo: String,
+    fontFamily: FontFamily,
+) {
+    if (memo.isNotBlank()) {
+        Text(
+            text = memo,
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .widthIn(max = 280.dp),
+            color = Grey8A,
+            fontSize = 14.sp,
+            fontFamily = fontFamily,
+            textAlign = TextAlign.Center,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun AodDrawing(
+    drawing: Bitmap?,
+    color: Color,
+) {
+    AnimatedContent(
+        targetState = drawing,
+        contentKey = { it != null },
+        label = "AodDrawing",
+    ) { bitmap ->
+        if (bitmap != null) {
+            Image(
+                bitmap = remember(bitmap) { bitmap.asImageBitmap() },
+                contentDescription = stringResource(R.string.aod_drawing),
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .size(120.dp),
+                colorFilter = ColorFilter.tint(color),
+            )
+        }
+    }
 }
 
 @Composable
@@ -639,8 +791,8 @@ private fun rememberFormatter(@StringRes patternRes: Int): DateTimeFormatter {
 }
 
 @Composable
-private fun rememberZonedNow(nowMillis: Long): ZonedDateTime = remember(nowMillis) {
-    Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault())
+private fun rememberZonedDateTime(epochMillis: Long): ZonedDateTime = remember(epochMillis) {
+    Instant.ofEpochMilli(epochMillis).atZone(ZoneId.systemDefault())
 }
 
 @Preview(widthDp = 360, heightDp = 720)
@@ -649,6 +801,21 @@ private fun AodContentPreview() {
     AodContent(
         state = AodState(
             nowMillis = System.currentTimeMillis(),
+            extras = AodExtrasUiModel(memo = "Buy milk"),
+            weather = WeatherUiModel(
+                temperature = 24,
+                condition = WeatherConditionValue.CLOUDY,
+                isDay = true,
+                updatedAtMillis = System.currentTimeMillis(),
+            ),
+            events = persistentListOf(
+                CalendarEventUiModel(
+                    title = "Team meeting",
+                    beginMillis = System.currentTimeMillis(),
+                    endMillis = System.currentTimeMillis(),
+                    isAllDay = false,
+                ),
+            ),
             battery = BatteryUiModel(percent = 72, isCharging = false),
             media = MediaUiModel(
                 title = "Song title",

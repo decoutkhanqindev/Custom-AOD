@@ -160,4 +160,9 @@ dependencies {
     implementation(libs.play.services.ads)
     implementation(libs.user.messaging.platform)
     implementation(libs.androidx.constraintlayout)
+
+    // Network (Retrofit + kotlinx-serialization, gọi API thời tiết Open-Meteo)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 }

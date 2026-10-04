@@ -11,6 +11,8 @@ sealed interface MainEffect {
     data object OpenNotificationSettings : MainEffect
     data object OpenNotificationAccessSettings : MainEffect
     data object RequestNotificationPermission : MainEffect
+    data object RequestCalendarPermission : MainEffect
+    data object RequestLocationPermission : MainEffect
     data object NavigateToLanguage : MainEffect
     data object OpenBackgroundPicker : MainEffect
     data class ShowMessage(@param:StringRes val messageRes: Int) : MainEffect

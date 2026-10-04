@@ -22,7 +22,7 @@ Số đo phía Custom AOD là của demo FakeAOD trên cùng máy (ghi **[FakeAO
 | Lượt tải, đánh giá | Hơn 10 triệu, 4,5★ [Play] | – |
 | Kiếm tiền | Quảng cáo và gói Premium [Play] | Quảng cáo AdMob của base: quảng cáo xen kẽ ở Splash, đang là id test. Không có Premium |
 | Ngôn ngữ giao diện | 23 [Play] | English và tiếng Việt, chọn trong app (lần mở đầu tiên và ở màn cài đặt) |
-| Kích thước APK | 17,6 MB, gói cho nhiều kiến trúc CPU [Play] | 81,3 MB bản debug, chưa bật R8. Bản release (R8 + shrink) chưa build vì chưa có keystore |
+| Kích thước APK | 17,6 MB, gói cho nhiều kiến trúc CPU [Play] | 83,2 MB bản debug, chưa bật R8. R8 của bản release chạy được, nhưng chưa đóng gói vì chưa có keystore |
 
 ## 2. Kỹ thuật
 
@@ -52,7 +52,7 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | Quy tắc khi nào hiện | ? | `AodRulesUiModel.allows()` (nguồn điện, khung giờ, ngưỡng pin), kiểm lúc màn hình tắt và trong lúc AOD hiện |
 | Kiểm tra sau khi mở AOD | ? | `checkLaunch` sau 2 giây: ghi kết quả, dọn AOD bị giấu sau màn hình khóa |
 | Màn hình khởi động | `PHSplashActivity` của SDK PremiumHelper [máy] | Splash của base: consent UMP rồi quảng cáo xen kẽ. AOD có splash màu đen trên Android 12+ |
-| Tích hợp hệ thống | Ô Cài đặt nhanh, widget, plugin Tasker, `ToggleServiceReceiver` [máy] | Ô Cài đặt nhanh (`AodTileService`). Từ Android 15, bật từ ô phải mở app vì service không được khởi động từ nền. Chưa có widget, Tasker |
+| Tích hợp hệ thống | Ô Cài đặt nhanh, widget, plugin Tasker, `ToggleServiceReceiver` [máy] | Ô Cài đặt nhanh (`AodTileService`). Từ Android 15, bật từ ô phải mở app vì service không được khởi động từ nền. Chưa có widget, Tasker (bỏ qua ở giai đoạn 5) |
 
 ### 2.2 Quyền
 
@@ -63,7 +63,7 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | `POST_NOTIFICATIONS` | ✓ | ✓ (tùy chọn) | Hiện thông báo thường trực |
 | `WAKE_LOCK` | ✓ | ✓ | |
 | `RECEIVE_BOOT_COMPLETED` | ✓ | ✓ | |
-| `INTERNET`, `ACCESS_NETWORK_STATE` | ✓ | ✓ | Custom AOD: quảng cáo, consent, `NetworkManager` của base |
+| `INTERNET`, `ACCESS_NETWORK_STATE` | ✓ | ✓ | Custom AOD: quảng cáo, consent, thời tiết (Open-Meteo), `NetworkManager` của base |
 | `ACCESS_WIFI_STATE` | ✓ | – | |
 | `AD_ID`, 3 quyền `ACCESS_ADSERVICES_*` | ✓ | ✓ | Do SDK quảng cáo thêm (Custom AOD: Google Mobile Ads) |
 | Quyền của AppLovin | ✓ | – | |
@@ -71,13 +71,15 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | `READ_PHONE_STATE` | ✓ | – | Custom AOD nhận biết cuộc gọi qua `AudioManager` |
 | `BIND_NOTIFICATION_LISTENER_SERVICE` | ✓ | ✓ | Thông báo trên AOD. Ở Custom AOD đây là quyền bảo vệ service listener (chỉ hệ thống bind được), không phải quyền app xin, nên `aapt2` không đếm vào tổng |
 | `CAMERA` | ✓ | – | Đèn pin. `CameraManager.setTorchMode()` không cần quyền này |
-| `READ_CALENDAR`, `PACKAGE_USAGE_STATS`, `ACCESS_NOTIFICATION_POLICY`, `REORDER_TASKS`, `VIBRATE` | ✓ | – | Phục vụ các tính năng Custom AOD chưa có |
+| `READ_CALENDAR` | ✓ | ✓ (hỏi khi bật "Sự kiện hôm nay") | Sự kiện trên AOD |
+| `ACCESS_COARSE_LOCATION` | – | ✓ (hỏi khi bật "Thời tiết") | Custom AOD: vị trí gần đúng để tải thời tiết. Danh sách quyền của Always On AMOLED không có quyền vị trí |
+| `PACKAGE_USAGE_STATS`, `ACCESS_NOTIFICATION_POLICY`, `REORDER_TASKS`, `VIBRATE` | ✓ | – | Phục vụ các tính năng Custom AOD chưa có |
 | `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` | ✓ | – | Ảnh nền. Custom AOD dùng Photo Picker, không cần quyền |
 | `BILLING`, `CHECK_LICENSE` | ✓ | – | Mua Premium, kiểm tra bản quyền |
 | `c2dm.RECEIVE`, `BIND_GET_INSTALL_REFERRER_SERVICE` | ✓ | – | Firebase Messaging, đo nguồn cài đặt |
 | `DEVICE_POWER` | ✓ | – | Quyền hệ thống, app thường không được cấp. Có lẽ còn sót từ "Force doze" |
 | `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | ✓ | ✓ | androidx tự sinh |
-| **Tổng số quyền** | **31** | **12 + 1 tự sinh** (6 cho AOD, 6 cho quảng cáo và mạng) | Custom AOD kiểm bằng `aapt2 dump permissions` trên bản debug |
+| **Tổng số quyền** | **31** | **14 + 1 tự sinh** (8 cho AOD, trong đó lịch và vị trí chỉ hỏi khi bật tùy chọn; 6 cho quảng cáo và mạng) | Custom AOD kiểm bằng `aapt2 dump permissions` trên bản debug |
 
 Quyền riêng của Xiaomi:
 
@@ -94,8 +96,8 @@ Quyền riêng của Xiaomi:
 | Quảng cáo | AppLovin, Google Ad ID, Privacy Sandbox (AdServices) | Google Mobile Ads (AdMob) + UMP consent; Google Ad ID và Privacy Sandbox do SDK thêm |
 | Premium, mua hàng | PremiumHelper (Zipoapps), Google Play Billing | Không |
 | Analytics, push | Firebase (Messaging), AppMetrica (tiến trình riêng `:AppMetrica`) | Không |
-| Khác | WorkManager, WebView sandbox | AndroidX, Compose, Navigation 3, Koin, DataStore, Timber, Lottie, kotlinx-collections-immutable |
-| Data safety | Có thể chia sẻ ID thiết bị với bên thứ ba | Google Mobile Ads dùng mã quảng cáo, phải khai báo trong Data safety. Không có analytics |
+| Khác | WorkManager, WebView sandbox | AndroidX, Compose, Navigation 3, Koin, DataStore, Timber, Lottie, kotlinx-collections-immutable, Retrofit + kotlinx-serialization (API thời tiết Open-Meteo) |
+| Data safety | Có thể chia sẻ ID thiết bị với bên thứ ba | Google Mobile Ads dùng mã quảng cáo, phải khai báo trong Data safety. Thời tiết gửi vị trí gần đúng (làm tròn khoảng 1 km) tới Open-Meteo. Không có analytics |
 
 ## 3. Tính năng
 
@@ -109,10 +111,10 @@ Quyền riêng của Xiaomi:
 | | Thông báo: icon và nội dung | ✓ [Play] | ⚠️ chỉ icon, mỗi app một icon (không hiện nội dung trên màn hình khóa) |
 | | Viền sáng (edge glow) khi có thông báo mới | ✓ [Play] | ✓ (theo màu của app, khoảng 4 giây) |
 | | Điều khiển nhạc | ✓ [Play] | ✓ (tên bài, nghệ sĩ, Bài trước / Phát–Tạm dừng / Bài tiếp theo) |
-| | Memo luôn hiện | ✓ [Play] | ✗ |
-| | Ghi chú, vẽ nhanh | ✓ [Play] | ✗ |
-| | Thời tiết | ✓ [Play] | ✗ |
-| | Lịch | ? (suy ra từ quyền `READ_CALENDAR`) | ✗ |
+| | Memo luôn hiện | ✓ [Play] | ✓ (tối đa 120 ký tự, 3 dòng dưới ngày) |
+| | Ghi chú, vẽ nhanh | ✓ [Play] | ⚠️ vẽ nhanh có (một hình, tô theo màu đồng hồ); ghi chú chỉ có một ô Ghi nhớ |
+| | Thời tiết | ✓ [Play] | ✓ (Open-Meteo theo vị trí gần đúng, °C/°F, icon ngày/đêm; không có dự báo) |
+| | Lịch | ? (suy ra từ quyền `READ_CALENDAR`) | ✓ (tối đa 2 sự kiện còn lại trong hôm nay) |
 | Tùy biến | Mặt đồng hồ: Digital S7, Classic 24H, Analog S7, Analog Pebble… | ✓ [Play] | ✓ (4 mặt: Số, Số xếp chồng, Kim, Kim tối giản) |
 | | Font, màu, cỡ chữ | ✓ [Play] | ✓ (4 họ font hệ thống, 8 màu, cỡ 60–150%) |
 | | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ⚠️ ảnh tự chọn bằng Photo Picker, hiện mờ 50%; chưa có bộ ảnh AMOLED sẵn |
@@ -151,13 +153,13 @@ Quyền riêng của Xiaomi:
   - Cùng cách che màn hình khóa (Activity với cờ cửa sổ), cùng cách mở từ nền (quyền "Hiển thị trên ứng dụng khác"), cùng cách giữ chạy nền (foreground service `specialUse`).
   - Custom AOD còn xử lý tốt hơn hai trường hợp: bấm nguồn tắt rồi bật lại ngay, và không mở AOD khi báo thức đang reo.
   - Các số đo là của FakeAOD. Custom AOD giữ cùng cơ chế sau khi refactor, nhưng phải chạy lại trên máy để xác nhận.
-- **Ít quyền hơn:** 12 so với 31. Trong 12 quyền, 6 cho AOD và 6 cho quảng cáo và mạng của base. Không có analytics, Premium hay quyền điện thoại.
+- **Ít quyền hơn:** 14 so với 31. Trong 14 quyền, 8 cho AOD (lịch và vị trí chỉ hỏi khi bật tùy chọn) và 6 cho quảng cáo và mạng của base. Không có analytics, Premium hay quyền điện thoại.
 - **Khác có chủ ý:** nút nguồn đưa về màn hình khóa thay vì mở lại AOD.
 - **Giai đoạn 1 (2026-10-04) đã thêm**, không cần quyền mới: luật theo sạc, lịch theo giờ, chỉnh mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Chưa chạy trên máy.
 - **Giai đoạn 2 (2026-10-04) đã thêm**, cần quyền đặc biệt "Truy cập thông báo": icon thông báo, viền sáng, điều khiển nhạc. Khác đối thủ: chỉ hiện icon, không hiện nội dung thông báo. Chưa chạy trên máy.
 - **Giai đoạn 3 (2026-10-04) đã thêm**, không cần quyền mới: 4 mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Chưa chạy trên máy.
 - **Giai đoạn 4 (2026-10-04) đã thêm**, không cần quyền mới: hành động cho thao tác và phím, đèn pin, tự giảm sáng, nhấc máy để hiện lại đồng hồ. Chưa chạy trên máy.
-- **Khoảng trống lớn nhất còn lại là nội dung và tích hợp.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
-  1. Widget bật/tắt, tùy chọn hiện nội dung thông báo.
-  2. Memo, ghi chú, lịch, thời tiết.
-  3. Tasker, Premium.
+- **Giai đoạn 5 (2026-10-04) đã thêm**, cần 2 quyền hỏi khi bật tùy chọn (`READ_CALENDAR`, `ACCESS_COARSE_LOCATION`) và thư viện Retrofit: thời tiết, sự kiện hôm nay, ghi nhớ, hình vẽ nhanh. Bỏ qua widget và Tasker. Chưa chạy trên máy.
+- **Khoảng trống còn lại chủ yếu là tích hợp và kinh doanh.** Theo mức ảnh hưởng tới người dùng:
+  1. Tùy chọn hiện nội dung thông báo, widget bật/tắt.
+  2. Tasker, Premium, bộ ảnh nền AMOLED có sẵn.

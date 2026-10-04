@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -120,6 +121,7 @@ fun SettingsValueRow(
     value: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    description: String? = null,
 ) {
     Row(
         modifier = modifier
@@ -128,13 +130,27 @@ fun SettingsValueRow(
             .onClick(shape = MaterialTheme.shapes.small, action = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = label,
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 16.dp),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+
+            description?.let { text ->
+                Text(
+                    text = text,
+                    modifier = Modifier.padding(top = 2.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
 
         Text(
             text = value,

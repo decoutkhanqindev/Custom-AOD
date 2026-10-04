@@ -26,6 +26,12 @@ class PermissionManager(
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             app.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
 
+    fun hasCalendarPermission(): Boolean =
+        app.checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
+
+    fun hasCoarseLocationPermission(): Boolean =
+        app.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
     // "Truy cập thông báo" là quyền đặc biệt user bật trong Cài đặt, không có checkSelfPermission.
     fun isNotificationListenerEnabled(): Boolean =
         app.packageName in NotificationManagerCompat.getEnabledListenerPackages(app)

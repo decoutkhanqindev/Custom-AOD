@@ -1,0 +1,300 @@
+package com.decoutkhanqindev.custom_aod.presentation.screens.main
+
+import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.PointMode
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import com.decoutkhanqindev.custom_aod.R
+import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSectionHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSwitchRow
+import com.decoutkhanqindev.custom_aod.presentation.components.SettingsValueRow
+import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.theme.Black
+import com.decoutkhanqindev.custom_aod.presentation.theme.Grey6E
+import com.decoutkhanqindev.custom_aod.presentation.theme.White
+
+@Composable
+fun MainExtrasSection(
+    extras: AodExtrasUiModel,
+    hasDrawing: Boolean,
+    isEditingMemo: Boolean,
+    isDrawingPadVisible: Boolean,
+    hasCalendarPermission: Boolean,
+    hasLocationPermission: Boolean,
+    onIntent: (MainIntent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        SettingsSectionHeader(title = stringResource(R.string.section_extras))
+
+        SettingsValueRow(
+            label = stringResource(R.string.opt_memo),
+            value = stringResource(if (extras.memo.isBlank()) R.string.memo_add else R.string.memo_edit),
+            onClick = { onIntent(MainIntent.ShowMemoEditor) },
+            description = extras.memo.ifBlank { null },
+        )
+
+        SettingsValueRow(
+            label = stringResource(R.string.opt_drawing),
+            value = stringResource(if (hasDrawing) R.string.drawing_redraw else R.string.drawing_draw),
+            onClick = { onIntent(MainIntent.ShowDrawingPad) },
+        )
+
+        AnimatedVisibility(visible = hasDrawing) {
+            SettingsValueRow(
+                label = stringResource(R.string.drawing_remove),
+                value = "",
+                onClick = { onIntent(MainIntent.RemoveDrawing) },
+            )
+        }
+
+        SettingsSwitchRow(
+            label = stringResource(R.string.opt_calendar),
+            isChecked = extras.isCalendarEnabled && hasCalendarPermission,
+            onCheckedChange = { onIntent(MainIntent.ToggleCalendar(it)) },
+            description = stringResource(R.string.opt_calendar_desc),
+        )
+
+        SettingsSwitchRow(
+            label = stringResource(R.string.opt_weather),
+            isChecked = extras.isWeatherEnabled && hasLocationPermission,
+            onCheckedChange = { onIntent(MainIntent.ToggleWeather(it)) },
+            description = stringResource(R.string.opt_weather_desc),
+        )
+
+        AnimatedVisibility(visible = extras.isWeatherEnabled && hasLocationPermission) {
+            SettingsSwitchRow(
+                label = stringResource(R.string.opt_weather_fahrenheit),
+                isChecked = extras.isWeatherFahrenheit,
+                onCheckedChange = { onIntent(MainIntent.ToggleWeatherFahrenheit(it)) },
+            )
+        }
+    }
+
+    if (isEditingMemo) {
+        MemoEditorDialog(
+            memo = extras.memo,
+            onConfirm = { memo -> onIntent(MainIntent.ChangeMemo(memo)) },
+            onDismiss = { onIntent(MainIntent.DismissMemoEditor) },
+        )
+    }
+
+    if (isDrawingPadVisible) {
+        DrawingPadDialog(
+            onConfirm = { drawing -> onIntent(MainIntent.ChangeDrawing(drawing)) },
+            onDismiss = { onIntent(MainIntent.DismissDrawingPad) },
+        )
+    }
+}
+
+@Composable
+private fun MemoEditorDialog(
+    memo: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val memoState = rememberTextFieldState(initialText = memo)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onConfirm(memoState.text.toString()) }) {
+                Text(text = stringResource(R.string.action_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.action_cancel))
+            }
+        },
+        title = { Text(text = stringResource(R.string.opt_memo)) },
+        text = {
+            OutlinedTextField(
+                state = memoState,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(text = stringResource(R.string.memo_hint)) },
+                supportingText = {
+                    Text(
+                        text = stringResource(
+                            R.string.memo_length,
+                            memoState.text.length,
+                            AodExtrasUiModel.MEMO_MAX_LENGTH,
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End,
+                    )
+                },
+                inputTransformation = InputTransformation.maxLength(AodExtrasUiModel.MEMO_MAX_LENGTH),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 3),
+            )
+        },
+    )
+}
+
+@Composable
+private fun DrawingPadDialog(
+    onConfirm: (Bitmap) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val density = LocalDensity.current
+    val strokeWidthPx = with(density) { 8.dp.toPx() }
+    val strokes = remember { mutableStateListOf<SnapshotStateList<Offset>>() }
+    var padSize by remember { mutableStateOf(IntSize.Zero) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm(
+                        renderDrawing(
+                            strokes = strokes,
+                            size = padSize,
+                            density = density,
+                            strokeWidthPx = strokeWidthPx,
+                        ),
+                    )
+                },
+                enabled = strokes.isNotEmpty(),
+            ) {
+                Text(text = stringResource(R.string.action_save))
+            }
+        },
+        dismissButton = {
+            Row {
+                TextButton(
+                    onClick = { strokes.clear() },
+                    enabled = strokes.isNotEmpty(),
+                ) {
+                    Text(text = stringResource(R.string.action_clear))
+                }
+
+                TextButton(onClick = onDismiss) {
+                    Text(text = stringResource(R.string.action_cancel))
+                }
+            }
+        },
+        title = { Text(text = stringResource(R.string.opt_drawing)) },
+        text = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(Black)
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = MaterialTheme.shapes.medium)
+                    .onSizeChanged { size -> padSize = size }
+                    .pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown()
+                            val stroke = mutableStateListOf(down.position)
+                            strokes.add(stroke)
+                            drag(down.id) { change ->
+                                change.consume()
+                                stroke.add(change.position)
+                            }
+                        }
+                    }
+                    .drawBehind {
+                        strokes.forEach { stroke -> drawStroke(points = stroke, color = White, widthPx = strokeWidthPx) }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (strokes.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.drawing_hint),
+                        color = Grey6E,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+        },
+    )
+}
+
+private fun DrawScope.drawStroke(
+    points: List<Offset>,
+    color: Color,
+    widthPx: Float,
+) {
+    if (points.size == 1) {
+        drawCircle(color = color, radius = widthPx / 2, center = points.first())
+    } else {
+        drawPoints(
+            points = points,
+            pointMode = PointMode.Polygon,
+            color = color,
+            strokeWidth = widthPx,
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
+private fun renderDrawing(
+    strokes: List<List<Offset>>,
+    size: IntSize,
+    density: Density,
+    strokeWidthPx: Float,
+): Bitmap {
+    val image = ImageBitmap(width = size.width, height = size.height)
+    CanvasDrawScope().draw(
+        density = density,
+        layoutDirection = LayoutDirection.Ltr,
+        canvas = Canvas(image),
+        size = size.toSize(),
+    ) {
+        strokes.forEach { stroke -> drawStroke(points = stroke, color = White, widthPx = strokeWidthPx) }
+    }
+    return image.asAndroidBitmap()
+}

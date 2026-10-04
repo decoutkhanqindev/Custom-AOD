@@ -6,8 +6,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.decoutkhanqindev.custom_aod.utils.Tag
@@ -149,6 +151,42 @@ class DataStoreManager(
     val isAodRaiseToWakeEnabled: StateFlow<Boolean?> =
         isAodRaiseToWakeEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED)
 
+    private val aodMemoKey: Preferences.Key<String> = stringPreferencesKey(AOD_MEMO_KEY)
+    val aodMemo: StateFlow<String?> =
+        aodMemoKey.asStateFlow(default = DEFAULT_AOD_MEMO)
+
+    private val isAodCalendarEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_CALENDAR_ENABLED_KEY)
+    val isAodCalendarEnabled: StateFlow<Boolean?> =
+        isAodCalendarEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_CALENDAR_ENABLED)
+
+    private val isAodWeatherEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_WEATHER_ENABLED_KEY)
+    val isAodWeatherEnabled: StateFlow<Boolean?> =
+        isAodWeatherEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_WEATHER_ENABLED)
+
+    private val isAodWeatherFahrenheitKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_WEATHER_FAHRENHEIT_KEY)
+    val isAodWeatherFahrenheit: StateFlow<Boolean?> =
+        isAodWeatherFahrenheitKey.asStateFlow(default = DEFAULT_IS_AOD_WEATHER_FAHRENHEIT)
+
+    private val weatherTemperatureCelsiusKey: Preferences.Key<Double> =
+        doublePreferencesKey(WEATHER_TEMPERATURE_CELSIUS_KEY)
+    val weatherTemperatureCelsius: StateFlow<Double?> =
+        weatherTemperatureCelsiusKey.asStateFlow(default = DEFAULT_WEATHER_TEMPERATURE_CELSIUS)
+
+    private val weatherCodeKey: Preferences.Key<Int> = intPreferencesKey(WEATHER_CODE_KEY)
+    val weatherCode: StateFlow<Int?> =
+        weatherCodeKey.asStateFlow(default = DEFAULT_WEATHER_CODE)
+
+    private val isWeatherDayKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_WEATHER_DAY_KEY)
+    val isWeatherDay: StateFlow<Boolean?> =
+        isWeatherDayKey.asStateFlow(default = DEFAULT_IS_WEATHER_DAY)
+
+    private val weatherUpdatedAtMillisKey: Preferences.Key<Long> = longPreferencesKey(WEATHER_UPDATED_AT_MILLIS_KEY)
+    val weatherUpdatedAtMillis: StateFlow<Long?> =
+        weatherUpdatedAtMillisKey.asStateFlow(default = DEFAULT_WEATHER_UPDATED_AT_MILLIS)
+
     private val aodLastWakeKey: Preferences.Key<Int> = intPreferencesKey(AOD_LAST_WAKE_KEY)
     val aodLastWake: StateFlow<Int?> =
         aodLastWakeKey.asStateFlow(default = DEFAULT_AOD_LAST_WAKE)
@@ -270,6 +308,32 @@ class DataStoreManager(
         edit { prefs -> prefs[isAodRaiseToWakeEnabledKey] = value }
     }
 
+    fun saveAodMemo(value: String) {
+        edit { prefs -> prefs[aodMemoKey] = value }
+    }
+
+    fun saveIsAodCalendarEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodCalendarEnabledKey] = value }
+    }
+
+    fun saveIsAodWeatherEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodWeatherEnabledKey] = value }
+    }
+
+    fun saveIsAodWeatherFahrenheit(value: Boolean) {
+        edit { prefs -> prefs[isAodWeatherFahrenheitKey] = value }
+    }
+
+    // Một lần tải thời tiết ghi cả 4 giá trị trong cùng một lần edit: không bao giờ đọc được bản nửa cũ nửa mới.
+    fun saveWeather(temperatureCelsius: Double, code: Int, isDay: Boolean, updatedAtMillis: Long) {
+        edit { prefs ->
+            prefs[weatherTemperatureCelsiusKey] = temperatureCelsius
+            prefs[weatherCodeKey] = code
+            prefs[isWeatherDayKey] = isDay
+            prefs[weatherUpdatedAtMillisKey] = updatedAtMillis
+        }
+    }
+
     fun saveAodLastWake(value: Int) {
         edit { prefs -> prefs[aodLastWakeKey] = value }
     }
@@ -332,6 +396,14 @@ class DataStoreManager(
         private const val AOD_BACK_ACTION_KEY = "aod_back_action"
         private const val IS_AOD_AUTO_DIM_ENABLED_KEY = "is_aod_auto_dim_enabled"
         private const val IS_AOD_RAISE_TO_WAKE_ENABLED_KEY = "is_aod_raise_to_wake_enabled"
+        private const val AOD_MEMO_KEY = "aod_memo"
+        private const val IS_AOD_CALENDAR_ENABLED_KEY = "is_aod_calendar_enabled"
+        private const val IS_AOD_WEATHER_ENABLED_KEY = "is_aod_weather_enabled"
+        private const val IS_AOD_WEATHER_FAHRENHEIT_KEY = "is_aod_weather_fahrenheit"
+        private const val WEATHER_TEMPERATURE_CELSIUS_KEY = "weather_temperature_celsius"
+        private const val WEATHER_CODE_KEY = "weather_code"
+        private const val IS_WEATHER_DAY_KEY = "is_weather_day"
+        private const val WEATHER_UPDATED_AT_MILLIS_KEY = "weather_updated_at_millis"
         private const val AOD_LAST_WAKE_KEY = "aod_last_wake"
         private const val IS_NOTIFICATIONS_ASKED_KEY = "is_notifications_asked"
         private const val DEFAULT_SELECTED_LANG_CODE = "en"
@@ -362,6 +434,14 @@ class DataStoreManager(
         const val DEFAULT_AOD_BACK_ACTION = 1
         const val DEFAULT_IS_AOD_AUTO_DIM_ENABLED = true
         const val DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED = true
+        const val DEFAULT_AOD_MEMO = ""
+        const val DEFAULT_IS_AOD_CALENDAR_ENABLED = false
+        const val DEFAULT_IS_AOD_WEATHER_ENABLED = false
+        const val DEFAULT_IS_AOD_WEATHER_FAHRENHEIT = false
+        private const val DEFAULT_WEATHER_TEMPERATURE_CELSIUS = 0.0
+        private const val DEFAULT_WEATHER_CODE = 0
+        private const val DEFAULT_IS_WEATHER_DAY = true
+        const val DEFAULT_WEATHER_UPDATED_AT_MILLIS = 0L
         private const val DEFAULT_AOD_LAST_WAKE = 0
         private const val DEFAULT_IS_NOTIFICATIONS_ASKED = false
     }

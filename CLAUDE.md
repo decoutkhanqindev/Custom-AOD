@@ -42,18 +42,22 @@ Clean Architecture + MVI trong **1 module `:app`** — ranh giới layer giữ b
 ```
 com.decoutkhanqindev.custom_aod/
 ├── App.kt                         # Application: Timber, Koin, (TODO) SDK khác
-├── di/AppModule.kt                # Koin: managerModule · adsModule · aodModule · repositoryModule · useCaseModule · viewModelModule
+├── di/AppModule.kt                # Koin: managerModule · networkModule · adsModule · aodModule · repositoryModule · useCaseModule · viewModelModule
 ├── ads/                           # AdMob + consent UMP (không nằm trong presentation dù có Compose)
 │   ├── AdsManager.kt              #   consent, init MobileAds, currentActivity, isAdShowing + các placement `by lazy`
 │   ├── ad_unit/                   #   AdUnit (base) · AdUnitState · Banner/Native/Interstitial/Reward/AppOpenAdUnit
 │   └── composables/               #   BannerAdView · NativeAdView (+ NativeLayoutType) · AdLoadingDialog
-├── domain/                        # Business thuần Kotlin (chưa dùng: app chưa có dữ liệu nghiệp vụ — mục 20)
-│   ├── model/ · repository/ · usecase/
+├── domain/                        # Business thuần Kotlin: thời tiết, sự kiện lịch (mục 20)
+│   ├── model/                     #   Weather · WeatherCondition · CalendarEvent
+│   ├── repository/                #   WeatherRepository · CalendarRepository (interface)
+│   └── usecase/                   #   ObserveWeatherUseCase · RefreshWeatherUseCase · GetUpcomingEventsUseCase
 ├── data/
 │   ├── local/datastore/           # DataStoreManager  — prefs app-shell + tuỳ chọn AOD
 │   ├── local/locale/              # LanguageManager   — locale/ngôn ngữ
-│   ├── local/background/          # BackgroundImageManager — ảnh nền AOD (bản sao đã thu nhỏ trong filesDir)
+│   ├── local/image/               # AodImageManager   — ảnh nền + hình vẽ nhanh của AOD (file trong filesDir)
 │   ├── network/connectivity/      # NetworkManager    — trạng thái mạng
+│   ├── network/api/               # OpenMeteoApiService (Retrofit) · response/ (DTO @Serializable)
+│   ├── mapper/                    # mã thời tiết WMO → WeatherCondition
 │   ├── device/                    # tín hiệu thiết bị cho AOD (mục 20.3)
 │   │   ├── screen/                #   ScreenStateManager    — SCREEN_OFF/USER_PRESENT, isInteractive, wake lock
 │   │   ├── battery/               #   BatteryStateManager   — % pin, đang sạc, đang cắm nguồn
@@ -64,8 +68,9 @@ com.decoutkhanqindev.custom_aod/
 │   │   ├── flashlight/            #   FlashlightManager     — đèn pin (setTorchMode, không cần quyền CAMERA)
 │   │   ├── light/                 #   AmbientLightManager   — cảm biến ánh sáng
 │   │   ├── pickup/                #   PickupGestureManager  — cảm biến nhấc máy (android.sensor.pick_up_gesture)
+│   │   ├── location/              #   DeviceLocationManager — vị trí gần đúng 1 lần (cho thời tiết)
 │   │   └── permission/            #   PermissionManager     — overlay, thông báo, truy cập thông báo, quyền riêng của Xiaomi
-│   └── repository/                # XxxRepositoryImpl : XxxRepository
+│   └── repository/                # WeatherRepositoryImpl (Open-Meteo + bản lưu trong DataStore) · CalendarRepositoryImpl (CalendarContract)
 ├── utils/                         # CoroutineExt · NavExt (navigateTo) · ContextExt (showToast, registerSystemReceiver, mở trang cài đặt) · Tag
 └── presentation/
     ├── MainActivity.kt            # requestConsent, áp locale (AppLanguageProvider), AppTheme, start AodService
@@ -73,22 +78,22 @@ com.decoutkhanqindev.custom_aod/
     ├── base/BaseViewModel.kt      # MVI <State, Intent, Effect>
     ├── components/                # Modifiers · AppLottie · AppLanguageProvider · SettingsRows · dialog/NoInternetDialog
     ├── effects/                   # LaunchedWithLifecycleEffect (collect flow theo lifecycle)
-    ├── model/                     # UiModel (AodOptions, AodAppearance, AodInteraction, AodNotificationOptions, AodRules, AodSchedule, AodNotifications, Media, Language…) · LanguageValue · AnimationContentKey · AodGestureValue · AodActionValue · ClockFaceValue · ClockFontValue · ClockColorValue · ChargingRuleValue · ScheduleTimeValue · PermissionValue · PermissionStatusValue · WakeResultValue
+    ├── model/                     # UiModel (AodOptions, AodAppearance, AodInteraction, AodNotificationOptions, AodExtras, AodRules, AodSchedule, AodNotifications, Media, Weather, CalendarEvent, Language…) · LanguageValue · AnimationContentKey · AodGestureValue · AodActionValue · ClockFaceValue · ClockFontValue · ClockColorValue · WeatherConditionValue · ChargingRuleValue · ScheduleTimeValue · PermissionValue · PermissionStatusValue · WakeResultValue
     ├── navigation/                # AppDestinations (NavKey) · AppNavDisplay (+ NoInternetDialog)
     ├── screens/<feature>/         # XxxScreen · XxxContent · XxxViewModel · state/{XxxState, XxxIntent, XxxEffect}
     │   ├── language/              #   chọn ngôn ngữ: lần đầu mở app (Splash → Language → Main) và từ màn Main
-    │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, giao diện, thông báo trên đồng hồ, thao tác và cảm biến, quy tắc hiện, ngôn ngữ, xem thử (+ MainXxxSection)
+    │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, giao diện, thông tin thêm (ghi nhớ, hình vẽ, lịch, thời tiết), thông báo trên đồng hồ, thao tác và cảm biến, quy tắc hiện, ngôn ngữ, xem thử (+ MainXxxSection)
     │   └── aod/                   #   đồng hồ AOD, host là AodActivity (không nằm trong NavDisplay)
     └── theme/                     # Color · Theme · Type (bảng màu tối của FakeAOD)
 ```
 
-`Placeholder.kt` trong `domain/*`, `data/repository` chỉ giữ chỗ + TODO → xoá khi layer đó có file thật. `screens/language/` là màn MVI đầy đủ gọn nhất (6 file) — copy làm khung cho màn mới; `screens/main/` có thêm `MainXxxSection.kt` (Content dài tách theo mục 10.4).
+`screens/language/` là màn MVI đầy đủ gọn nhất (6 file) — copy làm khung cho màn mới; `screens/main/` có thêm `MainXxxSection.kt` (Content dài tách theo mục 10.4).
 
 ### 1.1 Luồng dữ liệu
 
 ```
 User ─▶ Content ──onIntent(Intent)──▶ ViewModel ──invoke()──▶ UseCase ──▶ Repository (interface, domain)
-          ▲                              │                                   │ Impl ở data, tự withContext
+          ▲                              │                                   │ Impl ở data, withContextCatching
           │ state: StateFlow<State> ─────┤                                   ▼
 Screen ◀──┴─ effect: SharedFlow<Effect> ─┘                    DataSource · API · DB · Manager
 
@@ -107,7 +112,7 @@ presentation ──▶ domain ◀── data
 | Layer | Được import | KHÔNG được import |
 |---|---|---|
 | `domain` | Kotlin stdlib · kotlinx.coroutines (`Flow`) · `java.time` · Timber · `utils/` | `android.*` · `androidx.*` · Compose · Koin · `data` · `presentation` · `ads` |
-| `data` | `domain` · kotlinx.coroutines · AndroidX DataStore · `utils/` | `presentation` · Compose · `ads` |
+| `data` | `domain` · `android.*` · kotlinx.coroutines · AndroidX DataStore · Retrofit + kotlinx-serialization (`data/network/api`) · `utils/` | `presentation` · Compose · `ads` |
 | `presentation` | `domain` (UseCase, model) · `presentation/*` · `utils/` · AndroidX/Compose · Manager trong `data/` · `ads/` | `data` Impl / Repository / DataSource |
 | `ads` | `NetworkManager` (inject trong `AdsManager`) · `AdsManager` (inject trong `AdUnit`) · `utils/` · `presentation/components` + `presentation/theme` (chỉ trong `ads/composables`) | `domain` · ViewModel · screen |
 | `di` | mọi layer | — |
@@ -122,7 +127,7 @@ Hệ quả bắt buộc:
 
 | Cần | Làm | Tham khảo |
 |---|---|---|
-| Gọi API | `data/network/api/` (ApiService, response DTO) + interceptor + Koin `single` cho OkHttp/Retrofit; map `HttpException`/`IOException` → exception domain tại Repository | DexReader `data/network/api`, `di/network/ApiModule.kt` |
+| Gọi API | **Đã có:** `data/network/api/` (`XxxApiService` + `response/` DTO `@Serializable`) + `networkModule` (`Json`, `Retrofit` với converter kotlinx-serialization, `create(XxxApiService)`). Không interceptor, không exception riêng của domain: lỗi xử lý ở Impl ([mục 9](#9-data-layer)) | `OpenMeteoApiService` · `WeatherRepositoryImpl` |
 | DB local | `data/local/database/` (Room: Database, Dao, Entity) | DexReader `data/local/database` |
 | Nguồn dữ liệu khác (asset, thuật toán…) | `data/source/<tên>/` — `XxxDataSource` + `XxxDataSourceImpl`, chỉ `data/repository` dùng | Lịch Việt `data/source` |
 | Firebase (Analytics/Crashlytics/Perf) | plugin `google-services` (+ `crashlytics`, `firebase-perf`), Firebase BOM, `app/google-services.json`; bật collection chỉ ở release: `Firebase.crashlytics.isCrashlyticsCollectionEnabled = !BuildConfig.DEBUG` (tương tự analytics/perf) trong `lifecycleScope.launch(Dispatchers.IO)` | DexReader `MainActivity.setUpFirebaseSdk` |
@@ -138,9 +143,9 @@ Manager = hạ tầng runtime **không phải nghiệp vụ** (prefs của app-s
 
 | Manager | Vị trí | Cung cấp |
 |---|---|---|
-| `DataStoreManager` | `data/local/datastore/` | `selectedLangCode`, `isFirstOpen`, tuỳ chọn AOD (`isAodEnabled`, `isAodCustomBrightness`, `aodBrightnessPercent`, `isAodProximityEnabled`, `aodTimeoutMinutes`), giao diện đồng hồ (`aodClockFace`, `aodClockFont`, `aodClockColor`, `aodClockSizePercent`, `isAodLandscape`), thao tác và cảm biến (`aodDoubleTapAction`, `aodSwipeUpAction`, `aodSwipeDownAction`, `aodVolumeUpAction`, `aodVolumeDownAction`, `aodBackAction`, `isAodAutoDimEnabled`, `isAodRaiseToWakeEnabled`), thông báo trên đồng hồ (`isAodNotificationIconsEnabled`, `isAodEdgeGlowEnabled`, `isAodMediaControlsEnabled`), quy tắc hiện (`aodMinBattery`, `aodChargingRule`, `isAodScheduleEnabled`, `aodScheduleStartMinute`, `aodScheduleEndMinute`), `aodLastWake`, `isNotificationsAsked` — mỗi key 1 `StateFlow<T?>` + `saveXxx()`; `DEFAULT_*` của tuỳ chọn AOD là `const` public để nơi đọc đồng bộ có giá trị dự phòng |
+| `DataStoreManager` | `data/local/datastore/` | `selectedLangCode`, `isFirstOpen`, tuỳ chọn AOD (`isAodEnabled`, `isAodCustomBrightness`, `aodBrightnessPercent`, `isAodProximityEnabled`, `aodTimeoutMinutes`), giao diện đồng hồ (`aodClockFace`, `aodClockFont`, `aodClockColor`, `aodClockSizePercent`, `isAodLandscape`), thao tác và cảm biến (`aodDoubleTapAction`, `aodSwipeUpAction`, `aodSwipeDownAction`, `aodVolumeUpAction`, `aodVolumeDownAction`, `aodBackAction`, `isAodAutoDimEnabled`, `isAodRaiseToWakeEnabled`), thông báo trên đồng hồ (`isAodNotificationIconsEnabled`, `isAodEdgeGlowEnabled`, `isAodMediaControlsEnabled`), quy tắc hiện (`aodMinBattery`, `aodChargingRule`, `isAodScheduleEnabled`, `aodScheduleStartMinute`, `aodScheduleEndMinute`), thông tin thêm (`aodMemo`, `isAodCalendarEnabled`, `isAodWeatherEnabled`, `isAodWeatherFahrenheit`), bản thời tiết đã lưu (`weatherTemperatureCelsius`, `weatherCode`, `isWeatherDay`, `weatherUpdatedAtMillis` — ghi cùng 1 lần `edit` bằng `saveWeather(…)`), `aodLastWake`, `isNotificationsAsked` — mỗi key 1 `StateFlow<T?>` + `saveXxx()`; `DEFAULT_*` của tuỳ chọn AOD là `const` public để nơi đọc đồng bộ có giá trị dự phòng |
 | `LanguageManager` | `data/local/locale/` | `deviceLanguageCode()`, `configurationFor(code)`, `resourcesFor(config)`, `displayNameOf(code, displayIn)` |
-| `BackgroundImageManager` | `data/local/background/` | `hasImage: StateFlow<Boolean?>`, `saveImage(uri): Boolean` (suspend, chép và thu nhỏ ảnh từ Photo Picker), `loadImage(): Bitmap?` (suspend), `removeImage()` |
+| `AodImageManager` | `data/local/image/` | `hasBackground` · `hasDrawing: StateFlow<Boolean?>`, `saveBackground(uri): Boolean` (suspend, chép và thu nhỏ ảnh từ Photo Picker), `saveDrawing(bitmap): Boolean` (suspend, PNG nền trong suốt), `loadBackground()` · `loadDrawing(): Bitmap?` (suspend), `removeBackground()`, `removeDrawing()` |
 | `NetworkManager` | `data/network/connectivity/` | `isAvailable: StateFlow<Boolean>` |
 | `ScreenStateManager` | `data/device/screen/` | `events: SharedFlow<String>` (action `SCREEN_OFF` / `USER_PRESENT`), `isInteractive`, `isDeviceSecure`, `wakeUp(holdMillis)` |
 | `BatteryStateManager` | `data/device/battery/` | `levelPercent: StateFlow<Int?>`, `isCharging: StateFlow<Boolean?>`, `isPlugged: StateFlow<Boolean?>` (`EXTRA_PLUGGED`: cắm nguồn kể cả khi pin đầy / giới hạn sạc), `readLevelPercent()`, `readIsCharging()`, `readIsPlugged()` |
@@ -151,7 +156,8 @@ Manager = hạ tầng runtime **không phải nghiệp vụ** (prefs của app-s
 | `FlashlightManager` | `data/device/flashlight/` | `isAvailable`, `isOn: StateFlow<Boolean>` (trạng thái đèn do bất kỳ đâu bật), `toggle()` |
 | `AmbientLightManager` | `data/device/light/` | `isAvailable`, `lux: StateFlow<Float?>` |
 | `PickupGestureManager` | `data/device/pickup/` | `isSupported`, `pickups: Flow<Unit>` (lạnh: phát một lần khi nhấc máy, huỷ collect là huỷ chờ) |
-| `PermissionManager` | `data/device/permission/` | `isXiaomi`, `canDrawOverlays()`, `areNotificationsEnabled()`, `needsNotificationPermission()`, `isNotificationListenerEnabled()`, `isMiuiShowWhenLockedAllowed()`, `isMiuiBackgroundStartAllowed()` |
+| `DeviceLocationManager` | `data/device/location/` | `currentCoarseLocation(): Coordinates?` (suspend, IO: vị trí gần đúng 1 lần, chờ tối đa 10 giây rồi lấy vị trí đã biết gần nhất; không có quyền hoặc tắt định vị → `null`) |
+| `PermissionManager` | `data/device/permission/` | `isXiaomi`, `canDrawOverlays()`, `areNotificationsEnabled()`, `needsNotificationPermission()`, `isNotificationListenerEnabled()`, `isMiuiShowWhenLockedAllowed()`, `isMiuiBackgroundStartAllowed()`, `hasCalendarPermission()`, `hasCoarseLocationPermission()` |
 | `AdsManager` | `ads/` | consent, init MobileAds, current activity, `isAdShowing`, placement (mục 4) |
 
 Rule:
@@ -298,7 +304,8 @@ Rule:
 | Storage | datastore-preferences 1.2.1 | Qua `DataStoreManager` |
 | Ads | play-services-ads 25.5.0 · user-messaging-platform 4.0.0 · constraintlayout 2.2.2 (layout NativeAdView) | Qua `AdsManager` |
 | Collections | kotlinx-collections-immutable 0.5.2 | `ImmutableList` trong State/UiModel |
-| Serialization | plugin `kotlin-serialization` | `@Serializable` cho NavKey |
+| Serialization | plugin `kotlin-serialization` · kotlinx-serialization-json 1.11.0 | `@Serializable` cho NavKey và DTO của API |
+| Network | retrofit 3.0.0 · converter-kotlinx-serialization (cùng version Retrofit) | Chỉ trong `data/network/api` + `networkModule`; OkHttp đi kèm Retrofit, không khai báo riêng |
 | Log | Timber 5.0.1 | KHÔNG `Log.*`/`println` |
 | Animation | lottie-compose 6.7.1 | Chỉ qua `AppLottie` — không gọi `LottieAnimation` trực tiếp |
 | Test | junit 4.13.2 · kotlinx-coroutines-test · androidx.test · compose ui-test | |
@@ -339,8 +346,8 @@ class ObserveXxxUseCase(private val repository: XxxRepository) {
 ## 9. Data layer
 
 - `XxxRepositoryImpl(...) : XxxRepository` trong `data/repository/`; nguồn dữ liệu ở `data/local/…`, `data/network/…`, `data/source/…`.
-- **Main-safe tại Repository/Manager**: `withContext(Dispatchers.IO)` cho IO, `Dispatchers.Default` cho CPU — thường qua `withContextCatching(context = Dispatchers.IO, action = { … }, catch = { … })`. UseCase/ViewModel không tự `withContext`.
-- Repository được ném exception (UseCase bọc `Result`); không trả `null` để báo lỗi. Map exception thư viện (HTTP, IO, DB…) sang exception có nghĩa tại biên data.
+- **Main-safe tại Repository/Manager**, đổi dispatcher **qua `withContextCatching(context = Dispatchers.IO, action = { … }, catch = { … })`** (IO; CPU → `Dispatchers.Default`) — không `withContext` thô ngoài `CoroutineExt.kt` (grep [mục 18](#18-banned-patterns)). Hàm suspend của Retrofit đã main-safe → `withContextCatching(action, catch)` không truyền `context`. UseCase/ViewModel không tự đổi dispatcher.
+- **Không có exception riêng của domain.** Lỗi đã biết của nguồn dữ liệu (mất quyền, mất mạng, chưa định vị được, API lỗi) xử lý ngay ở Impl, trong `catch` của `withContextCatching`: `Timber.w` + giá trị dự phòng có nghĩa (danh sách rỗng, giữ bản đã lưu) — `CalendarRepositoryImpl.getEvents`, `WeatherRepositoryImpl.refreshWeather`. Lỗi lọt ra ngoài vẫn được UseCase bọc `Result` (`suspendRunCatching`). Không trả `null` để báo lỗi.
 - Observe từ callback → `callbackFlow { …; awaitClose { unregister } }` + `distinctUntilChanged()`; flow cần sống tiếp sau lỗi → `recoverCatching { emit(default) }` trước `stateIn`.
 - Mapper DTO/Entity → domain đặt trong `data` (extension `toDomain()` cạnh DTO hoặc `object XxxMapper`).
 
@@ -580,13 +587,14 @@ fun MainScreen() {
 
 ## 12. DI — Koin
 
-- `di/AppModule.kt`: `managerModule` · `adsModule` · `aodModule` · `repositoryModule` · `useCaseModule` · `viewModelModule` → `appModules`, load ở `App.onCreate()` (`startKoin { androidContext(this@App); modules(appModules) }`).
+- `di/AppModule.kt`: `managerModule` · `networkModule` · `adsModule` · `aodModule` · `repositoryModule` · `useCaseModule` · `viewModelModule` → `appModules`, load ở `App.onCreate()` (`startKoin { androidContext(this@App); modules(appModules) }`).
 
 | Loại | Khai báo | Lý do |
 |---|---|---|
 | Manager | `single { XxxManager(androidApplication()) }` | State holder, 1 instance |
 | AdsManager | `single { AdsManager() }` | `Application`/`NetworkManager` lấy trong `AdsManager` qua `by inject()`; consent bắt đầu từ `MainActivity` (`requestConsent`) |
 | AodSession | `single { AodSession(get()) }` (`aodModule`) | State dùng chung giữa `AodService` và `AodActivity` (mục 20) |
+| Network (`networkModule`) | `single { Json { ignoreUnknownKeys = true } }` · `single { Retrofit.Builder()…addConverterFactory(get<Json>().asConverterFactory(…)).build() }` · `single { get<Retrofit>().create(XxxApiService::class.java) }` | 1 client cho cả app; API trả thừa trường không làm lỗi |
 | DataSource / Repository | `single<XxxRepository> { XxxRepositoryImpl(get()) }` | Giữ cache/kết nối |
 | UseCase | `factory { GetXxxUseCase(get()) }` | Không state, rẻ |
 | ViewModel | `viewModel { XxxViewModel(get()) }` · có args: `viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), …) }` | Theo ViewModelStore |
@@ -600,7 +608,7 @@ fun MainScreen() {
 | Hàm | Trả về | Bắt | Dùng ở |
 |---|---|---|---|
 | `suspendRunCatching { }` | `Result<T>` | `Throwable` | UseCase 1 lần; lời gọi suspend 1 lần có thể ném mà nơi gọi cần `Result` |
-| `withContextCatching(context, action, catch)` | `T` | `Exception` | Repository / Manager (đổi dispatcher + map/log lỗi): `DataStoreManager.edit`, init MobileAds của `AdsManager` |
+| `withContextCatching(context, action, catch)` | `T` | `Exception` | Repository / Manager (đổi dispatcher + log lỗi, trả giá trị dự phòng): `DataStoreManager.edit`, init MobileAds của `AdsManager`, `AodImageManager`, `DeviceLocationManager`, `CalendarRepositoryImpl.getEvents`, `WeatherRepositoryImpl.refreshWeather` |
 | `Flow<T>.collectCatching(action, catch)` | — (terminal) | `Exception` từ upstream **và** thân `action` | **Mọi** chỗ collect flow của manager/UseCase: ViewModel, Service, TileService, manager (`AdsManager` collect `isAvailable`) |
 | `Flow<T>.collectLatestCatching(action, catch)` | — (terminal) | Như `collectCatching`; khối cũ bị huỷ khi có giá trị mới không tính là lỗi | Collect phải huỷ khối đang chạy khi có giá trị mới (chờ rồi mới làm): `AodViewModel.observeProximity`, `observeAmbientLight` |
 | `Flow<T>.recoverCatching { }` | `Flow<T>` (intermediate) | `Throwable` | Flow phải sống tiếp: trước `shareIn`/`stateIn` trong manager (`callbackFlow` của receiver/cảm biến, `prefs.data`) |
@@ -625,6 +633,7 @@ fun MainScreen() {
 - Đọc giá trị của manager **1 lần** → `.value` (đồng bộ, `null` → `DEFAULT_*`) hoặc `filterNotNull().first()` (chờ nạp xong); không cần bọc vì `StateFlow` không ném lỗi, lỗi đọc đã được manager `recoverCatching`.
 - Manager: nguồn `callbackFlow` / `prefs.data` → `recoverCatching { … }` trước `shareIn`/`stateIn`; ghi hoặc IO → `withContextCatching(…)` trong `scope.launch` của manager.
 - Lời gọi suspend 1 lần có thể ném → `suspendRunCatching { }.onSuccess { }.onFailure { }` — không `try/catch`, không `runCatching`.
+- **RepositoryImpl dùng helper như Manager:** đổi dispatcher hoặc gọi nguồn có thể ném (`ContentResolver`, Retrofit, vị trí) → `withContextCatching(context = …, action = { … }, catch = { e -> Timber.tag(tag).w(…); giá trị dự phòng })`; lớp implement `Tag` để log. Không `withContext` / `try-catch` thô trong Impl.
 - Hàm **đồng bộ** của hệ thống ném exception có tên (vd `startForegroundService` ném `ForegroundServiceStartNotAllowedException`) → `try/catch` đúng loại đó như `AodService.start()`; helper `-Catching` là hàm suspend, không dùng ở đây.
 - Scope: `viewModelScope` (VM) · `LaunchedEffect`/`rememberCoroutineScope`/`LaunchedWithLifecycleEffect` (Compose) · `lifecycleScope` (Activity) · manager/ad unit tự tạo scope · `AodService` tự tạo scope `Dispatchers.Main.immediate`, huỷ ở `onDestroy` · `BootReceiver` tạo scope ngắn cho `goAsync()`.
 - Dispatcher chọn ở Repository/Manager, không ở VM/UseCase.
@@ -632,7 +641,7 @@ fun MainScreen() {
 
 ## 14. Compose & theme
 
-- **Theme luôn tối** (bảng màu của FakeAOD — app nói về một màn hình phần lớn thời gian tắt, nên nền đen chứ không phải xám tối): `AppTheme { }` với 1 `darkColorScheme` — `primary` Mint, nền/surface `Black`, chữ `GreyED`, `onSurfaceVariant` `Grey9A`, `error` Red; không dynamic color, không theo sáng/tối của hệ thống. `Type.kt` chỉ override `bodyLarge` (font: TODO theo design). XML `Theme.App` có `windowBackground` đen để không loé trắng trước khung Compose đầu tiên.
+- **Theme luôn tối** (bảng màu của FakeAOD — app nói về một màn hình phần lớn thời gian tắt, nên nền đen chứ không phải xám tối): `AppTheme { }` với 1 `darkColorScheme` — `primary` Mint, nền/surface `Black`, chữ `GreyED`, `onSurfaceVariant` `Grey9A`, `error` Red; không dynamic color, không theo sáng/tối của hệ thống. `Type.kt` chỉ override `bodyLarge` (font: TODO theo design). XML `Theme.App` có `windowBackground` đen để không loé trắng trước khung Compose đầu tiên. Splash của app đặt icon app (`ic_aod` 144dp, màu `primary`) đúng giữa cửa sổ, trùng icon của splash hệ thống từ Android 12 (icon thích ứng có nền đen trùng nền cửa sổ nên hệ thống chỉ vẽ lớp foreground cỡ 288dp, glyph chiếm nửa giữa), để chuyển sang Splash của app icon không nhảy.
 - UI dùng **role của MaterialTheme**: `MaterialTheme.colorScheme.<role>` (alpha biến thể viết inline `colorScheme.onSurface.copy(alpha = 0.6f)`), `MaterialTheme.typography.<role>`, `MaterialTheme.shapes.<role>`. Màu cố định ngoài scheme (overlay trong suốt…) → token trong `Color.kt` (`WhiteAlpha30`, `BlackAlpha50`). `Color.Transparent` dùng thẳng. Hex chỉ ở `Color.kt` (ngoại lệ: layout/drawable XML của native ad).
 - Màn AOD (`AodContent`) vẽ **không có `AppTheme`**, cả lúc chạy lẫn `@Preview`: màu là token (giờ theo `ClockColorValue` user chọn, mặc định `GreyB4`; `Grey8A` ngày, `Grey6E` pin, `Grey5A` gợi ý — xám chứ không trắng: ít sáng, ít tốn pin, ít burn-in), cỡ chữ cố định nhân `appearance.scale`. Bọc `AppTheme` thì `Text` nhận `lineHeight`/`letterSpacing` của `bodyLarge` và đồng hồ 76sp bị đè lên dòng ngày.
 - `MainActivity`: `enableEdgeToEdge(SystemBarStyle.dark(…))` (theme luôn tối nên icon thanh hệ thống luôn sáng), khoá dọc, `ComposeUiFlags.isBypassUnfocusableComposeViewEnabled = false` (đặt trước `super.onCreate`, giữ như DexReader), Manifest `adjustResize` → mỗi màn tự xử lý inset (`Scaffold` innerPadding, `navigationBarsPadding()`, `imePadding()`).
@@ -715,6 +724,7 @@ Quy tắc:
 | Manager dạng interface + `Impl` · base class chỉ có 1 lớp con (vd `BaseAds`) | 1 class cụ thể (`XxxManager`, `AdsManager`) |
 | UseCase/Repository chỉ forward Manager | Inject Manager trực tiếp |
 | `runCatching` trong suspend · `catch (CancellationException)` tự viết | `suspendRunCatching` · `withContextCatching` · `collectCatching` · `recoverCatching` |
+| `withContext(…)` thô (Repository, Manager) · exception riêng của domain | `withContextCatching(context = …, action = …, catch = …)` — lỗi xử lý ngay ở Impl ([mục 9](#9-data-layer)) |
 | `.collect { }` / `.collectLatest { }` thô với flow của manager/UseCase (ViewModel, Service, TileService…) | `collectCatching` / `collectLatestCatching(action = …, catch = …)` ([mục 13.1](#131-chọn-helper--bắt-buộc-cho-code-mới)) |
 | Intent/Effect ở thì quá khứ, danh từ trơn, theo nhãn nút (`BackgroundPicked`, `Preview`, `Done`) | Mẫu ở [mục 10.2.1](#1021-đặt-tên-intent--effect) (`BackgroundPickerResult`, `OpenPreview`, `ConfirmLanguage`) |
 | `repeatOnLifecycle` thô rải trong từng Screen · collect effect ngoài helper lifecycle | `LaunchedWithLifecycleEffect { }` (`presentation/effects/`) · `LifecycleResumeEffect` |
@@ -750,6 +760,7 @@ grep -rn "import .*\.data\.repository\.\|import .*Impl$" app/src/main/java --inc
 grep -rn "import .*\.domain\.repository\.\|import .*Impl$" app/src/main/java --include="*ViewModel.kt"
 grep -rn "Timber" app/src/main/java --include="*AdUnit.kt" | grep -v "/ad_unit/AdUnit.kt"
 grep -rn "ManagerImpl\|BaseAds" app/src/main/java --include="*.kt"
+grep -rn "withContext(" app/src/main/java --include="*.kt" | grep -v "/utils/CoroutineExt.kt"
 ```
 
 ---
@@ -758,16 +769,15 @@ grep -rn "ManagerImpl\|BaseAds" app/src/main/java --include="*.kt"
 
 1. `domain/model/` — domain model.
 2. `domain/repository/XxxRepository.kt` — interface.
-3. Nguồn dữ liệu (`data/network/…`, `data/local/…`, `data/source/…`) → `data/repository/XxxRepositoryImpl.kt` (main-safe, map → domain).
+3. Nguồn dữ liệu (`data/network/…`, `data/local/…`, `data/source/…`) → `data/repository/XxxRepositoryImpl.kt` (main-safe và bắt lỗi qua `withContextCatching`, map → domain).
 4. `domain/usecase/` — UseCase ([mục 8](#8-domain-layer)).
-5. `di/AppModule.kt` — `repositoryModule` · `useCaseModule` · `viewModelModule`.
+5. `di/AppModule.kt` — `repositoryModule` · `useCaseModule` · `viewModelModule` (+ `networkModule` nếu thêm ApiService).
 6. `presentation/model/XxxUiModel.kt` (+ `toUiModel()`) nếu cần.
 7. `presentation/screens/xxx/` — copy khung `screens/main/` (State · Intent · Effect · ViewModel · Content · Screen).
 8. `AppDestinations.kt` — `XxxDestination`; đăng ký `entry<XxxDestination>` ở `AppNavDisplay` (hoặc NavDisplay lồng).
 9. Ad cho màn: placement `by lazy` trong `AdsManager` + `<PLACEMENT>_ALL_ID` ở `release {}`/`debug {}`; native/banner truyền slot từ Screen.
 10. Text vào `strings.xml` (+ bản dịch nếu project có), màu cố định mới vào `Color.kt`.
-11. Xoá `Placeholder.kt` của layer vừa có file thật.
-12. `./gradlew :app:compileDebugKotlin` + chạy grep [mục 18](#18-banned-patterns).
+11. `./gradlew :app:compileDebugKotlin` + chạy grep [mục 18](#18-banned-patterns).
 
 ---
 
@@ -798,6 +808,8 @@ AodViewModel: icon (notifications) · viền sáng (alerts, khi không tối) ·
 chạm 2 lần · vuốt · phím âm lượng · phím back ─▶ AodIntent.PerformGesture ─▶ hành động user gán (về màn hình khoá, tối, đèn pin, nhạc)
 phòng tối (AmbientLightManager) ─▶ isDimmed ─▶ AodActivity.renderDim(): độ sáng 1%
 tối theo chủ ý + màn hình tắt ─▶ AodService chờ PickupGestureManager.pickups ─▶ nhấc máy ─▶ shouldEnter() ─▶ launchAod()
+AodViewModel lúc mở + mỗi phút: thời tiết (bản đã lưu ngay; RefreshWeatherUseCase ─▶ DeviceLocationManager ─▶ Open-Meteo ─▶ DataStore)
+                                · sự kiện hôm nay (GetUpcomingEventsUseCase ─▶ CalendarContract.Instances) · ghi nhớ · hình vẽ (AodImageManager)
 ```
 
 ### 20.2 Thành phần
@@ -809,15 +821,16 @@ tối theo chủ ý + màn hình tắt ─▶ AodService chờ PickupGestureMana
 | `presentation/aod/AodSession` | Koin `single`, chỉ dùng trên main thread. `WeakReference` tới `AodActivity`; `isShowing`, `isCovered`, `shownAt`, sleep request; `finish()` đóng AOD ngay |
 | `presentation/aod/BootReceiver` | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` → start service nếu đang bật (`goAsync()` trong lúc đọc DataStore) |
 | `presentation/aod/AodNotificationListener` | `NotificationListenerService`, hệ thống chỉ bind khi user đã cấp "Truy cập thông báo". Callback (main thread) chỉ đọc `activeNotifications` + `RankingMap` rồi chuyển cho `NotificationStateManager`; `openAccessSettings(context)` mở trang cấp quyền |
-| `BackgroundImageManager` | Ảnh nền: lưu bản sao JPEG đã thu về cạnh dài của màn hình trong `filesDir`, `loadImage()` cho AOD |
+| `AodImageManager` | Ảnh nền (bản sao JPEG đã thu về cạnh dài của màn hình) và hình vẽ nhanh (PNG nền trong suốt) trong `filesDir`; `loadBackground()` · `loadDrawing()` cho AOD |
+| `domain/` · `data/repository/` | Thời tiết: `ObserveWeatherUseCase` · `RefreshWeatherUseCase` → `WeatherRepository` (`WeatherRepositoryImpl`: `DeviceLocationManager` → `OpenMeteoApiService` → bản lưu trong `DataStoreManager`). Sự kiện: `GetUpcomingEventsUseCase` → `CalendarRepository` (`CalendarRepositoryImpl`: `CalendarContract.Instances`) |
 | `FlashlightManager` · `AmbientLightManager` · `PickupGestureManager` | Đèn pin, ánh sáng phòng, nhấc máy (mục 2) |
 | `NotificationStateManager` · `MediaStateManager` | Lọc thông báo như màn hình chờ của hệ thống, nạp icon ở luồng nền, báo thông báo mới; điều khiển nhạc bằng `MediaController` từ token của thông báo nhạc (mục 2) |
 | `presentation/aod/AodTileService` | Ô Cài đặt nhanh (`TOGGLEABLE_TILE`): hiện và đảo `isAodEnabled`, start/stop service; `AodService.start()` trả `false` → mở app bằng `startActivityAndCollapse` (đang khoá → `unlockAndRun` trước) |
 | `presentation/model/AodRulesUiModel` | Quy tắc hiện: `minBattery`, `chargingRule` (`ChargingRuleValue`), `schedule` (`AodScheduleUiModel`). `allows()` dùng chung cho `AodService.shouldEnter()` và `AodViewModel.checkRules()`; `DataStoreManager.currentAodRules()` đọc snapshot đồng bộ |
-| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ, dịch vị trí và kiểm quy tắc hiện; ẩn dòng gợi ý sau 3 giây; icon thông báo, viền sáng 4 giây, nút nhạc; hành động của thao tác, đèn pin, tự giảm sáng) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ; nhận chạm, vuốt, phím âm lượng) · `AodScreen` (collect effect, phím back, chuyển `isDark`/`isDimmed` cho Activity) |
-| `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn (độ sáng, tiệm cận, hết giờ), giao diện (mặt, font, màu, cỡ, xoay ngang, ảnh nền), thông báo trên đồng hồ (icon, viền sáng, nhạc), thao tác và cảm biến (hành động cho 6 thao tác, tự giảm sáng, nhấc máy), quy tắc hiện (nguồn điện, khung giờ, ngưỡng pin), ngôn ngữ, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
+| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ, dịch vị trí và kiểm quy tắc hiện; ẩn dòng gợi ý sau 3 giây; icon thông báo, viền sáng 4 giây, nút nhạc; hành động của thao tác, đèn pin, tự giảm sáng; thời tiết, sự kiện, ghi nhớ, hình vẽ) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ; nhận chạm, vuốt, phím âm lượng) · `AodScreen` (collect effect, phím back, chuyển `isDark`/`isDimmed` cho Activity) |
+| `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn (độ sáng, tiệm cận, hết giờ), giao diện (mặt, font, màu, cỡ, xoay ngang, ảnh nền), thông tin thêm (ghi nhớ, hình vẽ nhanh, sự kiện hôm nay, thời tiết, °F; hỏi quyền lịch và vị trí khi bật), thông báo trên đồng hồ (icon, viền sáng, nhạc), thao tác và cảm biến (hành động cho 6 thao tác, tự giảm sáng, nhấc máy), quy tắc hiện (nguồn điện, khung giờ, ngưỡng pin), ngôn ngữ, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
 | `data/device/*` | `ScreenStateManager` · `BatteryStateManager` · `AudioStateManager` · `ProximityManager` · `PermissionManager` (mục 2) |
-| `DataStoreManager` | Tuỳ chọn, thông báo trên đồng hồ và quy tắc hiện của AOD, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |
+| `DataStoreManager` | Tuỳ chọn, thông báo trên đồng hồ, thông tin thêm và quy tắc hiện của AOD, bản thời tiết đã lưu, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |
 
 ### 20.3 Bất biến
 
@@ -847,18 +860,24 @@ tối theo chủ ý + màn hình tắt ─▶ AodService chờ PickupGestureMana
 24. **Listener không khai báo `default_filter_types`:** thông báo nhạc thường thuộc loại im lặng hoặc thường trực, lọc theo loại thì mất điều khiển nhạc.
 25. **Giao diện đọc 1 lần lúc mở** (`currentAodAppearance()` trong `initialState`) để khung đầu tiên đúng mặt, font, màu, cỡ. Hướng ngang (`isAodLandscape`) đặt trong `AodActivity.onCreate` trước khi cửa sổ hiện (`SCREEN_ORIENTATION_SENSOR_LANDSCAPE`, cả lúc xem thử; màn hình lớn từ Android 16 bỏ qua). Bố cục ngang hay dọc theo kích thước thật (`BoxWithConstraints`), không theo tuỳ chọn, nên tự xoay của hệ thống cũng đúng; ở bố cục ngang hai biên độ dịch chống burn-in đổi chỗ cho nhau (trục dài dịch nhiều hơn).
 26. **Mặt đồng hồ chỉ đổi mỗi phút**, không có kim giây: mặt kim vẽ bằng `Canvas` từ `nowMillis`; mặt số dùng pattern `translatable="false"` trong `strings.xml` như trước, không có SA/CH.
-27. **Ảnh nền:** Photo Picker chỉ cho đọc tạm, nên `BackgroundImageManager.saveImage()` lưu bản sao JPEG đã thu về cạnh dài của màn hình (ghi file tạm rồi đổi tên). AOD giải mã ở luồng IO rồi hiện dần (`Crossfade`), không chặn khung đầu tiên; vẽ với `alpha = 0.5` để chữ nổi trên ảnh, ẩn khi tối. Ảnh nền đứng yên nên dễ burn-in hơn đồng hồ (README › Giới hạn).
+27. **Ảnh nền:** Photo Picker chỉ cho đọc tạm, nên `AodImageManager.saveBackground()` lưu bản sao JPEG đã thu về cạnh dài của màn hình (ghi file tạm rồi đổi tên). AOD giải mã ở luồng IO rồi hiện dần (`Crossfade`), không chặn khung đầu tiên; vẽ với `alpha = 0.5` để chữ nổi trên ảnh, ẩn khi tối. Ảnh nền đứng yên nên dễ burn-in hơn đồng hồ (README › Giới hạn).
 28. **Font là họ font chung của hệ thống** (`FontFamily.Default/Serif/Monospace/Cursive`): không thêm file font hay thư viện; font cụ thể do ROM chọn.
 29. **Thao tác và phím** (`AodGestureValue` → `AodActionValue`, mỗi thao tác một key DataStore, đọc 1 lần lúc mở): chạm 2 lần, vuốt lên/xuống (quá 80dp), phím tăng/giảm âm lượng, phím back. Mặc định giữ cách chạy trước đây: chạm 2 lần và back về màn hình khoá, còn lại không làm gì. Phím âm lượng chỉ bị chặn khi đã gán hành động, nếu không vẫn chỉnh âm lượng. `AodContent` giữ focus (`focusRequester` + `focusable`) để nhận phím âm lượng qua `onPreviewKeyEvent`; back qua `BackHandler` ở `AodScreen`. Mọi thao tác bị bỏ qua khi cảm biến tiệm cận đang bị che. Dòng "Chạm 2 lần để thoát" chỉ hiện khi chạm 2 lần vẫn là về màn hình khoá.
 30. **Đèn pin** bằng `CameraManager.setTorchMode`, không cần quyền `CAMERA`; trạng thái theo `TorchCallback` (đèn bật từ bất kỳ đâu), AOD hiện icon khi đèn đang bật. Đóng AOD không tắt đèn, giống ô Đèn pin của hệ thống.
 31. **Tự giảm sáng** (`AmbientLightManager`, chỉ đăng ký khi AOD hiện): ≤ 5 lux là phòng tối, ≥ 20 lux là sáng, giữa hai ngưỡng thì giữ nguyên; mức mới phải giữ 2 giây (`collectLatestCatching`) mới đổi. Phòng tối → `AodActivity.renderDim()` đặt độ sáng cửa sổ 1%; đang tối hẳn (`isDark`) thì `renderDark` quyết định.
 32. **Nhấc máy để hiện lại đồng hồ** chỉ dùng cảm biến chuẩn `android.sensor.pick_up_gesture` (wake-up, one-shot, chạy trên chip cảm biến). `AodService` chỉ chờ nhấc máy khi `SCREEN_OFF` đến lúc đồng hồ đã tối theo chủ ý mà **không** bị che: tối vì trong túi thì không chờ, để đi bộ không làm sáng màn hình trong túi. Nhấc máy → `shouldEnter()` (quy tắc vẫn áp dụng) → `launchAod()`; `SCREEN_OFF` tiếp theo huỷ lần chờ cũ.
+33. **Thông tin thêm đọc 1 lần lúc mở** (`currentAodExtras()` trong `initialState`): ghi nhớ, bật/tắt sự kiện, thời tiết, °F. Dưới đồng hồ theo thứ tự: ngày + thời tiết cùng một dòng → sự kiện → ghi nhớ → hình vẽ → icon thông báo → pin → đèn pin → nhạc. Tắt tuỳ chọn thì AOD không đọc lịch, không gọi mạng.
+34. **Thời tiết** (Open-Meteo, không cần API key, không gửi gì ngoài toạ độ): chỉ quyền `ACCESS_COARSE_LOCATION`, xin khi user bật "Thời tiết" và chỉ lưu "bật" khi đã có quyền. Vị trí lấy 1 lần (`DeviceLocationManager`: fused từ Android 12, không có thì nhà cung cấp mạng; chờ tối đa 10 giây rồi dùng vị trí đã biết gần nhất), **làm tròn 2 chữ số thập phân (khoảng 1 km) trước khi gửi**. Kết quả lưu trong DataStore (`saveWeather` ghi 4 key trong 1 lần `edit`): AOD hiện bản đã lưu ngay, tải bản mới ngầm. Chỉ gọi mạng khi bản đã lưu cũ từ 30 phút (`RefreshWeatherUseCase`); AOD đang hiện thử lại mỗi 10 phút (đồng hồ đêm lúc sạc); bản cũ từ 3 giờ không hiện (`WeatherUiModel.isFreshAt`, kiểm lại mỗi phút). Chỉ tải khi app ở tiền cảnh (AOD đang hiện, màn cài đặt lúc bật — `isForced = true`): không có quyền vị trí nền, không có job chạy ngầm. Lỗi (mất mạng, chưa định vị được, API lỗi) → `WeatherRepositoryImpl` log và giữ bản cũ. Icon ngày/đêm theo `is_day` của lần tải.
+35. **Sự kiện hôm nay** (`READ_CALENDAR`, xin khi user bật): `CalendarContract.Instances` từ lúc này tới hết ngày (có cả sự kiện lặp lại và đang diễn ra), chỉ lịch đang hiện trong ứng dụng Lịch, bỏ sự kiện user đã từ chối; sự kiện cả ngày trước rồi theo giờ bắt đầu; tối đa 2. Sự kiện cả ngày lưu theo nửa đêm UTC → so theo ngày ghi trên lịch với ngày ở múi giờ của máy. AOD đọc lúc mở và mỗi 15 phút; sự kiện đã kết thúc rời đồng hồ ở tick mỗi phút. Đọc lỗi (vd quyền bị thu hồi) → `CalendarRepositoryImpl` trả danh sách rỗng. Chỉ hiện giờ và tên sự kiện (1 dòng), không hiện địa điểm hay ghi chú: AOD nằm trên màn hình khoá.
+36. **Ghi nhớ:** tối đa 120 ký tự (`AodExtrasUiModel.MEMO_MAX_LENGTH`, chặn ngay ở ô nhập), bỏ khoảng trắng hai đầu khi lưu; AOD hiện tối đa 3 dòng, căn giữa, cùng font đồng hồ; rỗng thì không hiện.
+37. **Hình vẽ nhanh:** vẽ trên khung vuông nền đen trong dialog, nét trắng 8dp; lưu PNG nền trong suốt cỡ bằng khung vẽ (`AodImageManager.saveDrawing`, ghi file tạm rồi đổi tên). AOD hiện 120dp, tô theo màu đồng hồ (`ColorFilter.tint`), nên đổi màu đồng hồ không phải vẽ lại. Mở lại khung là vẽ hình mới, không sửa hình cũ.
 
 ### 20.4 Chỗ khác MVI / Manager chuẩn, có lý do
 
 - `AodActivity` không phải entry của `NavDisplay` và vẫn tự làm thao tác cửa sổ, vì ViewModel không được chạm `Context`/`Window`. `AodViewModel` chỉ quyết định `isDark`; `AodScreen` chuyển giá trị đó cho Activity qua `onDarkChange`.
 - `AodService` không có UI nên không có ViewModel: logic quyết định nằm trong service, mọi truy cập hệ thống đi qua manager.
-- Domain chưa dùng: tuỳ chọn AOD là prefs nên dùng thẳng `DataStoreManager` (như `isDark` của DexReader, `showCanChiOnCell` của Lịch Việt); bọc Repository/UseCase chỉ forward manager là banned (mục 18).
+- Domain chỉ dùng cho dữ liệu lấy từ nguồn ngoài app (thời tiết từ Open-Meteo, sự kiện từ `CalendarContract`): ViewModel → UseCase → Repository. Tuỳ chọn AOD (kể cả ghi nhớ, bật/tắt sự kiện và thời tiết) vẫn là prefs nên dùng thẳng `DataStoreManager` (như `isDark` của DexReader, `showCanChiOnCell` của Lịch Việt); ảnh nền và hình vẽ là file của app → `AodImageManager`. Bọc Repository/UseCase chỉ forward manager là banned (mục 18).
+- Không có exception riêng của domain (khác mục 1.3 của base): lỗi của nguồn dữ liệu được Impl xử lý tại chỗ bằng `withContextCatching` (mục 9), vì AOD chỉ cần biết "có dữ liệu để hiện hay không".
 - `BootReceiver` là `KoinComponent` (mục 12).
 - `AodNotificationListener` nằm ở `presentation/aod/` như các thành phần hệ thống khác (lấy manager bằng `by inject()`), còn lọc và nạp icon nằm trong `NotificationStateManager`, vì data layer không được dùng Koin như service locator.
 - `AodContent` không bọc `AppTheme` (mục 14).
@@ -878,4 +897,5 @@ tối theo chủ ý + màn hình tắt ─▶ AodService chờ PickupGestureMana
 - Quy tắc "khi nào hiện" mới → key trong `DataStoreManager` + field trong `AodRulesUiModel` (`allows()` và `currentAodRules()`) + Intent của màn Main: service và màn AOD tự áp dụng, không viết lại điều kiện ở chỗ khác.
 - Mặt đồng hồ mới → entry trong `ClockFaceValue` + nhánh trong `AodClockFace` (`AodContent`). Màu mới → token trong `Color.kt` + entry trong `ClockColorValue`.
 - Hành động mới cho thao tác → entry trong `AodActionValue` + nhánh trong `AodViewModel.performGesture`. Thao tác mới → entry trong `AodGestureValue` + key DataStore + nhánh trong `gestureActionCode` / `saveGestureAction` + nơi phát `PerformGesture`.
+- Thông tin thêm trên đồng hồ (kiểu ghi nhớ, sự kiện, thời tiết) → key trong `DataStoreManager` + field trong `AodExtrasUiModel` (`currentAodExtras()`) + Intent của màn Main + composable trong `AodDetails`; dữ liệu lấy từ nguồn ngoài → domain model + Repository + UseCase ([mục 8](#8-domain-layer), [mục 9](#9-data-layer)), quyền runtime xin lúc user bật tuỳ chọn.
 - Danh sách tính năng còn thiếu so với Always On AMOLED: [COMPARISON.md](COMPARISON.md).

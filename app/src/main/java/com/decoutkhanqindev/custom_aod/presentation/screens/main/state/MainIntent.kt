@@ -1,5 +1,6 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 
+import android.graphics.Bitmap
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
@@ -23,6 +24,18 @@ sealed interface MainIntent {
     data object OpenBackgroundPicker : MainIntent
     data class BackgroundPickerResult(val uri: String?) : MainIntent
     data object RemoveBackground : MainIntent
+    data object ShowMemoEditor : MainIntent
+    data object DismissMemoEditor : MainIntent
+    data class ChangeMemo(val memo: String) : MainIntent
+    data object ShowDrawingPad : MainIntent
+    data object DismissDrawingPad : MainIntent
+    data class ChangeDrawing(val drawing: Bitmap) : MainIntent
+    data object RemoveDrawing : MainIntent
+    data class ToggleCalendar(val isEnabled: Boolean) : MainIntent
+    data class CalendarPermissionResult(val isGranted: Boolean) : MainIntent
+    data class ToggleWeather(val isEnabled: Boolean) : MainIntent
+    data class LocationPermissionResult(val isGranted: Boolean) : MainIntent
+    data class ToggleWeatherFahrenheit(val isEnabled: Boolean) : MainIntent
     data class ShowGestureActionPicker(val gesture: AodGestureValue) : MainIntent
     data object DismissGestureActionPicker : MainIntent
     data class ChangeGestureAction(val gesture: AodGestureValue, val action: AodActionValue) : MainIntent

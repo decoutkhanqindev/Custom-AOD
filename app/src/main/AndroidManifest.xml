@@ -15,6 +15,10 @@
   <uses-permission android:name="android.permission.WAKE_LOCK" />
   <!-- Chạy lại AodService sau khi khởi động máy. -->
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <!-- Tuỳ chọn: sự kiện hôm nay trên đồng hồ, chỉ xin khi user bật "Sự kiện hôm nay". -->
+  <uses-permission android:name="android.permission.READ_CALENDAR" />
+  <!-- Tuỳ chọn: vị trí gần đúng (Wi-Fi, mạng di động) cho thời tiết, chỉ xin khi user bật "Thời tiết". -->
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
   <application
       android:name=".App"
