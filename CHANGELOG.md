@@ -4,6 +4,38 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-04 – Giai đoạn 1: quy tắc hiện, độ sáng, ô Cài đặt nhanh, ngôn ngữ
+
+Năm tính năng đầu trong danh sách còn thiếu so với Always On AMOLED ([COMPARISON.md](COMPARISON.md)). Không thêm quyền và thư viện nào. Bản này build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 1 và 14–18).
+
+### Thêm
+
+- Quy tắc nguồn điện (key `aod_charging_rule`): Luôn hiện / Chỉ khi đang cắm sạc / Chỉ khi dùng pin. "Đang cắm" đọc từ `BatteryManager.EXTRA_PLUGGED` (`BatteryStateManager.isPlugged`, `readIsPlugged()`), nên pin đầy hoặc máy dừng sạc ở 80% vẫn tính là đang cắm.
+- Khung giờ (keys `is_aod_schedule_enabled`, `aod_schedule_start_minute`, `aod_schedule_end_minute`): mặc định bật, 07:00–23:00, chỉnh bằng `TimePicker` của Material 3. Bắt đầu sau kết thúc là khung qua nửa đêm; bắt đầu trùng kết thúc là cả ngày; tắt khung giờ là hiện cả ngày.
+- Mức độ sáng (keys `is_aod_custom_brightness`, `aod_brightness_percent`): công tắc cùng thanh trượt 1–100%, mặc định bật ở 1% (bằng mức "giảm độ sáng" cũ). Tắt thì đồng hồ theo độ sáng của hệ thống.
+- `AodRulesUiModel` (kèm `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `DataStoreManager.currentAodRules()`): một hàm `allows()` cho nguồn điện, khung giờ và ngưỡng pin, dùng chung cho `AodService.shouldEnter()` và `AodViewModel.checkRules()`. Đồng hồ đang hiện mà sai quy tắc (rút hoặc cắm sạc, hết khung giờ, pin yếu) thì chuyển sang đen, kiểm lại khi pin, nguồn cắm đổi và mỗi phút.
+- Ô Cài đặt nhanh `AodTileService` (`TOGGLEABLE_TILE`): bật/tắt AOD, trạng thái theo `is_aod_enabled`. Hệ thống chặn khởi động foreground service từ ô (Android 15 trở lên) thì ô mở app bằng `startActivityAndCollapse` (đang khóa thì `unlockAndRun` trước) để `MainActivity` khởi động service.
+- Màn chọn ngôn ngữ `presentation/screens/language/` (MVI, `LanguageDestination(isFirstOpen)`): English và Tiếng Việt (`LanguageValue.TRANSLATED`), tên viết bằng chính ngôn ngữ đó (`LanguageUiModel`), ngôn ngữ của máy lên đầu.
+  - Lần đầu mở app: Splash → Language (chọn sẵn ngôn ngữ của máy, không có nút back) → Main. Bấm "Xong" lưu ngôn ngữ và `is_first_open = false`; thay TODO của base trong `SplashScreen`.
+  - Từ màn Main: mục "Ứng dụng › Ngôn ngữ". "Xong" chỉ bật khi chọn khác ngôn ngữ đang dùng.
+- `presentation/components/SettingsRows.kt`: `SettingsSectionHeader`, `SettingsSwitchRow`, `SettingsRadioRow`, `SettingsValueRow`, `SettingsSlider`, dùng chung cho màn Main và Language.
+- `CLAUDE.md`:
+  - Mục 13.1 "Chọn helper": collect flow của manager/UseCase phải dùng `collectCatching`, các chỗ được giữ collect thô, khi nào dùng `suspendRunCatching`, `withContextCatching`, `recoverCatching`.
+  - Mục 18 thêm lệnh grep `\.collect {` thô.
+  - Mục 20 thêm bất biến 17–19 (quy tắc hiện, `EXTRA_PLUGGED`, khung giờ) và ô Cài đặt nhanh.
+
+### Thay đổi
+
+- Màn Main tách thành `MainContent` cùng `MainPermissionsSection`, `MainOptionsSection`, `MainRulesSection` (mục mới "Khi nào hiện": nguồn điện, khung giờ, ngưỡng pin) và `MainAppSection` (ngôn ngữ). Ngưỡng pin chuyển từ "Tùy chọn" sang "Khi nào hiện" (`AodOptionsUiModel.minBattery` → `AodRulesUiModel.minBattery`).
+- `MainScreen` nhận `backStack` (mở màn Language); `MainViewModel` nhận thêm `LanguageManager`.
+- `AodActivity`: độ sáng là `aod_brightness_percent / 100` khi bật độ sáng riêng, ngược lại `BRIGHTNESS_OVERRIDE_NONE`. Vẫn đặt trong `onCreate`, trước khi cửa sổ hiện.
+- `AodService.start()` trả `Boolean`: `false` khi hệ thống chặn khởi động foreground service.
+- Collector của `AodService` (sự kiện màn hình, ngôn ngữ), `AodViewModel` (pin, nguồn cắm, âm thanh) và `AodTileService` dùng `collectCatching` thay vì `.collect { }` thô. Lỗi chỉ dừng collector đó và được log, không làm crash app. Collector tiệm cận giữ `collectLatest`, vì cần huỷ lần chờ 3 giây khi giá trị đổi.
+
+### Xóa
+
+- Key `is_aod_dim_brightness` (`saveIsAodDimBrightness`) và chuỗi `opt_dim`: thay bằng độ sáng riêng 1–100%. Giá trị đã lưu của key cũ không được chuyển sang, vì app chưa phát hành.
+
 ## [Chưa phát hành] – 2026-10-03 – Chuyển sang Android-Base
 
 Lõi AOD của FakeAOD được đưa vào base [Android-Base](https://github.com/decoutkhanqindev/Android-Base) (repo Custom-AOD) và refactor theo rule của base: tùy chọn vào `DataStoreManager`, tín hiệu thiết bị thành manager, màn đồng hồ và màn cài đặt theo MVI. Cơ chế lõi giữ như FakeAOD; các chỗ hành vi khác ghi ở mục "Khác FakeAOD". Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.

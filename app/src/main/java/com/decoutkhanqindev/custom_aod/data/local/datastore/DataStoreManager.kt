@@ -42,10 +42,14 @@ class DataStoreManager(
     val isAodEnabled: StateFlow<Boolean?> =
         isAodEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_ENABLED)
 
-    private val isAodDimBrightnessKey: Preferences.Key<Boolean> =
-        booleanPreferencesKey(IS_AOD_DIM_BRIGHTNESS_KEY)
-    val isAodDimBrightness: StateFlow<Boolean?> =
-        isAodDimBrightnessKey.asStateFlow(default = DEFAULT_IS_AOD_DIM_BRIGHTNESS)
+    private val isAodCustomBrightnessKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_CUSTOM_BRIGHTNESS_KEY)
+    val isAodCustomBrightness: StateFlow<Boolean?> =
+        isAodCustomBrightnessKey.asStateFlow(default = DEFAULT_IS_AOD_CUSTOM_BRIGHTNESS)
+
+    private val aodBrightnessPercentKey: Preferences.Key<Int> = intPreferencesKey(AOD_BRIGHTNESS_PERCENT_KEY)
+    val aodBrightnessPercent: StateFlow<Int?> =
+        aodBrightnessPercentKey.asStateFlow(default = DEFAULT_AOD_BRIGHTNESS_PERCENT)
 
     private val isAodProximityEnabledKey: Preferences.Key<Boolean> =
         booleanPreferencesKey(IS_AOD_PROXIMITY_ENABLED_KEY)
@@ -59,6 +63,24 @@ class DataStoreManager(
     private val aodMinBatteryKey: Preferences.Key<Int> = intPreferencesKey(AOD_MIN_BATTERY_KEY)
     val aodMinBattery: StateFlow<Int?> =
         aodMinBatteryKey.asStateFlow(default = DEFAULT_AOD_MIN_BATTERY)
+
+    private val aodChargingRuleKey: Preferences.Key<Int> = intPreferencesKey(AOD_CHARGING_RULE_KEY)
+    val aodChargingRule: StateFlow<Int?> =
+        aodChargingRuleKey.asStateFlow(default = DEFAULT_AOD_CHARGING_RULE)
+
+    private val isAodScheduleEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_SCHEDULE_ENABLED_KEY)
+    val isAodScheduleEnabled: StateFlow<Boolean?> =
+        isAodScheduleEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_SCHEDULE_ENABLED)
+
+    private val aodScheduleStartMinuteKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_SCHEDULE_START_MINUTE_KEY)
+    val aodScheduleStartMinute: StateFlow<Int?> =
+        aodScheduleStartMinuteKey.asStateFlow(default = DEFAULT_AOD_SCHEDULE_START_MINUTE)
+
+    private val aodScheduleEndMinuteKey: Preferences.Key<Int> = intPreferencesKey(AOD_SCHEDULE_END_MINUTE_KEY)
+    val aodScheduleEndMinute: StateFlow<Int?> =
+        aodScheduleEndMinuteKey.asStateFlow(default = DEFAULT_AOD_SCHEDULE_END_MINUTE)
 
     private val aodLastWakeKey: Preferences.Key<Int> = intPreferencesKey(AOD_LAST_WAKE_KEY)
     val aodLastWake: StateFlow<Int?> =
@@ -81,8 +103,12 @@ class DataStoreManager(
         edit { prefs -> prefs[isAodEnabledKey] = value }
     }
 
-    fun saveIsAodDimBrightness(value: Boolean) {
-        edit { prefs -> prefs[isAodDimBrightnessKey] = value }
+    fun saveIsAodCustomBrightness(value: Boolean) {
+        edit { prefs -> prefs[isAodCustomBrightnessKey] = value }
+    }
+
+    fun saveAodBrightnessPercent(value: Int) {
+        edit { prefs -> prefs[aodBrightnessPercentKey] = value }
     }
 
     fun saveIsAodProximityEnabled(value: Boolean) {
@@ -95,6 +121,22 @@ class DataStoreManager(
 
     fun saveAodMinBattery(value: Int) {
         edit { prefs -> prefs[aodMinBatteryKey] = value }
+    }
+
+    fun saveAodChargingRule(value: Int) {
+        edit { prefs -> prefs[aodChargingRuleKey] = value }
+    }
+
+    fun saveIsAodScheduleEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodScheduleEnabledKey] = value }
+    }
+
+    fun saveAodScheduleStartMinute(value: Int) {
+        edit { prefs -> prefs[aodScheduleStartMinuteKey] = value }
+    }
+
+    fun saveAodScheduleEndMinute(value: Int) {
+        edit { prefs -> prefs[aodScheduleEndMinuteKey] = value }
     }
 
     fun saveAodLastWake(value: Int) {
@@ -134,19 +176,29 @@ class DataStoreManager(
         private const val SELECTED_LANG_CODE_KEY = "selected_lang_code"
         private const val IS_FIRST_OPEN_KEY = "is_first_open"
         private const val IS_AOD_ENABLED_KEY = "is_aod_enabled"
-        private const val IS_AOD_DIM_BRIGHTNESS_KEY = "is_aod_dim_brightness"
+        private const val IS_AOD_CUSTOM_BRIGHTNESS_KEY = "is_aod_custom_brightness"
+        private const val AOD_BRIGHTNESS_PERCENT_KEY = "aod_brightness_percent"
         private const val IS_AOD_PROXIMITY_ENABLED_KEY = "is_aod_proximity_enabled"
         private const val AOD_TIMEOUT_MINUTES_KEY = "aod_timeout_minutes"
         private const val AOD_MIN_BATTERY_KEY = "aod_min_battery"
+        private const val AOD_CHARGING_RULE_KEY = "aod_charging_rule"
+        private const val IS_AOD_SCHEDULE_ENABLED_KEY = "is_aod_schedule_enabled"
+        private const val AOD_SCHEDULE_START_MINUTE_KEY = "aod_schedule_start_minute"
+        private const val AOD_SCHEDULE_END_MINUTE_KEY = "aod_schedule_end_minute"
         private const val AOD_LAST_WAKE_KEY = "aod_last_wake"
         private const val IS_NOTIFICATIONS_ASKED_KEY = "is_notifications_asked"
         private const val DEFAULT_SELECTED_LANG_CODE = "en"
         private const val DEFAULT_IS_FIRST_OPEN = true
         const val DEFAULT_IS_AOD_ENABLED = true
-        const val DEFAULT_IS_AOD_DIM_BRIGHTNESS = true
+        const val DEFAULT_IS_AOD_CUSTOM_BRIGHTNESS = true
+        const val DEFAULT_AOD_BRIGHTNESS_PERCENT = 1
         const val DEFAULT_IS_AOD_PROXIMITY_ENABLED = true
         const val DEFAULT_AOD_TIMEOUT_MINUTES = 0
         const val DEFAULT_AOD_MIN_BATTERY = 15
+        private const val DEFAULT_AOD_CHARGING_RULE = 0
+        const val DEFAULT_IS_AOD_SCHEDULE_ENABLED = true
+        const val DEFAULT_AOD_SCHEDULE_START_MINUTE = 7 * 60
+        const val DEFAULT_AOD_SCHEDULE_END_MINUTE = 23 * 60
         private const val DEFAULT_AOD_LAST_WAKE = 0
         private const val DEFAULT_IS_NOTIFICATIONS_ASKED = false
     }

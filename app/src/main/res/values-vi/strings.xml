@@ -33,14 +33,31 @@
   <string name="permission_state_missing">Chưa cấp</string>
   <string name="permission_state_unknown">Không rõ</string>
 
-  <string name="opt_dim">Giảm độ sáng khi đồng hồ đang hiện</string>
+  <string name="opt_custom_brightness">Dùng độ sáng riêng cho đồng hồ</string>
+  <string name="opt_brightness_value">Độ sáng: %1$d%%</string>
   <string name="opt_proximity">Tối màn hình khi máy ở trong túi hoặc bị úp</string>
   <string name="opt_timeout_never">Tối màn hình sau: không bao giờ</string>
   <string name="opt_timeout_value">Tối màn hình sau: %1$d phút</string>
+
+  <string name="section_rules">Khi nào hiện</string>
+  <string name="opt_charging_rule">Nguồn điện</string>
+  <string name="charging_rule_always">Luôn hiện</string>
+  <string name="charging_rule_plugged">Chỉ khi đang cắm sạc</string>
+  <string name="charging_rule_on_battery">Chỉ khi dùng pin</string>
+  <string name="opt_schedule">Chỉ hiện trong khung giờ</string>
+  <string name="opt_schedule_start">Bắt đầu</string>
+  <string name="opt_schedule_end">Kết thúc</string>
   <string name="opt_battery_off">Bỏ qua đồng hồ khi pin yếu: tắt</string>
   <string name="opt_battery_value">Bỏ qua đồng hồ khi pin dưới %1$d%%</string>
 
+  <string name="section_app">Ứng dụng</string>
+  <string name="language">Ngôn ngữ</string>
+
   <string name="action_preview">Xem thử</string>
+  <string name="action_done">Xong</string>
+  <string name="action_ok">OK</string>
+  <string name="action_cancel">Hủy</string>
+  <string name="action_back">Quay lại</string>
 
   <string name="wake_unknown">Đồng hồ chưa được hiện lần nào từ lúc màn hình tắt.</string>
   <string name="wake_ok">Lần gần nhất: đồng hồ đã mở được trên màn hình khóa.</string>

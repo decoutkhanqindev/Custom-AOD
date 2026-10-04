@@ -6,11 +6,14 @@ import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
 import com.decoutkhanqindev.custom_aod.utils.Tag
+import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -37,16 +40,18 @@ class AodViewModel(
         dataStoreManager.isAodProximityEnabled.value ?: DataStoreManager.DEFAULT_IS_AOD_PROXIMITY_ENABLED
     private val timeoutMinutes =
         dataStoreManager.aodTimeoutMinutes.value ?: DataStoreManager.DEFAULT_AOD_TIMEOUT_MINUTES
-    private val minBattery = dataStoreManager.aodMinBattery.value ?: DataStoreManager.DEFAULT_AOD_MIN_BATTERY
+    private val rules = dataStoreManager.currentAodRules()
 
-    // Tối vì bị che (khác với hết giờ, pin yếu): chỉ trường hợp này mới sáng lại khi lấy máy ra.
+    // Tối vì bị che (khác với hết giờ, pin yếu, ngoài quy tắc): chỉ trường hợp này mới sáng lại khi lấy máy ra.
     private var isDarkUntilUncovered = false
     private var isCovered = false
+    private var isPlugged = batteryStateManager.readIsPlugged()
     private var timeoutJob: Job? = null
     private var hintJob: Job? = null
 
     init {
         observeBattery()
+        observePlugged()
         observeAudio()
         startMinuteTicks()
         scheduleHintHide()
@@ -74,7 +79,25 @@ class AodViewModel(
                 batteryStateManager.levelPercent.filterNotNull(),
                 batteryStateManager.isCharging.filterNotNull(),
             ) { percent, isCharging -> BatteryUiModel(percent = percent, isCharging = isCharging) }
-                .collect { battery -> updateState { copy(battery = battery) } }
+                .collectCatching(
+                    action = { battery ->
+                        updateState { copy(battery = battery) }
+                        checkRules()
+                    },
+                    catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+                )
+        }
+    }
+
+    private fun observePlugged() {
+        viewModelScope.launch {
+            batteryStateManager.isPlugged.filterNotNull().collectCatching(
+                action = { isPlugged ->
+                    this@AodViewModel.isPlugged = isPlugged
+                    checkRules()
+                },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
         }
     }
 
@@ -85,7 +108,10 @@ class AodViewModel(
                 .filterNotNull()
                 .drop(1)
                 .filter { isBusy -> isBusy }
-                .collect { requestClose() }
+                .collectCatching(
+                    action = { requestClose() },
+                    catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+                )
         }
     }
 
@@ -142,9 +168,20 @@ class AodViewModel(
                 copy(nowMillis = nowMillis, shiftXDp = randomShiftX(), shiftYDp = randomShiftY())
             }
         }
+        checkRules()
+    }
+
+    // Hết khung giờ, rút / cắm sạc trái quy tắc hoặc pin yếu khi đồng hồ đang hiện: chuyển đen như khi hết giờ.
+    private fun checkRules() {
         if (isPreview) return
-        val battery = state.value.battery ?: return
-        if (!battery.isCharging && battery.percent in 0 until minBattery) goDark()
+        val battery = state.value.battery
+        val isAllowed = rules.allows(
+            batteryPercent = battery?.percent,
+            isCharging = battery?.isCharging == true,
+            isPlugged = isPlugged,
+            minuteOfDay = AodScheduleUiModel.minuteOfDay(state.value.nowMillis),
+        )
+        if (!isAllowed) goDark()
     }
 
     private fun goDark(isUntilUncovered: Boolean = false) {

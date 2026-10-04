@@ -8,4 +8,5 @@ sealed interface MainEffect {
     data object OpenMiuiPermissionEditor : MainEffect
     data object OpenNotificationSettings : MainEffect
     data object RequestNotificationPermission : MainEffect
+    data object NavigateToLanguage : MainEffect
 }

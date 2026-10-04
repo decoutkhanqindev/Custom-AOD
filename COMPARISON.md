@@ -21,7 +21,7 @@ Số đo phía Custom AOD là của demo FakeAOD trên cùng máy (ghi **[FakeAO
 | `minSdk` / `targetSdk` | 23 / 34 (Android 6 / Android 14) [máy] | 30 / 37 (Android 11 / Android 17), `compileSdk` 37 |
 | Lượt tải, đánh giá | Hơn 10 triệu, 4,5★ [Play] | – |
 | Kiếm tiền | Quảng cáo và gói Premium [Play] | Quảng cáo AdMob của base: quảng cáo xen kẽ ở Splash, đang là id test. Không có Premium |
-| Ngôn ngữ giao diện | 23 [Play] | Bản dịch English và tiếng Việt. Hạ tầng chọn ngôn ngữ trong app đã có, chưa có màn chọn nên đang hiện English |
+| Ngôn ngữ giao diện | 23 [Play] | English và tiếng Việt, chọn trong app (lần mở đầu tiên và ở màn cài đặt) |
 | Kích thước APK | 17,6 MB, gói cho nhiều kiến trúc CPU [Play] | 81,3 MB bản debug, chưa bật R8. Bản release (R8 + shrink) chưa build vì chưa có keystore |
 
 ## 2. Kỹ thuật
@@ -48,10 +48,11 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | Cảm biến tiệm cận | Bản 2017: `PROXIMITY_SCREEN_OFF_WAKE_LOCK` [2017] | `ProximityManager` + `AodViewModel`: bị che 3 giây thì đen, lấy ra thì sáng lại |
 | Cuộc gọi | `CallReceiver` (`PHONE_STATE`, `NEW_OUTGOING_CALL`) cộng quyền `READ_PHONE_STATE` [máy] | `noHistory` cộng `AudioStateManager` (theo dõi `AudioManager`), không cần quyền |
 | Thông báo trên AOD | `NotificationListenerService` [máy] | Chưa có |
-| Độ sáng | Không còn khai báo `WRITE_SETTINGS`, dù mô tả Play vẫn nhắc tới [Play] | `screenBrightness` của cửa sổ |
+| Độ sáng | Không còn khai báo `WRITE_SETTINGS`, dù mô tả Play vẫn nhắc tới [Play] | `screenBrightness` của cửa sổ: 1–100%, hoặc theo hệ thống |
+| Quy tắc khi nào hiện | ? | `AodRulesUiModel.allows()` (nguồn điện, khung giờ, ngưỡng pin), kiểm lúc màn hình tắt và trong lúc AOD hiện |
 | Kiểm tra sau khi mở AOD | ? | `checkLaunch` sau 2 giây: ghi kết quả, dọn AOD bị giấu sau màn hình khóa |
 | Màn hình khởi động | `PHSplashActivity` của SDK PremiumHelper [máy] | Splash của base: consent UMP rồi quảng cáo xen kẽ. AOD có splash màu đen trên Android 12+ |
-| Tích hợp hệ thống | Ô Cài đặt nhanh, widget, plugin Tasker, `ToggleServiceReceiver` [máy] | Chưa có |
+| Tích hợp hệ thống | Ô Cài đặt nhanh, widget, plugin Tasker, `ToggleServiceReceiver` [máy] | Ô Cài đặt nhanh (`AodTileService`). Từ Android 15, bật từ ô phải mở app vì service không được khởi động từ nền. Chưa có widget, Tasker |
 
 ### 2.2 Quyền
 
@@ -115,7 +116,7 @@ Quyền riêng của Xiaomi:
 | Tùy biến | Mặt đồng hồ: Digital S7, Classic 24H, Analog S7, Analog Pebble… | ✓ [Play] | ✗ (1 kiểu) |
 | | Font, màu, cỡ chữ | ✓ [Play] | ✗ |
 | | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ✗ |
-| | Độ sáng | ✓ chỉnh mức [2017] | ⚠️ chỉ bật/tắt giảm sáng |
+| | Độ sáng | ✓ chỉnh mức [2017] | ✓ (1–100%, hoặc theo hệ thống) |
 | | Tự giảm sáng khi trời tối (cảm biến ánh sáng) | ✓ [Play] | ✗ |
 | | Ép xoay ngang, dùng làm đồng hồ đêm | ✓ [Play] | ✗ |
 | Tương tác | Chạm 2 lần để thoát | ✓ [Play] | ✓ |
@@ -126,9 +127,9 @@ Quyền riêng của Xiaomi:
 | Pin và quy tắc | Dịch vị trí chống burn-in | ✓ [Play] | ✓ (mỗi phút) |
 | | Chế độ trong túi | ✓ [Play] | ✓ (đen, sáng lại khi lấy ra) |
 | | Bỏ qua khi pin dưới ngưỡng | ✓ [2017] | ✓ |
-| | Chỉ khi đang sạc, hoặc chỉ khi dùng pin | ✓ [2017] | ✗ |
+| | Chỉ khi đang sạc, hoặc chỉ khi dùng pin | ✓ [2017] | ✓ (theo việc cắm nguồn, kể cả khi pin đầy hoặc giới hạn sạc) |
 | | Kết thúc sau X phút | ✓ [2017] | ✓ (tối màn hình) |
-| | Lịch theo giờ | ? | ✗ |
+| | Lịch theo giờ | ? | ✓ (mặc định 07:00–23:00, khung qua nửa đêm được) |
 | Hệ thống | Tự đóng khi mở khóa | ✓ | ✓ |
 | | Nhường chỗ cho cuộc gọi | ✓ (`READ_PHONE_STATE`) | ✓ (không cần quyền) |
 | | Không mở AOD khi báo thức đang reo | ? | ✓ |
@@ -136,9 +137,9 @@ Quyền riêng của Xiaomi:
 | | Xem thử AOD trong app | ? | ✓ |
 | | Màn hình quyền có trạng thái và nút mở đúng trang | ? | ✓ |
 | | Dòng chẩn đoán lần mở gần nhất | ? | ✓ |
-| | Chọn ngôn ngữ trong app | ? | ⚠️ hạ tầng có, chưa có màn chọn |
+| | Chọn ngôn ngữ trong app | ? | ✓ (English, tiếng Việt) |
 | Tích hợp | Tasker | ✓ [máy] | ✗ |
-| | Ô Cài đặt nhanh | ✓ [máy] | ✗ |
+| | Ô Cài đặt nhanh | ✓ [máy] | ✓ (Android 15+: bật từ ô thì mở app) |
 | | Widget bật/tắt | ✓ [máy] | ✗ |
 | | Greenify, Force doze (cần root hoặc ADB) | ✓ [Play] | ✗ (đã lỗi thời) |
 | Kinh doanh | Quảng cáo | ✓ | ⚠️ hạ tầng AdMob có, đang là id test |
@@ -152,10 +153,9 @@ Quyền riêng của Xiaomi:
   - Các số đo là của FakeAOD. Custom AOD giữ cùng cơ chế sau khi refactor, nhưng phải chạy lại trên máy để xác nhận.
 - **Ít quyền hơn:** 12 so với 31. Trong 12 quyền, 6 cho AOD và 6 cho quảng cáo và mạng của base. Không có analytics, Premium hay quyền điện thoại.
 - **Khác có chủ ý:** nút nguồn đưa về màn hình khóa thay vì mở lại AOD.
-- **Khoảng trống lớn nhất là tính năng hiển thị và tùy biến.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
+- **Giai đoạn 1 (2026-10-04) đã thêm**, không cần quyền mới: luật theo sạc, lịch theo giờ, chỉnh mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Chưa chạy trên máy.
+- **Khoảng trống lớn nhất còn lại là tính năng hiển thị và tùy biến.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
   1. Thông báo trên AOD (cần `NotificationListenerService`, thêm một quyền đặc biệt).
-  2. Luật theo sạc và lịch theo giờ (không cần quyền mới).
-  3. 3–4 mặt đồng hồ, chọn font và màu.
-  4. Cử chỉ vuốt và điều khiển nhạc (nhạc dùng chung `NotificationListenerService`).
-  5. Ô Cài đặt nhanh để bật/tắt (`TileService`, không cần quyền).
-  6. Màn chọn ngôn ngữ, để dùng bản dịch tiếng Việt đã có.
+  2. 3–4 mặt đồng hồ, chọn font và màu.
+  3. Cử chỉ vuốt và điều khiển nhạc (nhạc dùng chung `NotificationListenerService`).
+  4. Widget bật/tắt, tự giảm sáng theo cảm biến ánh sáng.

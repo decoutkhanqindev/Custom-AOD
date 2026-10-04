@@ -1,41 +1,33 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
+import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AnimationContentKey
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionStatusValue
+import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
+import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
@@ -43,7 +35,6 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainInten
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.presentation.theme.AppTheme
 import kotlinx.collections.immutable.persistentListOf
-import kotlin.math.roundToInt
 
 @Composable
 fun MainContent(
@@ -96,57 +87,31 @@ private fun MainSettings(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SwitchRow(
-            labelRes = R.string.opt_enabled,
+        SettingsSwitchRow(
+            label = stringResource(R.string.opt_enabled),
             isChecked = state.options.isEnabled,
             onCheckedChange = { onIntent(MainIntent.ToggleAod(it)) },
         )
 
-        SectionHeader(titleRes = R.string.section_permissions)
-
-        state.permissions.forEach { permission ->
-            PermissionRow(
-                permission = permission,
-                onOpen = { onIntent(MainIntent.OpenPermission(permission.permission)) },
-            )
-        }
-
-        SectionHeader(titleRes = R.string.section_options)
-
-        SwitchRow(
-            labelRes = R.string.opt_dim,
-            isChecked = state.options.isDimBrightness,
-            onCheckedChange = { onIntent(MainIntent.ToggleDimBrightness(it)) },
+        MainPermissionsSection(
+            permissions = state.permissions,
+            onIntent = onIntent,
         )
 
-        SwitchRow(
-            labelRes = R.string.opt_proximity,
-            isChecked = state.options.isProximityEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleProximity(it)) },
+        MainOptionsSection(
+            options = state.options,
+            onIntent = onIntent,
         )
 
-        StepSlider(
-            label = if (state.options.timeoutMinutes == 0) {
-                stringResource(R.string.opt_timeout_never)
-            } else {
-                stringResource(R.string.opt_timeout_value, state.options.timeoutMinutes)
-            },
-            value = state.options.timeoutMinutes,
-            step = AodOptionsUiModel.TIMEOUT_STEP_MINUTES,
-            max = AodOptionsUiModel.TIMEOUT_MAX_MINUTES,
-            onValueChange = { onIntent(MainIntent.ChangeTimeout(it)) },
+        MainRulesSection(
+            rules = state.rules,
+            editingScheduleTime = state.editingScheduleTime,
+            onIntent = onIntent,
         )
 
-        StepSlider(
-            label = if (state.options.minBattery == 0) {
-                stringResource(R.string.opt_battery_off)
-            } else {
-                stringResource(R.string.opt_battery_value, state.options.minBattery)
-            },
-            value = state.options.minBattery,
-            step = AodOptionsUiModel.BATTERY_STEP_PERCENT,
-            max = AodOptionsUiModel.BATTERY_MAX_PERCENT,
-            onValueChange = { onIntent(MainIntent.ChangeMinBattery(it)) },
+        MainAppSection(
+            language = state.language,
+            onIntent = onIntent,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -167,130 +132,22 @@ private fun MainSettings(
     }
 }
 
-@Composable
-private fun SectionHeader(@StringRes titleRes: Int) {
-    Text(
-        text = stringResource(titleRes).uppercase(),
-        modifier = Modifier.padding(top = 28.dp, bottom = 4.dp),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelMedium,
-    )
-}
-
-@Composable
-private fun SwitchRow(
-    @StringRes labelRes: Int,
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .toggleable(value = isChecked, role = Role.Switch, onValueChange = onCheckedChange),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(labelRes),
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 16.dp),
-            style = MaterialTheme.typography.bodyLarge,
-        )
-
-        Switch(checked = isChecked, onCheckedChange = null)
-    }
-}
-
-@Composable
-private fun PermissionRow(
-    permission: PermissionUiModel,
-    onOpen: () -> Unit,
-) {
-    val status = permission.status
-    val statusColor = when (status) {
-        PermissionStatusValue.GRANTED -> MaterialTheme.colorScheme.primary
-        PermissionStatusValue.MISSING_REQUIRED -> MaterialTheme.colorScheme.error
-        PermissionStatusValue.UNKNOWN,
-        PermissionStatusValue.MISSING_OPTIONAL -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(modifier = Modifier.width(28.dp)) {
-            Icon(
-                imageVector = status.icon,
-                contentDescription = stringResource(status.descriptionRes),
-                modifier = Modifier.size(20.dp),
-                tint = statusColor,
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 12.dp),
-        ) {
-            Text(
-                text = stringResource(permission.permission.titleRes),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-
-            Text(
-                text = stringResource(permission.permission.descriptionRes),
-                modifier = Modifier.padding(top = 2.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-
-        OutlinedButton(onClick = onOpen) {
-            Text(text = stringResource(R.string.action_open))
-        }
-    }
-}
-
-@Composable
-private fun StepSlider(
-    label: String,
-    value: Int,
-    step: Int,
-    max: Int,
-    onValueChange: (Int) -> Unit,
-) {
-    Column(modifier = Modifier.padding(top = 12.dp)) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-
-        Slider(
-            value = (value / step).toFloat(),
-            onValueChange = { onValueChange(it.roundToInt() * step) },
-            valueRange = 0f..(max / step).toFloat(),
-            steps = max / step - 1,
-        )
-    }
-}
-
-@Preview(widthDp = 360, heightDp = 900)
+@Preview(widthDp = 360, heightDp = 1600)
 @Composable
 private fun MainContentPreview() {
     AppTheme {
         MainContent(
             state = MainState(
                 isLoading = false,
-                options = AodOptionsUiModel(timeoutMinutes = 30),
+                options = AodOptionsUiModel(brightnessPercent = 20, timeoutMinutes = 30),
+                rules = AodRulesUiModel(chargingRule = ChargingRuleValue.PLUGGED),
                 permissions = persistentListOf(
                     PermissionUiModel(permission = PermissionValue.OVERLAY, isGranted = true),
                     PermissionUiModel(permission = PermissionValue.MIUI_LOCK_SCREEN, isGranted = false),
                     PermissionUiModel(permission = PermissionValue.MIUI_BACKGROUND_POPUP, isGranted = null),
                     PermissionUiModel(permission = PermissionValue.NOTIFICATIONS, isGranted = false),
                 ),
+                language = LanguageUiModel(language = LanguageValue.ENGLISH, displayName = "English"),
                 lastWakeMessageRes = WakeResultValue.OK.messageRes,
             ),
             onIntent = {},

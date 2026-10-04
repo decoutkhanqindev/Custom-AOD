@@ -20,7 +20,7 @@ class AodActivity : ComponentActivity() {
     private val session: AodSession by inject()
 
     private var isPreview = false
-    private var isDimBrightness = DataStoreManager.DEFAULT_IS_AOD_DIM_BRIGHTNESS
+    private var normalBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isDark = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,13 +32,21 @@ class AodActivity : ComponentActivity() {
         )
 
         isPreview = intent.getBooleanExtra(EXTRA_PREVIEW, false)
-        isDimBrightness = dataStoreManager.isAodDimBrightness.value ?: DataStoreManager.DEFAULT_IS_AOD_DIM_BRIGHTNESS
+        val isCustomBrightness =
+            dataStoreManager.isAodCustomBrightness.value ?: DataStoreManager.DEFAULT_IS_AOD_CUSTOM_BRIGHTNESS
+        val brightnessPercent =
+            dataStoreManager.aodBrightnessPercent.value ?: DataStoreManager.DEFAULT_AOD_BRIGHTNESS_PERCENT
+        normalBrightness = if (isCustomBrightness) {
+            brightnessPercent / MAX_BRIGHTNESS_PERCENT
+        } else {
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        }
         // Bản xem thử không phải AOD: service không được coi nó là AOD khi màn hình tắt.
         if (!isPreview) session.attach(this)
 
         // Độ sáng đặt trước khi cửa sổ hiện để ngay khung đầu tiên đã đúng mức.
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setBrightness(normalBrightness())
+        setBrightness(normalBrightness)
         setContent {
             AppLanguageProvider {
                 AodScreen(
@@ -80,12 +88,9 @@ class AodActivity : ComponentActivity() {
         } else {
             session.clearSleepRequest()
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            setBrightness(normalBrightness())
+            setBrightness(normalBrightness)
         }
     }
-
-    private fun normalBrightness(): Float =
-        if (isDimBrightness) DIM_BRIGHTNESS else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 
     private fun setBrightness(value: Float) {
         window.attributes = window.attributes.apply { screenBrightness = value }
@@ -104,7 +109,7 @@ class AodActivity : ComponentActivity() {
 
     companion object {
         private const val EXTRA_PREVIEW = "com.decoutkhanqindev.custom_aod.extra.PREVIEW"
-        private const val DIM_BRIGHTNESS = 0.01f
+        private const val MAX_BRIGHTNESS_PERCENT = 100f
 
         fun preview(context: Context) {
             context.startActivity(Intent(context, AodActivity::class.java).putExtra(EXTRA_PREVIEW, true))

@@ -15,7 +15,7 @@ Tài liệu khác:
 
 ## Trạng thái kiểm thử
 
-Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy trên máy**. Lõi đã được viết lại theo MVI và manager (xem CHANGELOG), nên cần chạy lại toàn bộ mục "Kiểm tra trên máy thật".
+Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy trên máy**. Lõi đã được viết lại theo MVI và manager, và giai đoạn 1 (quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ) mới được thêm (xem CHANGELOG), nên cần chạy lại toàn bộ mục "Kiểm tra trên máy thật".
 
 Kết quả của demo FakeAOD trước khi chuyển sang base:
 
@@ -28,11 +28,11 @@ Kết quả trên là của bản FakeAOD `targetSdk` 33. Bản `minSdk` 30 / `t
 
 Chưa kiểm tra:
 
-- Toàn bộ Custom AOD trên máy thật: Splash (consent, quảng cáo test), màn cài đặt, AOD.
+- Toàn bộ Custom AOD trên máy thật: Splash (consent, quảng cáo test), màn chọn ngôn ngữ, màn cài đặt, AOD, ô Cài đặt nhanh.
 - Khởi động lại máy. Trên Xiaomi, app không xin quyền "Tự khởi chạy", xem mục "Giới hạn đã biết".
 - Khóa máy lâu, ví dụ qua đêm.
 - Cuộc gọi đến và báo thức reo khi đồng hồ đang hiện.
-- Chế độ trong túi, hẹn giờ tối màn hình, ngưỡng pin.
+- Chế độ trong túi, hẹn giờ tối màn hình, ngưỡng pin, quy tắc nguồn điện, khung giờ, mức độ sáng.
 - Android 11 đến 13, và máy của các hãng khác.
 
 ## Build và cài đặt
@@ -126,18 +126,21 @@ Thư viện androidx tự thêm một quyền nội bộ `com.decoutkhanqindev.c
 ## Cách dùng
 
 - **Mở app:** Splash xin consent (form UMP, chỉ hiện khi cần) rồi hiện quảng cáo xen kẽ (đang là id test của Google), sau đó vào màn hình chính. Splash cần mạng; mất mạng thì hộp thoại "Không có kết nối Internet" chặn màn hình.
+- **Lần đầu mở app:** sau Splash là màn chọn ngôn ngữ, đã chọn sẵn ngôn ngữ của máy (ngôn ngữ của máy chưa có bản dịch thì chọn English). Bấm "Xong" để vào màn hình chính; những lần mở sau đi thẳng vào màn hình chính. Đổi lại ở mục "Ứng dụng › Ngôn ngữ" của màn hình chính.
+- **Ô Cài đặt nhanh "Custom AOD":** thêm vào bằng cách kéo bảng Cài đặt nhanh xuống rồi bấm sửa. Chạm để bật hoặc tắt đồng hồ (giống công tắc trong app). Từ Android 15, và trên Android 12–14 khi chưa cấp "Hiển thị trên ứng dụng khác", hệ thống không cho service khởi động từ ô này, nên khi bật, app sẽ mở lên để khởi động service (đang khóa máy thì phải mở khóa trước). Tắt thì không cần mở app.
 - **Màn hình tắt** (nút nguồn hoặc hết thời gian chờ): khoảng 1 giây sau, đồng hồ hiện lên. Phần này không cần mạng.
 - **Bấm nút nguồn khi đồng hồ đang hiện:** màn hình nháy tắt rồi sáng lên màn hình khóa, giống AOD thật. Bấm nguồn lần nữa thì màn hình tắt và đồng hồ hiện lại.
 - **Bấm nguồn bật màn hình lại ngay sau khi vừa tắt:** vào màn hình khóa, đồng hồ không chen vào.
 - **Chạm 2 lần:** thoát đồng hồ, về màn hình khóa. Mở khóa bằng khuôn mặt hoặc vân tay từ đây.
 - **Mở khóa:** đồng hồ tự đóng.
 - **Có cuộc gọi đến hoặc báo thức reo:** màn hình cuộc gọi, báo thức nằm trên đồng hồ, và đồng hồ tự đóng.
-- **Hết thời gian đã chọn, máy trong túi, hoặc pin yếu:** đồng hồ chuyển sang đen. Sau đó màn hình tự tắt theo thời gian chờ của máy.
+- **Hết thời gian đã chọn, máy trong túi, pin yếu, hết khung giờ, hoặc cắm/rút sạc trái với quy tắc nguồn điện:** đồng hồ chuyển sang đen. Sau đó màn hình tự tắt theo thời gian chờ của máy.
+- **Ngoài khung giờ, sai quy tắc nguồn điện, hoặc pin dưới ngưỡng lúc màn hình tắt:** đồng hồ không hiện, màn hình tắt như bình thường.
 - **Nút "Xem thử" trong app:** hiện đồng hồ ngay mà không cần khóa máy.
 
 Đồng hồ hiện giờ (theo định dạng 12 hoặc 24 giờ của máy), ngày, và phần trăm pin kèm trạng thái sạc. Dòng "Chạm 2 lần để thoát" hiện 3 giây rồi mờ đi. Mỗi phút, nội dung dịch sang một vị trí ngẫu nhiên để chống burn-in.
 
-Ngôn ngữ: app theo ngôn ngữ đã chọn trong app (`DataStoreManager.selectedLangCode`), mặc định English. Bản dịch tiếng Việt đã có trong `values-vi`, nhưng màn chọn ngôn ngữ còn là TODO của base, nên hiện tại giao diện, đồng hồ và thông báo đều là English. Định dạng 12/24 giờ vẫn theo cài đặt của máy.
+Ngôn ngữ: giao diện, đồng hồ và thông báo theo ngôn ngữ chọn trong app (key `selected_lang_code`, mặc định English), không theo ngôn ngữ của máy. Có English và Tiếng Việt; tên ngôn ngữ trong danh sách viết bằng chính ngôn ngữ đó. Key `is_first_open` đánh dấu đã qua màn chọn ngôn ngữ ở lần mở đầu tiên. Định dạng 12/24 giờ vẫn theo cài đặt của máy.
 
 ## Tùy chọn trong app
 
@@ -145,15 +148,24 @@ Lưu trong `DataStoreManager` (file `custom_aod_prefs`), mỗi tùy chọn một
 
 | Tùy chọn | Key | Mặc định | Tác dụng |
 |---|---|---|---|
-| Hiện đồng hồ khi màn hình tắt | `is_aod_enabled` | Bật | Tắt thì service dừng hẳn |
-| Giảm độ sáng khi đồng hồ đang hiện | `is_aod_dim_brightness` | Bật | Đặt độ sáng cửa sổ đồng hồ ở mức thấp nhất (`screenBrightness = 0.01`) |
+| Hiện đồng hồ khi màn hình tắt | `is_aod_enabled` | Bật | Tắt thì service dừng hẳn. Ô Cài đặt nhanh đổi cùng key này |
+| Dùng độ sáng riêng cho đồng hồ | `is_aod_custom_brightness` | Bật | Bật: dùng mức độ sáng bên dưới. Tắt: cửa sổ đồng hồ theo độ sáng của hệ thống |
+| Độ sáng | `aod_brightness_percent` | 1% | Từ 1 đến 100%, đặt `screenBrightness` của cửa sổ đồng hồ bằng phần trăm / 100. 1% bằng mức "giảm độ sáng" của bản trước |
 | Tối màn hình khi máy ở trong túi hoặc bị úp | `is_aod_proximity_enabled` | Bật | Cảm biến tiệm cận bị che liên tục 3 giây thì đồng hồ chuyển sang đen |
 | Tối màn hình sau | `aod_timeout_minutes` | Không bao giờ | Từ 0 (không bao giờ) đến 120 phút, mỗi nấc 5 phút |
+
+Mục "Khi nào hiện" (quy tắc). Đồng hồ chỉ hiện khi đủ mọi quy tắc:
+
+| Quy tắc | Key | Mặc định | Tác dụng |
+|---|---|---|---|
+| Nguồn điện | `aod_charging_rule` | Luôn hiện | Luôn hiện / Chỉ khi đang cắm sạc / Chỉ khi dùng pin. "Đang cắm" tính theo việc có cắm nguồn (`EXTRA_PLUGGED`), nên pin đầy hoặc máy dừng sạc ở 80% vẫn tính là đang cắm |
+| Chỉ hiện trong khung giờ | `is_aod_schedule_enabled` | Bật | Tắt thì hiện cả ngày |
+| Bắt đầu, Kết thúc | `aod_schedule_start_minute`, `aod_schedule_end_minute` | 07:00, 23:00 | Lưu theo phút trong ngày. Bắt đầu sau kết thúc là khung giờ qua nửa đêm (ví dụ 22:00–06:00). Bắt đầu trùng kết thúc là cả ngày |
 | Bỏ qua đồng hồ khi pin dưới | `aod_min_battery` | 15% | Từ 0 (tắt) đến 50%, mỗi nấc 5%. Khi đang sạc thì không áp dụng |
 
 Dòng cuối màn hình cho biết lần gần nhất đồng hồ có mở được trên màn hình khóa hay không (key `aod_last_wake`). Kết quả được ghi 2 giây sau mỗi lần mở (xem `checkLaunch` ở mục "Các quyết định thiết kế"). Key `is_notifications_asked` đánh dấu đã hỏi quyền thông báo ở lần mở đầu tiên.
 
-AOD đọc các tùy chọn một lần lúc mở. Đổi tùy chọn thì lần AOD sau mới áp dụng.
+AOD đọc các tùy chọn và quy tắc một lần lúc mở. Đổi chúng thì lần AOD sau mới áp dụng. Trong lúc đồng hồ đang hiện, quy tắc vẫn được kiểm lại mỗi phút và mỗi khi pin hoặc nguồn cắm thay đổi; sai quy tắc thì đồng hồ chuyển sang đen. "Xem thử" không áp dụng quy tắc.
 
 ## Sơ đồ hoạt động
 
@@ -166,7 +178,9 @@ màn hình tắt ──▶ AodService ──startActivity──▶ AodActivity (
      │                                              │
      └──────────── màn hình khóa tắt (nút nguồn, hết giờ chờ) ◀──┘
 
-hết giờ / trong túi / pin yếu ──▶ đen hoàn toàn ──▶ hết thời gian chờ của máy ──▶ màn hình tắt, không mở lại
+hết giờ / trong túi / sai quy tắc (pin yếu, hết khung giờ, nguồn điện) ──▶ đen hoàn toàn ──▶ hết thời gian chờ của máy ──▶ màn hình tắt, không mở lại
+
+ô Cài đặt nhanh ──▶ AodTileService ──▶ bật/tắt AodService (bị chặn ──▶ mở app để khởi động)
 ```
 
 Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20.1](CLAUDE.md#201-luồng).
@@ -181,14 +195,17 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/aod/AodActivity.kt` | Host của màn AOD: cờ cửa sổ `FLAG_SHOW_WHEN_LOCKED`, `FLAG_TURN_SCREEN_ON`, `FLAG_KEEP_SCREEN_ON`; độ sáng; ẩn thanh hệ thống; chuyển sang đen khi ViewModel báo |
 | `presentation/aod/AodSession.kt` | Trạng thái dùng chung giữa service và Activity (Koin `single`) |
 | `presentation/aod/BootReceiver.kt` | Chạy lại service sau khi khởi động máy hoặc cập nhật app |
-| `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, pin yếu, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần |
+| `presentation/aod/AodTileService.kt` | Ô Cài đặt nhanh bật/tắt đồng hồ; mở app khi hệ thống không cho khởi động service |
+| `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, quy tắc hiện, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần |
 | `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (giờ, ngày, pin, gợi ý, dịch vị trí) và phần nối với ViewModel |
-| `presentation/screens/main/` | Màn hình cấp quyền và tùy chọn (MVI), hỏi quyền thông báo ở lần mở đầu tiên |
-| `presentation/model/` | `AodOptionsUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue` |
+| `presentation/screens/main/` | Màn hình cài đặt (MVI): quyền, tùy chọn, quy tắc hiện, ngôn ngữ, xem thử; hỏi quyền thông báo ở lần mở đầu tiên. Mỗi mục một file `MainXxxSection.kt` |
+| `presentation/screens/language/` | Màn chọn ngôn ngữ (MVI): lần mở đầu tiên và từ màn hình cài đặt |
+| `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue` |
 | `presentation/components/AppLanguageProvider.kt` | Áp ngôn ngữ đã chọn cho `MainActivity` và `AodActivity` |
+| `presentation/components/SettingsRows.kt` | Các dòng cài đặt dùng chung: tiêu đề mục, công tắc, radio, dòng giá trị, thanh trượt |
 | `presentation/MainActivity.kt` | Activity chính: consent, ngôn ngữ, theme, khởi động service |
 | `data/device/screen/ScreenStateManager.kt` | Sự kiện tắt màn hình / mở khóa, màn hình có đang sáng, có khóa bảo mật, wake lock bật lại màn hình |
-| `data/device/battery/BatteryStateManager.kt` | Phần trăm pin và trạng thái sạc |
+| `data/device/battery/BatteryStateManager.kt` | Phần trăm pin, trạng thái sạc, có đang cắm nguồn |
 | `data/device/audio/AudioStateManager.kt` | Đang có chuông, cuộc gọi hoặc báo thức |
 | `data/device/proximity/ProximityManager.kt` | Cảm biến tiệm cận |
 | `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, và quyền riêng của Xiaomi |
@@ -227,14 +244,16 @@ Từ FakeAOD sang Custom AOD:
 - **Nút nguồn:** app không bắt được phím nguồn, nên bấm nguồn khi đồng hồ đang hiện thì hệ thống tắt màn hình. Vì AOD giữ màn hình sáng, một lần tắt màn hình lúc AOD đang hiện chỉ có thể do nút nguồn. Khi đó service đóng AOD và bật lại màn hình bằng wake lock `ACQUIRE_CAUSES_WAKEUP` (`ScreenStateManager.wakeUp`), nên màn hình khóa hiện ra. Bản Always On AMOLED mã nguồn mở năm 2017 cũng làm như vậy. Bản hiện tại của Always On AMOLED thì mở lại AOD.
 - **Bật lại màn hình ngay sau khi vừa tắt:** sự kiện `SCREEN_OFF` đến trễ khoảng 0,2–0,8 giây. Nếu lúc đó màn hình đã sáng lại (người dùng vừa bấm nguồn), service không mở AOD nữa. Vì vậy `ScreenStateManager.events` là `SharedFlow`: dùng `StateFlow` thì một lần tắt rồi bật lại ngay sẽ bị gộp mất.
 - **Kiểm tra sau khi mở (`checkLaunch`):** 2 giây sau mỗi lần mở, service xem đồng hồ có đang hiện và màn hình có sáng không. Kết quả hiện ở dòng cuối màn hình app. Nếu không, service đóng Activity, vì trên Xiaomi thiếu "Hiển thị trên màn hình khóa" thì Activity bị giấu sau màn hình khóa và sẽ hiện ra sau lần mở khóa kế tiếp.
-- **Không tự tắt màn hình:** app thường không có cách tắt màn hình, việc đó cần dịch vụ trợ năng hoặc quyền quản trị thiết bị. Khi cần kết thúc (hết giờ, trong túi, pin yếu), AOD chuyển sang đen hoàn toàn ở độ sáng thấp nhất và bỏ `FLAG_KEEP_SCREEN_ON`. Sau đó thời gian chờ của máy sẽ tắt màn hình. Lần tắt đó được đánh dấu là chủ ý, nên AOD không mở lại. Trong túi, cảm biến tiệm cận đang bị che thì service cũng không bật lại màn hình khóa.
-- **Độ sáng:** chỉnh bằng `screenBrightness` của cửa sổ AOD, không cần quyền "Sửa đổi cài đặt hệ thống". Độ sáng được đặt trong `onCreate`, trước khi cửa sổ hiện, để khung đầu tiên đã đúng mức. Pin cũng được đọc đồng bộ lúc mở để khung đầu tiên có ngay dòng pin.
+- **Không tự tắt màn hình:** app thường không có cách tắt màn hình, việc đó cần dịch vụ trợ năng hoặc quyền quản trị thiết bị. Khi cần kết thúc (hết giờ, trong túi, sai quy tắc hiện), AOD chuyển sang đen hoàn toàn ở độ sáng thấp nhất và bỏ `FLAG_KEEP_SCREEN_ON`. Sau đó thời gian chờ của máy sẽ tắt màn hình. Lần tắt đó được đánh dấu là chủ ý, nên AOD không mở lại. Trong túi, cảm biến tiệm cận đang bị che thì service cũng không bật lại màn hình khóa.
+- **Độ sáng:** chỉnh bằng `screenBrightness` của cửa sổ AOD (1–100%, hoặc theo hệ thống khi tắt độ sáng riêng), không cần quyền "Sửa đổi cài đặt hệ thống" và không đổi độ sáng của máy. Độ sáng được đặt trong `onCreate`, trước khi cửa sổ hiện, để khung đầu tiên đã đúng mức. Pin cũng được đọc đồng bộ lúc mở để khung đầu tiên có ngay dòng pin.
+- **Quy tắc hiện ở một chỗ:** nguồn điện, khung giờ và ngưỡng pin nằm trong `AodRulesUiModel.allows()`. Service gọi hàm này lúc màn hình tắt để quyết định có mở AOD không; `AodViewModel` gọi lại khi pin, nguồn cắm đổi và mỗi phút để chuyển AOD đang hiện sang đen. Không đọc được trạng thái pin hay nguồn cắm thì không chặn AOD.
+- **Ô Cài đặt nhanh mở app trên Android 15:** từ Android 15, app có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có cửa sổ nổi hiển thị, và ô Cài đặt nhanh không được miễn. Khi `startForegroundService` bị chặn, ô mở app (`startActivityAndCollapse`, mở khóa trước nếu đang khóa) và `MainActivity` khởi động service từ tiền cảnh. Tắt AOD từ ô thì chỉ cần dừng service, không cần mở app.
 - **Cuộc gọi và báo thức:** màn hình cuộc gọi, báo thức là Activity mở sau nên tự nằm trên AOD, và `noHistory` đóng AOD khi đó. App còn theo dõi `AudioManager` (`AudioStateManager`) để đóng sớm hơn, và không mở AOD khi đang có chuông, cuộc gọi hay báo thức. Không cần quyền `READ_PHONE_STATE`.
 - **Kiến trúc theo base:** tùy chọn là prefs nên nằm thẳng trong `DataStoreManager` (base cấm bọc manager bằng Repository/UseCase chỉ để chuyển tiếp). Mọi tín hiệu thiết bị đi qua manager trong `data/device/`; các manager này chỉ đăng ký receiver hoặc cảm biến khi có người dùng tới, để service chạy nền không nhận `BATTERY_CHANGED` liên tục. Logic của màn đồng hồ nằm trong `AodViewModel`; mọi thao tác với cửa sổ nằm ở `AodActivity`, vì ViewModel không được giữ `Context`. Chi tiết và các ngoại lệ ở [CLAUDE.md › 20](CLAUDE.md#20-aod-core).
 
 ## Kiểm tra trên máy thật
 
-1. Mở app: Splash có hiện form consent (bản debug giả lập vùng EEA) và quảng cáo test, rồi vào màn hình chính không.
+1. Mở app lần đầu (gỡ app hoặc xóa dữ liệu trước): Splash có hiện form consent (bản debug giả lập vùng EEA) và quảng cáo test không, rồi tới màn chọn ngôn ngữ, đã chọn sẵn ngôn ngữ của máy, không có nút back. Chọn "Tiếng Việt", bấm "Xong": vào màn hình chính bằng tiếng Việt. Đóng hẳn app rồi mở lại: đi thẳng vào màn hình chính.
 2. Cấp các quyền bắt buộc. Nếu đã cho phép thông báo, kiểm tra đã có thông báo "Shows the clock each time the screen turns off".
 3. Bấm "Xem thử": đồng hồ có phủ kín cả thanh trạng thái và thanh điều hướng không.
 4. Khóa máy: đồng hồ có hiện sau khoảng 1 giây không, có thấy màn hình khóa lóe lên không. Xem dòng trạng thái ở cuối màn hình chính của app.
@@ -247,13 +266,18 @@ Từ FakeAOD sang Custom AOD:
 11. Đổi tùy chọn, đóng hẳn app rồi mở lại: tùy chọn còn nguyên.
 12. Tắt mạng rồi mở app: hộp thoại mất mạng chặn màn hình. Khóa máy: đồng hồ vẫn hiện.
 13. Khởi động lại máy, chưa mở app, rồi khóa máy: xem đồng hồ có hiện không.
+14. Độ sáng: kéo thanh độ sáng lên 50% rồi bấm "Xem thử", đồng hồ sáng hơn rõ. Tắt "Dùng độ sáng riêng": đồng hồ theo độ sáng của máy.
+15. Nguồn điện "Chỉ khi đang cắm sạc": rút sạc rồi khóa máy, đồng hồ không hiện; cắm sạc rồi khóa máy, đồng hồ hiện; rút sạc khi đồng hồ đang hiện, đồng hồ chuyển sang đen. Làm ngược lại với "Chỉ khi dùng pin". Máy có giới hạn sạc 80%: khi đã dừng ở 80% vẫn phải tính là đang cắm.
+16. Khung giờ: đặt Bắt đầu và Kết thúc quanh giờ hiện tại (ví dụ đang 10:05, đặt 09:00–10:07). Khóa máy trước 10:07 thì đồng hồ hiện, tới 10:07 thì chuyển sang đen; khóa máy sau 10:07 thì đồng hồ không hiện. Thử thêm khung qua nửa đêm (Bắt đầu sau Kết thúc). Tắt "Chỉ hiện trong khung giờ": hiện cả ngày.
+17. Ô Cài đặt nhanh: thêm ô "Custom AOD", chạm để tắt rồi bật. Công tắc trong app đổi theo. Trên Android 15 trở lên, bật từ ô thì app mở lên (đang khóa máy thì hỏi mở khóa trước), sau đó khóa máy thì đồng hồ hiện. Trên Android 12–14 đã cấp quyền overlay thì bật được mà không mở app.
+18. Đổi ngôn ngữ ở "Ứng dụng › Ngôn ngữ": nút "Xong" chỉ bật khi chọn khác ngôn ngữ đang dùng; đổi xong, màn hình chính, đồng hồ và thông báo của service đổi theo.
 
 Lưu ý khi test trên máy ảo hoặc ngay sau khi vừa dùng app: trong 10 giây sau khi app vừa mở hoặc đóng một Activity, Android cho phép mở Activity từ nền mà không cần quyền gì (log ghi `BAL_ALLOW_GRACE_PERIOD`). Vì vậy đồng hồ có thể hiện dù chưa bật "Hiển thị trên ứng dụng khác". Muốn test đúng thì về màn hình chính, đợi hơn 10 giây rồi mới khóa máy.
 
 Xem log khi có vấn đề:
 
 ```
-adb logcat -s AodService AodViewModel MainViewModel ActivityTaskManager PowerManagerService
+adb logcat -s AodService AodViewModel AodTileService MainViewModel ActivityTaskManager PowerManagerService
 ```
 
 Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
@@ -277,7 +301,7 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
 - **Trên Xiaomi, app không tự chạy lại** sau khi bị đóng (vuốt khỏi đa nhiệm, khởi động lại máy, cập nhật app), vì app không xin quyền "Tự khởi chạy". HyperOS chặn việc khởi động lại service (log: `MIUILOG- Reject RestartService ... AodService`). AOD chỉ chạy lại khi mở app. Muốn tự chạy lại thì người dùng bật "Tự khởi chạy" trong cài đặt app. `BootReceiver` vẫn được giữ cho các máy Android khác.
 - **Mã quyền của Xiaomi** (10020, 10021) không có tài liệu chính thức và có thể đổi theo phiên bản HyperOS. Khi đó app hiện dấu "?" thay vì trạng thái.
 - **Màn hình cài đặt cần mạng** (Splash chờ consent, hộp thoại mất mạng của base). AOD không cần mạng.
-- **Giao diện đang là English** cho tới khi có màn chọn ngôn ngữ.
+- **Ô Cài đặt nhanh trên Android 15 trở lên** phải mở app mỗi lần bật AOD (xem "Các quyết định thiết kế"), đang khóa máy thì phải mở khóa trước.
 - **Form consent có thể hiện trên AOD** nếu nó tải xong đúng lúc AOD đang mở (rất hiếm), xem CLAUDE.md › 20.5.
 
 ## targetSdk 37
@@ -291,7 +315,7 @@ App target Android 17 (API 37), chạy từ Android 11 (API 30) trở lên. Đâ
 | Android 14 (34) | Siết intent ngầm và `PendingIntent` | App chỉ dùng intent tường minh và `FLAG_IMMUTABLE` |
 | Android 14–17 | Tài liệu ghi `ACQUIRE_CAUSES_WAKEUP` "sẽ cần" quyền `TURN_SCREEN_ON` | AOSP chưa áp dụng cho `targetSdk` nào (`@EnabledSince(CUR_DEVELOPMENT)`). Wake lock bật lại màn hình khóa vẫn chạy |
 | Android 15 (35) | Bắt buộc vẽ tràn viền (edge-to-edge) | `MainActivity` gọi `enableEdgeToEdge()`, màn hình dùng `Scaffold` và inset của nó. `AodActivity` tự ẩn thanh hệ thống |
-| Android 15 (35) | App có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có overlay hiển thị | Service chỉ được khởi động khi app ở tiền cảnh, hoặc từ `BOOT_COMPLETED` và `MY_PACKAGE_REPLACED` là hai trường hợp được miễn |
+| Android 15 (35) | App có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có overlay hiển thị | Service chỉ được khởi động khi app ở tiền cảnh, hoặc từ `BOOT_COMPLETED` và `MY_PACKAGE_REPLACED` là hai trường hợp được miễn. Ô Cài đặt nhanh không được miễn: `AodService.start()` bắt lỗi và ô mở app |
 | Android 15 (35) | `BOOT_COMPLETED` không được khởi động một số loại foreground service | `specialUse` không thuộc danh sách bị chặn |
 | Android 16 (36) | Bỏ tùy chọn tắt edge-to-edge; bật sẵn predictive back | App không override `onBackPressed`. Back trong app do Navigation 3 xử lý |
 | Android 16–17 | Màn hình lớn (sw ≥ 600dp) bỏ qua khóa hướng xoay và giới hạn kích thước | `MainActivity` khóa dọc (theo base), nên trên màn hình lớn hệ thống bỏ qua khóa này. `AodActivity` không khóa hướng xoay |
@@ -321,7 +345,7 @@ Còn phải làm (tìm `TODO` trong Android Studio › View › Tool Windows ›
 | AdMob App ID thật | `AndroidManifest.xml` › meta-data `com.google.android.gms.ads.APPLICATION_ID` |
 | Ad unit id thật cho từng placement | `app/build.gradle.kts` › `release { buildConfigField("String", "<PLACEMENT>_ALL_ID", …) }` (debug giữ test id) |
 | Form consent | AdMob console › Privacy & messaging › publish message cho App ID thật |
-| Màn chọn ngôn ngữ, onboarding | `SplashScreen` (`isFirstOpen`), CLAUDE.md › 5 |
+| Onboarding (nếu cần) | Sau màn chọn ngôn ngữ ở lần mở đầu tiên, CLAUDE.md › 5 |
 | Font, type scale | `presentation/theme/Type.kt` |
 
 `local.properties` (đã gitignore):
@@ -344,7 +368,7 @@ admob.test.device.ids=HASH_1,HASH_2
 Các tính năng Always On AMOLED có mà app này chưa có được liệt kê trong [COMPARISON.md](COMPARISON.md). Ưu tiên gợi ý:
 
 - Hiện biểu tượng thông báo bằng `NotificationListenerService`.
-- Luật theo sạc (chỉ khi sạc, chỉ khi dùng pin) và lịch tắt ban đêm theo giờ.
 - Nhiều kiểu mặt đồng hồ, cho chọn font, màu và ảnh nền.
 - Nhận diện cuộc gọi chắc chắn hơn bằng `READ_PHONE_STATE` và `TelephonyCallback`, nếu chấp nhận thêm một quyền.
-- Màn chọn ngôn ngữ để dùng bản dịch tiếng Việt đã có.
+
+Đã làm ở giai đoạn 1: quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ.

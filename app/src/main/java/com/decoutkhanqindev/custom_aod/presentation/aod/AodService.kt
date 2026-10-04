@@ -18,9 +18,12 @@ import com.decoutkhanqindev.custom_aod.data.device.screen.ScreenStateManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.MainActivity
+import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
 import com.decoutkhanqindev.custom_aod.utils.Tag
+import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,18 +52,24 @@ class AodService : Service(), Tag {
     override fun onCreate() {
         super.onCreate()
         scope.launch {
-            screenStateManager.events.collect { action ->
-                when (action) {
-                    Intent.ACTION_SCREEN_OFF -> onScreenOff()
-                    Intent.ACTION_USER_PRESENT -> onUserPresent()
-                }
-            }
+            screenStateManager.events.collectCatching(
+                action = { event ->
+                    when (event) {
+                        Intent.ACTION_SCREEN_OFF -> onScreenOff()
+                        Intent.ACTION_USER_PRESENT -> onUserPresent()
+                    }
+                },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
         }
         scope.launch {
             dataStoreManager.selectedLangCode
                 .filterNotNull()
                 .distinctUntilChanged()
-                .collect { startInForeground() }
+                .collectCatching(
+                    action = { startInForeground() },
+                    catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+                )
         }
     }
 
@@ -113,9 +122,12 @@ class AodService : Service(), Tag {
         // Đang có chuông, cuộc gọi hoặc báo thức: AOD sẽ bị mở đè lên màn hình đó.
         if (audioStateManager.isBusyNow()) return false
 
-        val minBattery = dataStoreManager.aodMinBattery.value ?: DataStoreManager.DEFAULT_AOD_MIN_BATTERY
-        val percent = batteryStateManager.readLevelPercent() ?: return true
-        return batteryStateManager.readIsCharging() == true || percent !in 0 until minBattery
+        return dataStoreManager.currentAodRules().allows(
+            batteryPercent = batteryStateManager.readLevelPercent(),
+            isCharging = batteryStateManager.readIsCharging() == true,
+            isPlugged = batteryStateManager.readIsPlugged(),
+            minuteOfDay = AodScheduleUiModel.minuteOfDay(System.currentTimeMillis()),
+        )
     }
 
     // Mở Activity từ nền được là nhờ user đã cấp "Hiển thị trên ứng dụng khác".
@@ -186,14 +198,14 @@ class AodService : Service(), Tag {
         private const val WAKE_HOLD_MILLIS = 1_000L
         private const val USER_PRESENT_GRACE_MILLIS = 1_500L
 
-        fun start(context: Context) {
-            try {
-                context.startForegroundService(Intent(context, AodService::class.java))
-            } catch (e: IllegalStateException) {
-                // Android 12+ cấm start foreground service từ nền; boot, cập nhật app và màn hình của app đều được miễn nên đây chỉ là chốt an toàn.
-                Timber.tag(AodService::class.java.simpleName)
-                    .e("Could not start the AOD service: ${e.stackTraceToString()}")
-            }
+        // Android 12+ cấm start foreground service từ nền; boot, cập nhật app và màn hình của app được miễn, ô Cài đặt nhanh từ Android 15 thì không (false: nơi gọi tự xử lý).
+        fun start(context: Context): Boolean = try {
+            context.startForegroundService(Intent(context, AodService::class.java))
+            true
+        } catch (e: IllegalStateException) {
+            Timber.tag(AodService::class.java.simpleName)
+                .e("Could not start the AOD service: ${e.stackTraceToString()}")
+            false
         }
 
         fun stop(context: Context) {

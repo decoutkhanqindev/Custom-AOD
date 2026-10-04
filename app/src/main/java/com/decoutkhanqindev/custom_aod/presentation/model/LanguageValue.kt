@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 
@@ -82,6 +83,9 @@ enum class LanguageValue(
 
     companion object {
         val DEFAULT = ENGLISH
+
+        // Chỉ các ngôn ngữ đã có res/values-<qualifier>/strings.xml; thêm bản dịch thì thêm vào đây.
+        val TRANSLATED: ImmutableList<LanguageValue> = persistentListOf(ENGLISH, VIETNAMESE)
 
         fun fromCode(code: String?): LanguageValue =
             entries.find { it.code.equals(other = code, ignoreCase = true) } ?: DEFAULT

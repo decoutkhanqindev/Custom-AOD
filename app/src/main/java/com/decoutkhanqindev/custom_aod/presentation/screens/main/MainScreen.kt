@@ -9,9 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodActivity
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
+import com.decoutkhanqindev.custom_aod.presentation.navigation.LanguageDestination
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 import com.decoutkhanqindev.custom_aod.utils.openMiuiPermissionEditor
@@ -20,7 +23,7 @@ import com.decoutkhanqindev.custom_aod.utils.openOverlaySettings
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(backStack: NavBackStack<NavKey>) {
     val context = LocalContext.current
     val viewModel: MainViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -43,6 +46,8 @@ fun MainScreen() {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
+
+                is MainEffect.NavigateToLanguage -> backStack.add(LanguageDestination(isFirstOpen = false))
             }
         }
     }

@@ -35,14 +35,33 @@
   <string name="permission_state_missing">Not granted</string>
   <string name="permission_state_unknown">Unknown</string>
 
-  <string name="opt_dim">Lower the brightness while the clock is shown</string>
+  <string name="opt_custom_brightness">Use a custom brightness for the clock</string>
+  <string name="opt_brightness_value">Brightness: %1$d%%</string>
   <string name="opt_proximity">Go dark in a pocket or face down</string>
   <string name="opt_timeout_never">Go dark after: never</string>
   <string name="opt_timeout_value">Go dark after: %1$d min</string>
+
+  <string name="section_rules">When to show</string>
+  <string name="opt_charging_rule">Power</string>
+  <string name="charging_rule_always">Always</string>
+  <string name="charging_rule_plugged">Only while plugged in</string>
+  <string name="charging_rule_on_battery">Only on battery</string>
+  <string name="opt_schedule">Only during set hours</string>
+  <string name="opt_schedule_start">Start</string>
+  <string name="opt_schedule_end">End</string>
   <string name="opt_battery_off">Skip the clock on low battery: off</string>
   <string name="opt_battery_value">Skip the clock when the battery is below %1$d%%</string>
+  <string name="time_skeleton_24h" translatable="false">Hm</string>
+  <string name="time_skeleton_12h" translatable="false">hma</string>
+
+  <string name="section_app">App</string>
+  <string name="language">Language</string>
 
   <string name="action_preview">Preview</string>
+  <string name="action_done">Done</string>
+  <string name="action_ok">OK</string>
+  <string name="action_cancel">Cancel</string>
+  <string name="action_back">Back</string>
 
   <string name="wake_unknown">The clock has not been shown from a screen-off yet.</string>
   <string name="wake_ok">Last time: the clock opened over the lock screen.</string>

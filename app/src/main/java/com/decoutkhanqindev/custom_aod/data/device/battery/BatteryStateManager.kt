@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -67,9 +68,21 @@ class BatteryStateManager(
             initialValue = null,
         )
 
+    // Cắm nguồn, kể cả khi pin đầy hoặc máy đang giới hạn sạc (vd dừng ở 80%) — khác isCharging.
+    val isPlugged: StateFlow<Boolean?> = batteryChanged
+        .map { it.isPlugged() }
+        .distinctUntilChanged()
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(replayExpirationMillis = 0),
+            initialValue = null,
+        )
+
     fun readLevelPercent(): Int? = readBatteryChanged()?.levelPercent()
 
     fun readIsCharging(): Boolean? = readBatteryChanged()?.isCharging()
+
+    fun readIsPlugged(): Boolean? = readBatteryChanged()?.isPlugged()
 
     private fun readBatteryChanged(): Intent? = app.registerSystemReceiver(null, batteryChangedFilter)
 
@@ -83,6 +96,8 @@ class BatteryStateManager(
         val status = getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
         return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
     }
+
+    private fun Intent.isPlugged(): Boolean = getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0
 
     companion object {
         private const val DEFAULT_SCALE = 100

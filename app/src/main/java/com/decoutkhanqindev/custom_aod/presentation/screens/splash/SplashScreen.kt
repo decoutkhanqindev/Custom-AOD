@@ -12,7 +12,9 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.decoutkhanqindev.custom_aod.ads.AdsManager
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
+import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.network.connectivity.NetworkManager
+import com.decoutkhanqindev.custom_aod.presentation.navigation.LanguageDestination
 import com.decoutkhanqindev.custom_aod.presentation.navigation.MainDestination
 import com.decoutkhanqindev.custom_aod.utils.navigateTo
 import org.koin.compose.koinInject
@@ -21,6 +23,7 @@ import org.koin.compose.koinInject
 fun SplashScreen(backStack: NavBackStack<NavKey>) {
     val context = LocalContext.current
     val activity = LocalActivity.current
+    val dataStoreManager: DataStoreManager = koinInject()
     val networkManager: NetworkManager = koinInject()
     val adsManager: AdsManager = koinInject()
     val isNetworkAvailable by networkManager.isAvailable.collectAsStateWithLifecycle()
@@ -29,8 +32,11 @@ fun SplashScreen(backStack: NavBackStack<NavKey>) {
     val interSplash = adsManager.interSplash
     val interSplashState by interSplash.state.collectAsStateWithLifecycle()
     val handleNext = {
-        // TODO: Lần đầu mở app (DataStoreManager.isFirstOpen) → màn Language/Onboarding của project
-        backStack.navigateTo(MainDestination, preserveState = false)
+        if (dataStoreManager.isFirstOpen.value == true) {
+            backStack.navigateTo(LanguageDestination(isFirstOpen = true), preserveState = false)
+        } else {
+            backStack.navigateTo(MainDestination, preserveState = false)
+        }
     }
 
     LaunchedEffect(isConsentGathered, isMobileAdsInitialized, isNetworkAvailable) {

@@ -72,6 +72,24 @@
           android:value="Shows an always-on clock over the lock screen each time the screen turns off" />
     </service>
 
+    <!--
+      Ô Cài đặt nhanh bật/tắt AOD. Chỉ hệ thống (BIND_QUICK_SETTINGS_TILE) được bind.
+      TOGGLEABLE_TILE: trình đọc màn hình đọc ô này như một công tắc.
+    -->
+    <service
+        android:name=".presentation.aod.AodTileService"
+        android:exported="true"
+        android:icon="@drawable/ic_aod"
+        android:label="@string/app_name"
+        android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+      <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+          android:value="true" />
+    </service>
+
     <receiver
         android:name=".presentation.aod.BootReceiver"
         android:exported="false">

@@ -55,7 +55,7 @@ com.decoutkhanqindev.custom_aod/
 │   ├── network/connectivity/      # NetworkManager    — trạng thái mạng
 │   ├── device/                    # tín hiệu thiết bị cho AOD (mục 20.3)
 │   │   ├── screen/                #   ScreenStateManager    — SCREEN_OFF/USER_PRESENT, isInteractive, wake lock
-│   │   ├── battery/               #   BatteryStateManager   — % pin, đang sạc
+│   │   ├── battery/               #   BatteryStateManager   — % pin, đang sạc, đang cắm nguồn
 │   │   ├── audio/                 #   AudioStateManager     — chuông / cuộc gọi / báo thức
 │   │   ├── proximity/             #   ProximityManager      — cảm biến tiệm cận
 │   │   └── permission/            #   PermissionManager     — overlay, thông báo, quyền riêng của Xiaomi
@@ -63,19 +63,20 @@ com.decoutkhanqindev.custom_aod/
 ├── utils/                         # CoroutineExt · NavExt (navigateTo) · ContextExt (showToast, registerSystemReceiver, mở trang cài đặt) · Tag
 └── presentation/
     ├── MainActivity.kt            # requestConsent, áp locale (AppLanguageProvider), AppTheme, start AodService
-    ├── aod/                       # runtime AOD: AodActivity · AodService · AodSession · BootReceiver (mục 20)
+    ├── aod/                       # runtime AOD: AodActivity · AodService · AodSession · BootReceiver · AodTileService (mục 20)
     ├── base/BaseViewModel.kt      # MVI <State, Intent, Effect>
-    ├── components/                # Modifiers · AppLottie · AppLanguageProvider · dialog/NoInternetDialog
+    ├── components/                # Modifiers · AppLottie · AppLanguageProvider · SettingsRows · dialog/NoInternetDialog
     ├── effects/                   # LaunchedWithLifecycleEffect (collect flow theo lifecycle)
-    ├── model/                     # UiModel · LanguageValue · AnimationContentKey · PermissionValue · PermissionStatusValue · WakeResultValue
+    ├── model/                     # UiModel (AodOptions, AodRules, AodSchedule, Language…) · LanguageValue · AnimationContentKey · ChargingRuleValue · ScheduleTimeValue · PermissionValue · PermissionStatusValue · WakeResultValue
     ├── navigation/                # AppDestinations (NavKey) · AppNavDisplay (+ NoInternetDialog)
     ├── screens/<feature>/         # XxxScreen · XxxContent · XxxViewModel · state/{XxxState, XxxIntent, XxxEffect}
-    │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, xem thử
+    │   ├── language/              #   chọn ngôn ngữ: lần đầu mở app (Splash → Language → Main) và từ màn Main
+    │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, quy tắc hiện, ngôn ngữ, xem thử (+ MainXxxSection)
     │   └── aod/                   #   đồng hồ AOD, host là AodActivity (không nằm trong NavDisplay)
     └── theme/                     # Color · Theme · Type (bảng màu tối của FakeAOD)
 ```
 
-`Placeholder.kt` trong `domain/*`, `data/repository` chỉ giữ chỗ + TODO → xoá khi layer đó có file thật. `screens/main/` và `screens/aod/` là màn MVI đầy đủ (6 file) — copy làm khung cho màn mới.
+`Placeholder.kt` trong `domain/*`, `data/repository` chỉ giữ chỗ + TODO → xoá khi layer đó có file thật. `screens/language/` là màn MVI đầy đủ gọn nhất (6 file) — copy làm khung cho màn mới; `screens/main/` có thêm `MainXxxSection.kt` (Content dài tách theo mục 10.4).
 
 ### 1.1 Luồng dữ liệu
 
@@ -119,7 +120,7 @@ Hệ quả bắt buộc:
 | DB local | `data/local/database/` (Room: Database, Dao, Entity) | DexReader `data/local/database` |
 | Nguồn dữ liệu khác (asset, thuật toán…) | `data/source/<tên>/` — `XxxDataSource` + `XxxDataSourceImpl`, chỉ `data/repository` dùng | Lịch Việt `data/source` |
 | Firebase (Analytics/Crashlytics/Perf) | plugin `google-services` (+ `crashlytics`, `firebase-perf`), Firebase BOM, `app/google-services.json`; bật collection chỉ ở release: `Firebase.crashlytics.isCrashlyticsCollectionEnabled = !BuildConfig.DEBUG` (tương tự analytics/perf) trong `lifecycleScope.launch(Dispatchers.IO)` | DexReader `MainActivity.setUpFirebaseSdk` |
-| Màn Language / Onboarding | Xem [mục 5](#5-ngôn-ngữ--locale) + [mục 4](#4-ads--admob--consent-ump) | DexReader `screens/language`, `screens/onboarding` |
+| Onboarding | Màn sau Language ở lần đầu mở app — chuyển `saveIsFirstOpen(false)` từ Language sang cuối onboarding ([mục 5](#5-ngôn-ngữ--locale)); ad: [mục 4](#4-ads--admob--consent-ump) | DexReader `screens/onboarding` |
 | Widget | Glance — `presentation/widget/` | Lịch Việt `presentation/widget` |
 | Service / BroadcastReceiver | `presentation/<feature>/` cạnh Activity dùng chung state (vd `presentation/aod/`); logic quyết định ở đó, truy cập hệ thống qua manager | Custom AOD `presentation/aod` (mục 20) |
 
@@ -131,11 +132,11 @@ Manager = hạ tầng runtime **không phải nghiệp vụ** (prefs của app-s
 
 | Manager | Vị trí | Cung cấp |
 |---|---|---|
-| `DataStoreManager` | `data/local/datastore/` | `selectedLangCode`, `isFirstOpen`, tuỳ chọn AOD (`isAodEnabled`, `isAodDimBrightness`, `isAodProximityEnabled`, `aodTimeoutMinutes`, `aodMinBattery`), `aodLastWake`, `isNotificationsAsked` — mỗi key 1 `StateFlow<T?>` + `saveXxx()`; `DEFAULT_*` của tuỳ chọn AOD là `const` public để nơi đọc đồng bộ có giá trị dự phòng |
+| `DataStoreManager` | `data/local/datastore/` | `selectedLangCode`, `isFirstOpen`, tuỳ chọn AOD (`isAodEnabled`, `isAodCustomBrightness`, `aodBrightnessPercent`, `isAodProximityEnabled`, `aodTimeoutMinutes`), quy tắc hiện (`aodMinBattery`, `aodChargingRule`, `isAodScheduleEnabled`, `aodScheduleStartMinute`, `aodScheduleEndMinute`), `aodLastWake`, `isNotificationsAsked` — mỗi key 1 `StateFlow<T?>` + `saveXxx()`; `DEFAULT_*` của tuỳ chọn AOD là `const` public để nơi đọc đồng bộ có giá trị dự phòng |
 | `LanguageManager` | `data/local/locale/` | `deviceLanguageCode()`, `configurationFor(code)`, `resourcesFor(config)`, `displayNameOf(code, displayIn)` |
 | `NetworkManager` | `data/network/connectivity/` | `isAvailable: StateFlow<Boolean>` |
 | `ScreenStateManager` | `data/device/screen/` | `events: SharedFlow<String>` (action `SCREEN_OFF` / `USER_PRESENT`), `isInteractive`, `isDeviceSecure`, `wakeUp(holdMillis)` |
-| `BatteryStateManager` | `data/device/battery/` | `levelPercent: StateFlow<Int?>`, `isCharging: StateFlow<Boolean?>`, `readLevelPercent()`, `readIsCharging()` |
+| `BatteryStateManager` | `data/device/battery/` | `levelPercent: StateFlow<Int?>`, `isCharging: StateFlow<Boolean?>`, `isPlugged: StateFlow<Boolean?>` (`EXTRA_PLUGGED`: cắm nguồn kể cả khi pin đầy / giới hạn sạc), `readLevelPercent()`, `readIsCharging()`, `readIsPlugged()` |
 | `AudioStateManager` | `data/device/audio/` | `isBusy: StateFlow<Boolean?>` (chuông / cuộc gọi / báo thức), `isBusyNow()` |
 | `ProximityManager` | `data/device/proximity/` | `isNear: StateFlow<Boolean>` |
 | `PermissionManager` | `data/device/permission/` | `isXiaomi`, `canDrawOverlays()`, `areNotificationsEnabled()`, `needsNotificationPermission()`, `isMiuiShowWhenLockedAllowed()`, `isMiuiBackgroundStartAllowed()` |
@@ -232,14 +233,17 @@ Rule:
 
 ## 5. Ngôn ngữ / locale
 
-- `LanguageValue` (`presentation/model/`): 64 ngôn ngữ (`code` ISO + `flag`), `DEFAULT = ENGLISH`, `fromCode(code)`, `displayNamesFor(displayIn, languageManager)`, `sortedForDisplay(deviceLanguageCode, displayNames)` (ngôn ngữ máy → English → theo tên), `labelFor(...)`.
-- Ngôn ngữ đã chọn lưu dạng ISO code ở `DataStoreManager.selectedLangCode` (mặc định `"en"`). `MainActivity` collect → `languageManager.configurationFor(code)` + `resourcesFor(config)` → provide `LocalConfiguration`/`LocalResources` ⇒ `stringResource()` đổi ngôn ngữ ngay, không recreate Activity.
+- `LanguageValue` (`presentation/model/`): 64 ngôn ngữ (`code` ISO + `flag`), `DEFAULT = ENGLISH`, `TRANSLATED` (ngôn ngữ đã có bản dịch — hiện English, Tiếng Việt), `fromCode(code)`, `displayNamesFor(displayIn, languageManager)`, `sortedForDisplay(deviceLanguageCode, displayNames)` (ngôn ngữ máy → English → theo tên), `labelFor(...)`. `LanguageUiModel` (`toUiModel(languageManager)`): cờ + tên viết bằng chính ngôn ngữ đó.
+- Ngôn ngữ đã chọn lưu dạng ISO code ở `DataStoreManager.selectedLangCode` (mặc định `"en"`). `AppLanguageProvider` (bọc `setContent` của `MainActivity` và `AodActivity`) collect → `languageManager.configurationFor(code)` + `resourcesFor(config)` → provide `LocalConfiguration`/`LocalResources` ⇒ `stringResource()` đổi ngôn ngữ ngay, không recreate Activity. Thông báo của `AodService` lấy chuỗi qua `resourcesFor(...)` và đăng lại khi `selectedLangCode` đổi.
 - Text UI phải qua `stringResource(...)` hoặc `LocalResources.current.getString(...)` — **không** `context.getString`/`activity.getString` (Context của Activity bỏ qua locale override). Toast: `context.showToast(resources.getString(R.string.x))` với `val resources = LocalResources.current`.
 - Ngôn ngữ đang áp dụng trong Compose: `LanguageValue.fromCode(LocalConfiguration.current.locales[0].toLanguageTag())`.
 - `LocalConfiguration` bị override từ config của Application (theo ngôn ngữ) → **không** đọc kích thước màn hình từ nó; dùng `LocalWindowInfo` / `BoxWithConstraints`.
 - Bản dịch: `res/values-<qualifier>/strings.xml`. Code khác qualifier: `id → values-in`, `he → values-iw`, `zh-hk → values-zh-rHK`, `es-la → values-es-rLA`, `pt-br → values-pt-rBR`, `fil → values-b+fil`; còn lại `values-<code>`. `generateLocaleConfig = true` + `res/resources.properties` (`unqualifiedResLocale=en-US`) sinh danh sách ngôn ngữ cho Android 13+. Thiếu bản dịch → rơi về `values/` (English).
 - **Giữ `bundle { language { enableSplit = false } }`** trong `app/build.gradle.kts`: phát hành AAB mà bật split thì máy chỉ nhận ngôn ngữ trùng ngôn ngữ hệ thống → đổi sang ngôn ngữ khác trong app sẽ hiện English (lint `AppBundleLocaleChanges`).
-- Màn chọn ngôn ngữ (TODO theo project): lựa chọn tạm là state của màn; chỉ nút Done mới gọi `saveSelectedLangCode(language.code)`. Lần đầu mở app (`isFirstOpen == true`) Splash điều hướng tới màn này; xong onboarding gọi `saveIsFirstOpen(false)`.
+- Màn chọn ngôn ngữ `screens/language/` (`LanguageDestination(isFirstOpen)`): chỉ liệt kê `LanguageValue.TRANSLATED`, ngôn ngữ máy lên đầu rồi tới English. Lựa chọn tạm là state của màn; chỉ nút Xong mới gọi `saveSelectedLangCode(language.code)`.
+  - Lần đầu mở app (`isFirstOpen == true`): Splash `navigateTo(LanguageDestination(isFirstOpen = true), preserveState = false)`. Không có nút back, chọn sẵn ngôn ngữ của máy (chưa có bản dịch → English); Xong gọi thêm `saveIsFirstOpen(false)` rồi `navigateTo(MainDestination, preserveState = false)`. Có onboarding thì chuyển `saveIsFirstOpen(false)` sang cuối onboarding.
+  - Từ màn Main (mục "Ứng dụng › Ngôn ngữ"): `backStack.add(LanguageDestination(isFirstOpen = false))`; Xong chỉ bật khi chọn khác ngôn ngữ đang dùng, lưu xong thì quay lại.
+  - Thêm bản dịch: `values-<qualifier>/strings.xml` + thêm vào `LanguageValue.TRANSLATED`.
 
 ---
 
@@ -247,7 +251,7 @@ Rule:
 
 | Thành phần | Quy ước | Ví dụ |
 |---|---|---|
-| Destination | `XxxDestination` | `MainDestination`, `DetailDestination(id)` |
+| Destination | `XxxDestination` | `MainDestination`, `LanguageDestination(isFirstOpen)` |
 | Màn | `XxxScreen` · `XxxContent` · `XxxViewModel` | `MainScreen` |
 | MVI | `XxxState` · `XxxIntent` · `XxxEffect` | `MainState` |
 | UseCase | `VerbNounUseCase` | `GetDailyMetadataUseCase` |
@@ -418,7 +422,7 @@ class XxxViewModel(
 - `onIntent` là cửa duy nhất UI gọi vào; `when (intent)` exhaustive, không `else`. Hàm public khác chỉ để nhận args khởi tạo ([11.4](#114-truyền-args)).
 - Chỉ đổi state qua `updateState { copy(...) }`; đọc state hiện tại bằng `state.value`.
 - Tác vụ có thể bị gọi chồng → giữ `Job?` và `cancel()` job cũ trước khi launch.
-- Reactive UseCase → `collectCatching(action = …, catch = …)` (tham số đặt tên, `action` trước; cần return sớm trong catch → nhãn `catch@`).
+- Flow của UseCase/manager → `collectCatching(action = …, catch = …)` (tham số đặt tên, `action` trước; cần return sớm trong catch → nhãn `catch@`) — chọn helper theo [mục 13.1](#131-chọn-helper--bắt-buộc-cho-code-mới).
 - Map domain → UiModel trong VM (`toUiModel()`), không map trong Content. Text hiển thị cho user → `@StringRes` (Effect `ShowMessage` hoặc field `@StringRes` trong State).
 
 ### 10.4 Screen vs Content
@@ -487,7 +491,7 @@ Lib: `navigation3-runtime`, `navigation3-ui`, `lifecycle-viewmodel-navigation3`.
 
 ### 11.4 Truyền args
 1. Entry đọc args từ `dest` → Screen: `entry<DetailDestination> { dest -> DetailScreen(id = dest.id) }`.
-2. Vào ViewModel: VM gắn entry (`koinViewModel`) → `koinViewModel { parametersOf(id) }` + `viewModel { (id: Int) -> DetailViewModel(id, get()) }`; VM sống lâu hơn entry (`koinActivityViewModel`) → hàm `setXxx(arg)` gọi trong `LaunchedEffect(arg)`.
+2. Vào ViewModel: VM gắn entry (`koinViewModel`) → `koinViewModel { parametersOf(id) }` + `viewModel { (id: Int) -> DetailViewModel(id, get()) }` (đang dùng: `LanguageScreen` → `LanguageViewModel(isFirstOpen, …)`); VM sống lâu hơn entry (`koinActivityViewModel`) → hàm `setXxx(arg)` gọi trong `LaunchedEffect(arg)`.
 
 ### 11.5 Nested navigation (bottom tab)
 
@@ -543,12 +547,31 @@ fun MainScreen() {
 
 | Hàm | Trả về | Bắt | Dùng ở |
 |---|---|---|---|
-| `suspendRunCatching { }` | `Result<T>` | `Throwable` | UseCase 1 lần |
-| `withContextCatching(context, action, catch)` | `T` | `Exception` | Repository / Manager (đổi dispatcher + map/log lỗi) |
-| `Flow<T>.collectCatching(action, catch)` | — (terminal) | `Exception` từ upstream **và** thân `action` | ViewModel collect UseCase reactive |
-| `Flow<T>.recoverCatching { }` | `Flow<T>` (intermediate) | `Throwable` | Flow phải sống tiếp (trước `stateIn` trong manager) |
+| `suspendRunCatching { }` | `Result<T>` | `Throwable` | UseCase 1 lần; lời gọi suspend 1 lần có thể ném mà nơi gọi cần `Result` |
+| `withContextCatching(context, action, catch)` | `T` | `Exception` | Repository / Manager (đổi dispatcher + map/log lỗi): `DataStoreManager.edit`, init MobileAds của `AdsManager` |
+| `Flow<T>.collectCatching(action, catch)` | — (terminal) | `Exception` từ upstream **và** thân `action` | **Mọi** chỗ collect flow của manager/UseCase: ViewModel, Service, TileService, manager (`AdsManager` collect `isAvailable`) |
+| `Flow<T>.recoverCatching { }` | `Flow<T>` (intermediate) | `Throwable` | Flow phải sống tiếp: trước `shareIn`/`stateIn` trong manager (`callbackFlow` của receiver/cảm biến, `prefs.data`) |
 
 - Hậu tố **`-Catching` = rethrow `CancellationException`, bắt phần còn lại**. Vì vậy ViewModel/Repository **không** tự viết `catch (c: CancellationException) { throw c }` — gọi helper. Ngoại lệ duy nhất: ad unit (phải bắt `TimeoutCancellationException` trước).
+
+### 13.1 Chọn helper — bắt buộc cho code mới
+
+- **Collect flow của manager/UseCase → `collectCatching`, không `.collect { }` thô** — trong ViewModel (`init`), `AodService.onCreate`, `AodTileService.onStartListening`… Lỗi ở `action` hay upstream chỉ dừng collector đó và được log; collect thô thì lỗi lọt ra scope (`SupervisorJob` không có handler → crash app). Mẫu, lớp cần log implement `Tag`:
+  ```kotlin
+  viewModelScope.launch {
+      batteryStateManager.isPlugged.filterNotNull().collectCatching(
+          action = { isPlugged -> … },
+          catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+      )
+  }
+  ```
+- Chỉ 2 chỗ được collect thô (grep ở [mục 18](#18-banned-patterns) không báo 2 chỗ này):
+  - `viewModel.effect.collect { }` trong `LaunchedWithLifecycleEffect` của Screen (khung [mục 10.4](#104-screen-vs-content)): `SharedFlow` của `BaseViewModel` không ném lỗi.
+  - `collectLatest` khi phải huỷ khối đang chạy lúc có giá trị mới — helper không có bản "latest": `AodViewModel.observeProximity` (chờ che 3 giây), `snapshotFlow` trong `Modifier.onClick`. Chỉ với `StateFlow` của manager (đã `recoverCatching` trong manager) hoặc state Compose.
+- Đọc giá trị của manager **1 lần** → `.value` (đồng bộ, `null` → `DEFAULT_*`) hoặc `filterNotNull().first()` (chờ nạp xong); không cần bọc vì `StateFlow` không ném lỗi, lỗi đọc đã được manager `recoverCatching`.
+- Manager: nguồn `callbackFlow` / `prefs.data` → `recoverCatching { … }` trước `shareIn`/`stateIn`; ghi hoặc IO → `withContextCatching(…)` trong `scope.launch` của manager.
+- Lời gọi suspend 1 lần có thể ném → `suspendRunCatching { }.onSuccess { }.onFailure { }` — không `try/catch`, không `runCatching`.
+- Hàm **đồng bộ** của hệ thống ném exception có tên (vd `startForegroundService` ném `ForegroundServiceStartNotAllowedException`) → `try/catch` đúng loại đó như `AodService.start()`; helper `-Catching` là hàm suspend, không dùng ở đây.
 - Scope: `viewModelScope` (VM) · `LaunchedEffect`/`rememberCoroutineScope`/`LaunchedWithLifecycleEffect` (Compose) · `lifecycleScope` (Activity) · manager/ad unit tự tạo scope · `AodService` tự tạo scope `Dispatchers.Main.immediate`, huỷ ở `onDestroy` · `BootReceiver` tạo scope ngắn cho `goAsync()`.
 - Dispatcher chọn ở Repository/Manager, không ở VM/UseCase.
 - Banned: `GlobalScope`, `runBlocking` trong code app, `Thread.sleep`.
@@ -579,12 +602,13 @@ fun MainScreen() {
 | Skeleton loading | `Modifier.shimmerLoading(backgroundColor, shimmerColor, shape, isEnable)` · `Modifier.shimmerHighlight(...)` | `components/Modifiers.kt` |
 | Nền mờ dần (sau nút đáy) | `Modifier.blurBackground(alphas = persistentListOf(0f, 0f, 1f, 1f))` | `components/Modifiers.kt` |
 | Dialog mất mạng | `NoInternetDialog()` (đã gắn ở `AppNavDisplay`) | `components/dialog/` |
+| Dòng cài đặt: tiêu đề mục, công tắc, radio, dòng giá trị bấm được, thanh trượt theo nấc | `SettingsSectionHeader` · `SettingsSwitchRow` · `SettingsRadioRow` · `SettingsValueRow` · `SettingsSlider(valueRange, step)` | `components/SettingsRows.kt` |
 | Animation Lottie (lặp vô hạn) | `AppLottie(resId = R.raw.x, modifier = …)` | `components/AppLottie.kt` |
 | Manager trong Compose | `val x: XxxManager = koinInject()` (Screen/host) | `di/AppModule.kt` |
 | Banner / Native / loading ad | `BannerAdView` · `NativeAdView` · `AdLoadingDialog` | `ads/composables/` |
 | Danh sách ngôn ngữ | `LanguageValue` | `presentation/model/` |
 | Key `AnimatedContent` | `AnimationContentKey` | `presentation/model/` |
-| Coroutine an toàn huỷ | `suspendRunCatching` · `withContextCatching` · `collectCatching` · `recoverCatching` | `utils/CoroutineExt.kt` |
+| Coroutine an toàn huỷ (chọn helper: [mục 13.1](#131-chọn-helper--bắt-buộc-cho-code-mới)) | `suspendRunCatching` · `withContextCatching` · `collectCatching` · `recoverCatching` | `utils/CoroutineExt.kt` |
 | Điều hướng | `NavBackStack.navigateTo(dest, preserveState)` | `utils/NavExt.kt` |
 | Toast | `context.showToast(message)` | `utils/ContextExt.kt` |
 | Đăng ký receiver cho broadcast hệ thống (`RECEIVER_NOT_EXPORTED` từ Android 13; receiver `null` = đọc broadcast sticky) | `context.registerSystemReceiver(receiver, filter)` | `utils/ContextExt.kt` |
@@ -637,6 +661,7 @@ Quy tắc:
 | Manager dạng interface + `Impl` · base class chỉ có 1 lớp con (vd `BaseAds`) | 1 class cụ thể (`XxxManager`, `AdsManager`) |
 | UseCase/Repository chỉ forward Manager | Inject Manager trực tiếp |
 | `runCatching` trong suspend · `catch (CancellationException)` tự viết | `suspendRunCatching` · `withContextCatching` · `collectCatching` · `recoverCatching` |
+| `.collect { }` thô với flow của manager/UseCase (ViewModel, Service, TileService…) | `collectCatching(action = …, catch = …)` ([mục 13.1](#131-chọn-helper--bắt-buộc-cho-code-mới)) |
 | `repeatOnLifecycle` thô rải trong từng Screen · collect effect ngoài helper lifecycle | `LaunchedWithLifecycleEffect { }` (`presentation/effects/`) · `LifecycleResumeEffect` |
 | `context.getString` cho text UI | `stringResource` · `LocalResources.current.getString` |
 | Hex `Color(0x…)`, `Color.White/Black`, `RoundedCornerShape(n.dp)` trong UI | `MaterialTheme.colorScheme/shapes` · token `Color.kt` |
@@ -661,6 +686,7 @@ grep -rn "LottieAnimation(" app/src/main/java --include="*.kt" | grep -v "/compo
 grep -rn "LiveData\|dagger\.hilt\|androidx\.navigation\.compose" app/src/main/java --include="*.kt"
 grep -rn "val .*: \(Mutable\)\?List<" app/src/main/java --include="*State.kt" --include="*UiModel.kt"
 grep -rn "catch (.*: CancellationException)" app/src/main/java --include="*.kt" | grep -v "/ads/ad_unit/\|/utils/CoroutineExt.kt"
+grep -rn "\.collect {" app/src/main/java --include="*.kt" | grep -v "\.effect\.collect {"
 grep -rn "context\.getString\|activity\.getString" app/src/main/java --include="*.kt"
 grep -rln "^import android\.\|^import androidx\." app/src/main/java --include="*.kt" | grep "/domain/"
 grep -rn "import .*\.data\.repository\.\|import .*Impl$" app/src/main/java --include="*.kt" | grep "/presentation/"
@@ -696,17 +722,19 @@ Lõi AOD port từ demo FakeAOD (đã chạy trên Redmi Note 13 Pro 5G, HyperOS
 
 ```
 màn hình tắt ─▶ ScreenStateManager.events ─▶ AodService.onScreenOff()
-                                                 │ shouldEnter(): đang bật · màn hình vẫn tắt · không chuông/cuộc gọi/báo thức · pin đủ
+                                                 │ shouldEnter(): đang bật · màn hình vẫn tắt · không chuông/cuộc gọi/báo thức
+                                                 │                · AodRulesUiModel.allows(): nguồn điện · khung giờ · pin đủ
                                                  ▼
                                   startActivity(AodActivity) — được phép từ nền nhờ "Hiển thị trên ứng dụng khác"
                                                  │ cờ cửa sổ SHOW_WHEN_LOCKED | TURN_SCREEN_ON: che màn hình khoá rồi mới sáng
                                                  ▼
-             AodActivity ── AodScreen ── AodViewModel (pin · tiệm cận · âm thanh · hết giờ · mỗi phút)
+             AodActivity ── AodScreen ── AodViewModel (pin · cắm nguồn · tiệm cận · âm thanh · hết giờ · mỗi phút)
                                                  │ state.isDark ─▶ AodActivity.renderDark(): KEEP_SCREEN_ON, độ sáng, requestSleep
                                                  ▼
 nút nguồn khi AOD hiện ─▶ SCREEN_OFF ─▶ AodService: ScreenStateManager.wakeUp() → màn hình khoá
 chạm 2 lần · mở khoá (USER_PRESENT) · cuộc gọi · báo thức ─▶ đóng AOD
-hết giờ · trong túi · pin yếu ─▶ đen ─▶ giờ chờ của máy tắt màn hình ─▶ SCREEN_OFF có sleep request ─▶ không mở lại
+hết giờ · trong túi · sai quy tắc hiện ─▶ đen ─▶ giờ chờ của máy tắt màn hình ─▶ SCREEN_OFF có sleep request ─▶ không mở lại
+ô Cài đặt nhanh ─▶ AodTileService: lưu isAodEnabled, start/stop AodService (start bị chặn ─▶ mở app để MainActivity start)
 ```
 
 ### 20.2 Thành phần
@@ -717,22 +745,24 @@ hết giờ · trong túi · pin yếu ─▶ đen ─▶ giờ chờ của máy
 | `presentation/aod/AodActivity` | Host của `AodScreen`. Giữ mọi thao tác cửa sổ: cờ, độ sáng, ẩn thanh hệ thống, `renderDark()`. Áp ngôn ngữ bằng `AppLanguageProvider` |
 | `presentation/aod/AodSession` | Koin `single`, chỉ dùng trên main thread. `WeakReference` tới `AodActivity`; `isShowing`, `isCovered`, `shownAt`, sleep request; `finish()` đóng AOD ngay |
 | `presentation/aod/BootReceiver` | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` → start service nếu đang bật (`goAsync()` trong lúc đọc DataStore) |
-| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ và dịch vị trí; ẩn dòng gợi ý sau 3 giây) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ) · `AodScreen` (collect effect, chuyển `isDark` cho Activity) |
-| `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
+| `presentation/aod/AodTileService` | Ô Cài đặt nhanh (`TOGGLEABLE_TILE`): hiện và đảo `isAodEnabled`, start/stop service; `AodService.start()` trả `false` → mở app bằng `startActivityAndCollapse` (đang khoá → `unlockAndRun` trước) |
+| `presentation/model/AodRulesUiModel` | Quy tắc hiện: `minBattery`, `chargingRule` (`ChargingRuleValue`), `schedule` (`AodScheduleUiModel`). `allows()` dùng chung cho `AodService.shouldEnter()` và `AodViewModel.checkRules()`; `DataStoreManager.currentAodRules()` đọc snapshot đồng bộ |
+| `presentation/screens/aod/` | `AodViewModel` (khi nào tối, sáng lại, đóng; mỗi phút cập nhật giờ, dịch vị trí và kiểm quy tắc hiện; ẩn dòng gợi ý sau 3 giây) · `AodContent` (vẽ đồng hồ từ state, không tự đếm giờ) · `AodScreen` (collect effect, chuyển `isDark` cho Activity) |
+| `presentation/screens/main/` | Cài đặt: công tắc, danh sách quyền, tuỳ chọn (độ sáng, tiệm cận, hết giờ), quy tắc hiện (nguồn điện, khung giờ, ngưỡng pin), ngôn ngữ, xem thử, kết quả lần mở gần nhất, hỏi quyền thông báo lần đầu |
 | `data/device/*` | `ScreenStateManager` · `BatteryStateManager` · `AudioStateManager` · `ProximityManager` · `PermissionManager` (mục 2) |
-| `DataStoreManager` | Tuỳ chọn AOD, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |
+| `DataStoreManager` | Tuỳ chọn và quy tắc hiện của AOD, `aodLastWake` (mã của `WakeResultValue`), `isNotificationsAsked` |
 
 ### 20.3 Bất biến
 
 1. **Activity che màn hình khoá, không dùng overlay.** Overlay (kể cả `TYPE_ACCESSIBILITY_OVERLAY`) chỉ vẽ đè: mở khoá bằng khuôn mặt chạy mỗi lần AOD hiện, vòng vân tay của Xiaomi nằm trên AOD, màn hình khoá loé lên trước khi vẽ xong. `android:showWhenLocked` trong manifest là điều kiện để Activity được mở trên màn hình khoá.
 2. **Bật màn hình bằng cờ cửa sổ `FLAG_SHOW_WHEN_LOCKED | FLAG_TURN_SCREEN_ON` ở đầu `onCreate`**, không dùng `android:turnScreenOn` hay `setTurnScreenOn()`. Hai cách kia bật màn hình ngay khi Activity khởi động, trước khi màn hình khoá bị che: trên HyperOS màn hình khoá lộ 0,3–0,45 giây và nhận diện khuôn mặt chạy ở mọi lần mở. Với cờ cửa sổ, nhận diện khuôn mặt không chạy ở 5/6 lần mở được ghi lại.
 3. **Mở từ nền nhờ `SYSTEM_ALERT_WINDOW`** (log `BAL_ALLOW_SAW_PERMISSION`), lúc màn hình còn tắt. Không dùng thông báo toàn màn hình: SystemUI bật màn hình trước rồi mới mở AOD, màn hình khoá lộ khoảng 0,2 giây.
-4. **Foreground service `specialUse`** giữ receiver `SCREEN_OFF` (broadcast này chỉ tới receiver đăng ký lúc chạy). Chỉ start từ: `MainActivity` (tiền cảnh), công tắc trên màn Main, `BootReceiver` (được miễn). Từ Android 15, app có quyền "Hiển thị trên ứng dụng khác" chỉ được start foreground service từ nền khi đang có overlay hiển thị — đừng thêm chỗ start khác.
+4. **Foreground service `specialUse`** giữ receiver `SCREEN_OFF` (broadcast này chỉ tới receiver đăng ký lúc chạy). Chỉ start từ: `MainActivity` (tiền cảnh), công tắc trên màn Main, `BootReceiver` (được miễn), ô Cài đặt nhanh. Từ Android 15, app có quyền "Hiển thị trên ứng dụng khác" chỉ được start foreground service từ nền khi đang có overlay hiển thị, và ô Cài đặt nhanh không được miễn: `AodService.start()` bắt `IllegalStateException` (`ForegroundServiceStartNotAllowedException`) và trả `false`, `AodTileService` khi đó mở app để `MainActivity` start. Đừng thêm chỗ start khác.
 5. **`AodSession` đồng bộ trên main thread.** Lúc `SCREEN_OFF`, service đọc `isShowing`, `isCovered`, `consumeSleepRequest()` rồi `finish()` trong cùng một lần xử lý. Không chuyển thành StateFlow hay sự kiện bất đồng bộ.
 6. **Thứ tự `when` trong `onScreenOff()` là có chủ ý:** sleep request (tối theo chủ ý) → bị che (ROM tự tắt màn hình trong túi) → AOD đang hiện (= nút nguồn, vì AOD giữ màn hình sáng) → `shouldEnter()`. Không mở AOD nếu `isInteractive` đã true lúc `SCREEN_OFF` tới: `SCREEN_OFF` đến trễ 0,2–0,8 giây, người dùng vừa bấm nguồn bật lại.
 7. **`ScreenStateManager.events` là `SharedFlow`**, không phải `StateFlow`: StateFlow gộp mất một lần tắt rồi bật lại ngay.
-8. **App không tự tắt màn hình được** (cần trợ năng hoặc quản trị thiết bị). Hết giờ, trong túi, pin yếu → `isDark`: đen ở `BRIGHTNESS_OVERRIDE_OFF`, bỏ `FLAG_KEEP_SCREEN_ON`, `requestSleep()`; giờ chờ của máy tắt màn hình và service không mở lại.
-9. **Khung đầu tiên phải đúng:** độ sáng đặt trong `onCreate` trước khi cửa sổ hiện; pin ban đầu đọc đồng bộ (`readLevelPercent()`) để dòng pin có ngay, bố cục không nhảy khi màn hình vừa sáng. Tuỳ chọn được đọc đồng bộ từ `.value` của `DataStoreManager` (đã nạp vì service hoặc `MainActivity` tạo manager từ trước); `null` → `DEFAULT_*`.
+8. **App không tự tắt màn hình được** (cần trợ năng hoặc quản trị thiết bị). Hết giờ, trong túi, sai quy tắc hiện (pin yếu, ngoài khung giờ, sai nguồn điện) → `isDark`: đen ở `BRIGHTNESS_OVERRIDE_OFF`, bỏ `FLAG_KEEP_SCREEN_ON`, `requestSleep()`; giờ chờ của máy tắt màn hình và service không mở lại.
+9. **Khung đầu tiên phải đúng:** độ sáng đặt trong `onCreate` trước khi cửa sổ hiện (độ sáng riêng: `aodBrightnessPercent / 100`; tắt: `BRIGHTNESS_OVERRIDE_NONE` = theo hệ thống); pin ban đầu đọc đồng bộ (`readLevelPercent()`) để dòng pin có ngay, bố cục không nhảy khi màn hình vừa sáng. Tuỳ chọn được đọc đồng bộ từ `.value` của `DataStoreManager` (đã nạp vì service hoặc `MainActivity` tạo manager từ trước); `null` → `DEFAULT_*`.
 10. **`USER_PRESENT` trong 1,5 giây sau khi AOD hiện**, trên máy không có PIN/hình vẽ, là do chính app bật màn hình → không đóng AOD.
 11. **`checkLaunch()` sau 2 giây:** AOD không hiện hoặc màn hình không sáng → ghi `FAILED` và `finish()`, vì trên Xiaomi thiếu "Hiển thị trên màn hình khoá" thì Activity nằm sau màn hình khoá và sẽ hiện ra sau lần mở khoá kế tiếp.
 12. **Tiệm cận:** bị che liên tục 3 giây mới tối (bàn tay lướt qua bị bỏ qua); chỉ tối do che mới sáng lại khi lấy máy ra; chạm 2 lần bị bỏ qua khi cảm biến đang bị che (vải cọ trong túi).
@@ -740,6 +770,9 @@ hết giờ · trong túi · pin yếu ─▶ đen ─▶ giờ chờ của máy
 14. **Manifest của `AodActivity`:** `singleInstance`, `noHistory`, `excludeFromRecents`, `taskAffinity=""`, `configChanges` đủ để không bị tạo lại; mở với `NEW_TASK | CLEAR_TASK | NO_ANIMATION | NO_USER_ACTION` (giống Always On AMOLED). `noHistory` đóng AOD khi màn hình cuộc gọi hoặc báo thức mở lên trên.
 15. **Theme `Theme.App.Aod`:** không có animation cửa sổ, cutout `shortEdges`, splash Android 12+ màu đen (`values-v31`) để không loé icon app trước đồng hồ.
 16. **Không backup** (`allowBackup="false"` + `data_extraction_rules.xml`): `isNotificationsAsked` mà sang máy mới thì máy mới không bao giờ được hỏi quyền thông báo.
+17. **Quy tắc hiện kiểm ở 2 nơi bằng cùng `AodRulesUiModel.allows()`:** `AodService.shouldEnter()` lúc `SCREEN_OFF` (đọc đồng bộ `readLevelPercent()`, `readIsCharging()`, `readIsPlugged()`, giờ hiện tại) và `AodViewModel.checkRules()` khi pin hoặc nguồn cắm đổi và mỗi phút. AOD đang hiện mà sai quy tắc → `goDark()` chứ không đóng: đóng lúc màn hình đang sáng sẽ lộ màn hình khoá. Không đọc được trạng thái (`null`) thì không chặn. Xem thử không kiểm quy tắc.
+18. **"Đang cắm nguồn" theo `EXTRA_PLUGGED`**, không theo `isCharging`: pin đầy hoặc máy giới hạn sạc (dừng ở 80%) vẫn là đang cắm. Ngưỡng pin vẫn bỏ qua khi `isCharging` như FakeAOD.
+19. **Khung giờ lưu theo phút trong ngày** (`aodScheduleStartMinute`, `aodScheduleEndMinute`, giờ địa phương): bắt đầu < kết thúc → `[bắt đầu, kết thúc)`; bắt đầu > kết thúc → qua nửa đêm; bằng nhau → cả ngày; tắt khung giờ → luôn hiện. Mặc định bật, 07:00–23:00.
 
 ### 20.4 Chỗ khác MVI / Manager chuẩn, có lý do
 
@@ -748,7 +781,8 @@ hết giờ · trong túi · pin yếu ─▶ đen ─▶ giờ chờ của máy
 - Domain chưa dùng: tuỳ chọn AOD là prefs nên dùng thẳng `DataStoreManager` (như `isDark` của DexReader, `showCanChiOnCell` của Lịch Việt); bọc Repository/UseCase chỉ forward manager là banned (mục 18).
 - `BootReceiver` là `KoinComponent` (mục 12).
 - `AodContent` không bọc `AppTheme` (mục 14).
-- Dòng công tắc ở màn Main dùng `Modifier.toggleable(role = Role.Switch)`, không dùng `Modifier.onClick`: giữ trạng thái bật/tắt cho TalkBack.
+- `SettingsSwitchRow` dùng `Modifier.toggleable(role = Role.Switch)` và `SettingsRadioRow` dùng `Modifier.selectable(role = Role.RadioButton)`, không dùng `Modifier.onClick`: TalkBack đọc được trạng thái bật/tắt, đã chọn. Dòng chỉ để bấm (`SettingsValueRow`) vẫn dùng `Modifier.onClick`.
+- `AodTileService` gọi `startActivityAndCollapse(Intent)` (deprecated) dưới API 34 với `@Suppress("DEPRECATION", "StartActivityAndCollapseDeprecated")`: bản nhận `PendingIntent` chỉ có từ API 34, bản nhận `Intent` chỉ ném lỗi từ Android 14.
 
 ### 20.5 Ads và AOD
 
@@ -759,4 +793,5 @@ hết giờ · trong túi · pin yếu ─▶ đen ─▶ giờ chờ của máy
 
 - Tín hiệu mới (thông báo, sạc…) → manager mới trong `data/device/<tên>/` theo mục 2.
 - Tuỳ chọn mới → key trong `DataStoreManager` + field trong `AodOptionsUiModel` + Intent của màn Main + đọc snapshot trong `AodViewModel` (hoặc `AodActivity` nếu là thao tác cửa sổ).
+- Quy tắc "khi nào hiện" mới → key trong `DataStoreManager` + field trong `AodRulesUiModel` (`allows()` và `currentAodRules()`) + Intent của màn Main: service và màn AOD tự áp dụng, không viết lại điều kiện ở chỗ khác.
 - Danh sách tính năng còn thiếu so với Always On AMOLED: [COMPARISON.md](COMPARISON.md).

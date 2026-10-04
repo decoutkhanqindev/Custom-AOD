@@ -11,6 +11,7 @@ import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.data.network.connectivity.NetworkManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodSession
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.AodViewModel
+import com.decoutkhanqindev.custom_aod.presentation.screens.language.LanguageViewModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModel
@@ -44,7 +45,8 @@ val useCaseModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get()) }
     viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get()) }
 }
 

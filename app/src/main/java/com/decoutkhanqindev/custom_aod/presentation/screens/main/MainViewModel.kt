@@ -3,17 +3,25 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main
 import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
+import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
+import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -23,6 +31,7 @@ import timber.log.Timber
 class MainViewModel(
     private val dataStoreManager: DataStoreManager,
     private val permissionManager: PermissionManager,
+    private val languageManager: LanguageManager,
 ) : BaseViewModel<MainState, MainIntent, MainEffect>(
     initialState = MainState(),
 ), Tag {
@@ -31,9 +40,9 @@ class MainViewModel(
     private var isFirstLaunchNotificationRequest = false
 
     init {
-        observeOptions()
+        observeSettings()
+        observeLanguage()
         observeLastWake()
-        refreshPermissions()
         checkFirstLaunchNotificationPermission()
     }
 
@@ -41,36 +50,76 @@ class MainViewModel(
         Timber.tag(tag).d("onIntent: $intent")
         when (intent) {
             is MainIntent.ToggleAod -> toggleAod(intent.isEnabled)
-            is MainIntent.ToggleDimBrightness -> dataStoreManager.saveIsAodDimBrightness(intent.isEnabled)
+            is MainIntent.ToggleCustomBrightness -> dataStoreManager.saveIsAodCustomBrightness(intent.isEnabled)
+            is MainIntent.ChangeBrightness -> dataStoreManager.saveAodBrightnessPercent(intent.percent)
             is MainIntent.ToggleProximity -> dataStoreManager.saveIsAodProximityEnabled(intent.isEnabled)
             is MainIntent.ChangeTimeout -> dataStoreManager.saveAodTimeoutMinutes(intent.minutes)
+            is MainIntent.ChangeChargingRule -> dataStoreManager.saveAodChargingRule(intent.rule.code)
+            is MainIntent.ToggleSchedule -> dataStoreManager.saveIsAodScheduleEnabled(intent.isEnabled)
+            is MainIntent.ShowScheduleTimePicker -> updateState { copy(editingScheduleTime = intent.time) }
+            is MainIntent.DismissScheduleTimePicker -> updateState { copy(editingScheduleTime = null) }
+            is MainIntent.ChangeScheduleTime -> changeScheduleTime(intent.time, intent.minuteOfDay)
             is MainIntent.ChangeMinBattery -> dataStoreManager.saveAodMinBattery(intent.percent)
             is MainIntent.OpenPermission -> openPermission(intent.permission)
             is MainIntent.RefreshPermissions -> refreshPermissions()
             is MainIntent.NotificationPermissionRequested -> onFirstLaunchNotificationPermissionRequested()
             is MainIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
+            is MainIntent.OpenLanguage -> viewModelScope.launch { sendEffect(MainEffect.NavigateToLanguage) }
             is MainIntent.Preview -> viewModelScope.launch { sendEffect(MainEffect.OpenPreview) }
         }
     }
 
-    private fun observeOptions() {
+    private fun observeSettings() {
         viewModelScope.launch {
-            combine(
-                dataStoreManager.isAodEnabled.filterNotNull(),
-                dataStoreManager.isAodDimBrightness.filterNotNull(),
-                dataStoreManager.isAodProximityEnabled.filterNotNull(),
-                dataStoreManager.aodTimeoutMinutes.filterNotNull(),
-                dataStoreManager.aodMinBattery.filterNotNull(),
-            ) { isEnabled, isDimBrightness, isProximityEnabled, timeoutMinutes, minBattery ->
-                AodOptionsUiModel(
-                    isEnabled = isEnabled,
-                    isDimBrightness = isDimBrightness,
-                    isProximityEnabled = isProximityEnabled,
-                    timeoutMinutes = timeoutMinutes,
-                    minBattery = minBattery,
-                )
-            }.collectCatching(
-                action = { options -> updateState { copy(isLoading = false, options = options) } },
+            combine(optionsFlow(), rulesFlow()) { options, rules -> options to rules }.collectCatching(
+                action = { (options, rules) ->
+                    updateState { copy(isLoading = false, options = options, rules = rules) }
+                },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    private fun optionsFlow(): Flow<AodOptionsUiModel> = combine(
+        dataStoreManager.isAodEnabled.filterNotNull(),
+        dataStoreManager.isAodCustomBrightness.filterNotNull(),
+        dataStoreManager.aodBrightnessPercent.filterNotNull(),
+        dataStoreManager.isAodProximityEnabled.filterNotNull(),
+        dataStoreManager.aodTimeoutMinutes.filterNotNull(),
+    ) { isEnabled, isCustomBrightness, brightnessPercent, isProximityEnabled, timeoutMinutes ->
+        AodOptionsUiModel(
+            isEnabled = isEnabled,
+            isCustomBrightness = isCustomBrightness,
+            brightnessPercent = brightnessPercent,
+            isProximityEnabled = isProximityEnabled,
+            timeoutMinutes = timeoutMinutes,
+        )
+    }
+
+    private fun rulesFlow(): Flow<AodRulesUiModel> = combine(
+        dataStoreManager.aodMinBattery.filterNotNull(),
+        dataStoreManager.aodChargingRule.filterNotNull(),
+        dataStoreManager.isAodScheduleEnabled.filterNotNull(),
+        dataStoreManager.aodScheduleStartMinute.filterNotNull(),
+        dataStoreManager.aodScheduleEndMinute.filterNotNull(),
+    ) { minBattery, chargingRule, isScheduleEnabled, scheduleStartMinute, scheduleEndMinute ->
+        AodRulesUiModel(
+            minBattery = minBattery,
+            chargingRule = ChargingRuleValue.fromCode(chargingRule),
+            schedule = AodScheduleUiModel(
+                isEnabled = isScheduleEnabled,
+                startMinute = scheduleStartMinute,
+                endMinute = scheduleEndMinute,
+            ),
+        )
+    }
+
+    private fun observeLanguage() {
+        viewModelScope.launch {
+            dataStoreManager.selectedLangCode.filterNotNull().collectCatching(
+                action = { code ->
+                    updateState { copy(language = LanguageValue.fromCode(code).toUiModel(languageManager)) }
+                },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -122,6 +171,14 @@ class MainViewModel(
         }
     }
 
+    private fun changeScheduleTime(time: ScheduleTimeValue, minuteOfDay: Int) {
+        when (time) {
+            ScheduleTimeValue.START -> dataStoreManager.saveAodScheduleStartMinute(minuteOfDay)
+            ScheduleTimeValue.END -> dataStoreManager.saveAodScheduleEndMinute(minuteOfDay)
+        }
+        updateState { copy(editingScheduleTime = null) }
+    }
+
     private fun openPermission(permission: PermissionValue) {
         val effect = when (permission) {
             PermissionValue.OVERLAY -> MainEffect.OpenOverlaySettings
@@ -154,6 +211,5 @@ class MainViewModel(
                 !isFirstLaunch -> sendEffect(MainEffect.OpenNotificationSettings)
             }
         }
-        refreshPermissions()
     }
 }
