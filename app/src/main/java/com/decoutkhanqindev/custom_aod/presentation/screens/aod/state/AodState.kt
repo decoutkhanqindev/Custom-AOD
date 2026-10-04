@@ -1,7 +1,9 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.aod.state
 
+import android.graphics.Bitmap
 import androidx.annotation.ColorInt
 import androidx.compose.runtime.Immutable
+import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
@@ -9,6 +11,8 @@ import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
 @Immutable
 data class AodState(
     val nowMillis: Long = 0L,
+    val appearance: AodAppearanceUiModel = AodAppearanceUiModel(),
+    val background: Bitmap? = null,
     val battery: BatteryUiModel? = null,
     val notifications: AodNotificationsUiModel = AodNotificationsUiModel(),
     val media: MediaUiModel? = null,

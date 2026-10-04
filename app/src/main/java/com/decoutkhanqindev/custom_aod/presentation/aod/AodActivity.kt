@@ -1,7 +1,9 @@
 package com.decoutkhanqindev.custom_aod.presentation.aod
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
@@ -48,9 +50,10 @@ class AodActivity : ComponentActivity() {
         // Bản xem thử không phải AOD: service không được coi nó là AOD khi màn hình tắt.
         if (!isPreview) session.attach(this)
 
-        // Độ sáng đặt trước khi cửa sổ hiện để ngay khung đầu tiên đã đúng mức.
+        // Độ sáng và hướng xoay đặt trước khi cửa sổ hiện để ngay khung đầu tiên đã đúng.
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setBrightness(normalBrightness)
+        if (dataStoreManager.isAodLandscape.value == true) lockLandscape()
         setContent {
             AppLanguageProvider {
                 AodScreen(
@@ -98,6 +101,12 @@ class AodActivity : ComponentActivity() {
 
     private fun setBrightness(value: Float) {
         window.attributes = window.attributes.apply { screenBrightness = value }
+    }
+
+    // Tuỳ chọn "đồng hồ đêm" của user: ngang theo cảm biến để dựng máy chiều nào cũng đúng. Màn hình lớn (Android 16+) bỏ qua yêu cầu này.
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun lockLandscape() {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     }
 
     @Suppress("DEPRECATION") // setDecorFitsSystemWindows: từ API 35 luôn edge-to-edge

@@ -51,7 +51,7 @@ fun Context.openNotificationListenerSettings(listener: ComponentName) {
 }
 
 // Trang "Quyền khác" của Xiaomi (MIUI / HyperOS); máy hãng khác không có trang này nên rơi về Thông tin ứng dụng.
-fun Context.openMiuiPermissionEditor() {
+fun Context.openMiuiPermissionSettings() {
     openSettingsPage(
         Intent(MIUI_PERMISSION_EDITOR_ACTION)
             .setClassName(MIUI_SECURITY_CENTER_PACKAGE, MIUI_PERMISSION_EDITOR_ACTIVITY)

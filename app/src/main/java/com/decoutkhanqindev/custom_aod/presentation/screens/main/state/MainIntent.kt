@@ -1,6 +1,9 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 
 import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
+import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
+import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
+import com.decoutkhanqindev.custom_aod.presentation.model.ClockFontValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 
@@ -10,6 +13,14 @@ sealed interface MainIntent {
     data class ChangeBrightness(val percent: Int) : MainIntent
     data class ToggleProximity(val isEnabled: Boolean) : MainIntent
     data class ChangeTimeout(val minutes: Int) : MainIntent
+    data class ChangeClockFace(val face: ClockFaceValue) : MainIntent
+    data class ChangeClockFont(val font: ClockFontValue) : MainIntent
+    data class ChangeClockColor(val color: ClockColorValue) : MainIntent
+    data class ChangeClockSize(val percent: Int) : MainIntent
+    data class ToggleLandscape(val isEnabled: Boolean) : MainIntent
+    data object OpenBackgroundPicker : MainIntent
+    data class BackgroundPickerResult(val uri: String?) : MainIntent
+    data object RemoveBackground : MainIntent
     data class ToggleNotificationIcons(val isEnabled: Boolean) : MainIntent
     data class ToggleEdgeGlow(val isEnabled: Boolean) : MainIntent
     data class ToggleMediaControls(val isEnabled: Boolean) : MainIntent
@@ -19,10 +30,10 @@ sealed interface MainIntent {
     data object DismissScheduleTimePicker : MainIntent
     data class ChangeScheduleTime(val time: ScheduleTimeValue, val minuteOfDay: Int) : MainIntent
     data class ChangeMinBattery(val percent: Int) : MainIntent
-    data class OpenPermission(val permission: PermissionValue) : MainIntent
+    data class OpenPermissionSettings(val permission: PermissionValue) : MainIntent
     data object RefreshPermissions : MainIntent
-    data object NotificationPermissionRequested : MainIntent
+    data object NotificationPermissionDialogShown : MainIntent
     data class NotificationPermissionResult(val isGranted: Boolean) : MainIntent
-    data object OpenLanguage : MainIntent
-    data object Preview : MainIntent
+    data object NavigateToLanguage : MainIntent
+    data object OpenPreview : MainIntent
 }

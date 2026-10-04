@@ -35,7 +35,7 @@ fun MainPermissionsSection(
         permissions.forEach { permission ->
             PermissionRow(
                 permission = permission,
-                onOpen = { onIntent(MainIntent.OpenPermission(permission.permission)) },
+                onOpen = { onIntent(MainIntent.OpenPermissionSettings(permission.permission)) },
             )
         }
     }

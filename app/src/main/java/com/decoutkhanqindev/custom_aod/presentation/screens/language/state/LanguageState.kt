@@ -14,6 +14,6 @@ data class LanguageState(
     val selectedLanguage: LanguageValue? = null,
 ) {
     // Mở từ màn chính mà chọn lại đúng ngôn ngữ đang dùng thì không có gì để lưu; lần đầu mở app thì luôn phải bấm Xong để đi tiếp.
-    val isDoneEnabled: Boolean
+    val isConfirmEnabled: Boolean
         get() = selectedLanguage != null && (isFirstOpen || selectedLanguage != appliedLanguage)
 }

@@ -21,7 +21,7 @@ fun AodScreen(
     LaunchedWithLifecycleEffect {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is AodEffect.Close -> onClose()
+                is AodEffect.CloseAod -> onClose()
             }
         }
     }

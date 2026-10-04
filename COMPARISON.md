@@ -72,7 +72,7 @@ Phần lõi gần như giống nhau. Khác biệt chính nằm ở nút nguồn,
 | `BIND_NOTIFICATION_LISTENER_SERVICE` | ✓ | ✓ | Thông báo trên AOD. Ở Custom AOD đây là quyền bảo vệ service listener (chỉ hệ thống bind được), không phải quyền app xin, nên `aapt2` không đếm vào tổng |
 | `CAMERA` | ✓ | – | Đèn pin. `CameraManager.setTorchMode()` không cần quyền này |
 | `READ_CALENDAR`, `PACKAGE_USAGE_STATS`, `ACCESS_NOTIFICATION_POLICY`, `REORDER_TASKS`, `VIBRATE` | ✓ | – | Phục vụ các tính năng Custom AOD chưa có |
-| `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` | ✓ | – | Ảnh nền. Photo Picker không cần quyền |
+| `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` | ✓ | – | Ảnh nền. Custom AOD dùng Photo Picker, không cần quyền |
 | `BILLING`, `CHECK_LICENSE` | ✓ | – | Mua Premium, kiểm tra bản quyền |
 | `c2dm.RECEIVE`, `BIND_GET_INSTALL_REFERRER_SERVICE` | ✓ | – | Firebase Messaging, đo nguồn cài đặt |
 | `DEVICE_POWER` | ✓ | – | Quyền hệ thống, app thường không được cấp. Có lẽ còn sót từ "Force doze" |
@@ -113,12 +113,12 @@ Quyền riêng của Xiaomi:
 | | Ghi chú, vẽ nhanh | ✓ [Play] | ✗ |
 | | Thời tiết | ✓ [Play] | ✗ |
 | | Lịch | ? (suy ra từ quyền `READ_CALENDAR`) | ✗ |
-| Tùy biến | Mặt đồng hồ: Digital S7, Classic 24H, Analog S7, Analog Pebble… | ✓ [Play] | ✗ (1 kiểu) |
-| | Font, màu, cỡ chữ | ✓ [Play] | ✗ |
-| | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ✗ |
+| Tùy biến | Mặt đồng hồ: Digital S7, Classic 24H, Analog S7, Analog Pebble… | ✓ [Play] | ✓ (4 mặt: Số, Số xếp chồng, Kim, Kim tối giản) |
+| | Font, màu, cỡ chữ | ✓ [Play] | ✓ (4 họ font hệ thống, 8 màu, cỡ 60–150%) |
+| | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ⚠️ ảnh tự chọn bằng Photo Picker, hiện mờ 50%; chưa có bộ ảnh AMOLED sẵn |
 | | Độ sáng | ✓ chỉnh mức [2017] | ✓ (1–100%, hoặc theo hệ thống) |
 | | Tự giảm sáng khi trời tối (cảm biến ánh sáng) | ✓ [Play] | ✗ |
-| | Ép xoay ngang, dùng làm đồng hồ đêm | ✓ [Play] | ✗ |
+| | Ép xoay ngang, dùng làm đồng hồ đêm | ✓ [Play] | ✓ (ngang theo cảm biến, bố cục đồng hồ trái, thông tin phải) |
 | Tương tác | Chạm 2 lần để thoát | ✓ [Play] | ✓ |
 | | Vuốt lên/xuống, phím âm lượng, phím back | ✓ [Play] | ✗ |
 | | Nút nguồn khi AOD đang hiện | Mở lại AOD [máy] | Về màn hình khóa |
@@ -155,7 +155,8 @@ Quyền riêng của Xiaomi:
 - **Khác có chủ ý:** nút nguồn đưa về màn hình khóa thay vì mở lại AOD.
 - **Giai đoạn 1 (2026-10-04) đã thêm**, không cần quyền mới: luật theo sạc, lịch theo giờ, chỉnh mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Chưa chạy trên máy.
 - **Giai đoạn 2 (2026-10-04) đã thêm**, cần quyền đặc biệt "Truy cập thông báo": icon thông báo, viền sáng, điều khiển nhạc. Khác đối thủ: chỉ hiện icon, không hiện nội dung thông báo. Chưa chạy trên máy.
-- **Khoảng trống lớn nhất còn lại là giao diện và tương tác.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
-  1. 3–4 mặt đồng hồ, chọn font, màu, cỡ chữ, ảnh nền.
-  2. Cử chỉ vuốt, phím âm lượng, đèn pin, tự giảm sáng theo cảm biến ánh sáng.
-  3. Widget bật/tắt, tùy chọn hiện nội dung thông báo.
+- **Giai đoạn 3 (2026-10-04) đã thêm**, không cần quyền mới: 4 mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Chưa chạy trên máy.
+- **Khoảng trống lớn nhất còn lại là tương tác và nội dung.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
+  1. Cử chỉ vuốt, phím âm lượng, đèn pin, tự giảm sáng theo cảm biến ánh sáng, nhấc máy để bật.
+  2. Widget bật/tắt, tùy chọn hiện nội dung thông báo.
+  3. Memo, ghi chú, lịch, thời tiết.

@@ -8,6 +8,7 @@ import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStat
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
 import com.decoutkhanqindev.custom_aod.data.device.screen.ScreenStateManager
+import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.data.network.connectivity.NetworkManager
@@ -30,6 +31,7 @@ val managerModule = module {
     single { ProximityManager(androidApplication()) }
     single { NotificationStateManager(androidApplication()) }
     single { MediaStateManager(androidApplication(), get()) }
+    single { BackgroundImageManager(androidApplication()) }
 }
 
 val adsModule = module {
@@ -49,9 +51,9 @@ val useCaseModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get()) }
-    viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get(), get(), get()) }
+    viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val appModules = listOf(

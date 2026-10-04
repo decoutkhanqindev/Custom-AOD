@@ -3,10 +3,8 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -17,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
+import com.decoutkhanqindev.custom_aod.presentation.components.SettingsLabel
 import com.decoutkhanqindev.custom_aod.presentation.components.SettingsRadioRow
 import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSectionHeader
 import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSlider
@@ -44,12 +42,7 @@ fun MainRulesSection(
     Column(modifier = modifier) {
         SettingsSectionHeader(title = stringResource(R.string.section_rules))
 
-        Text(
-            text = stringResource(R.string.opt_charging_rule),
-            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        SettingsLabel(text = stringResource(R.string.opt_charging_rule))
 
         ChargingRuleValue.entries.forEach { rule ->
             SettingsRadioRow(

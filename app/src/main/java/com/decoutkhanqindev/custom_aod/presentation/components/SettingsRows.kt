@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -29,6 +30,19 @@ fun SettingsSectionHeader(
         modifier = modifier.padding(top = 28.dp, bottom = 4.dp),
         color = MaterialTheme.colorScheme.primary,
         style = MaterialTheme.typography.labelMedium,
+    )
+}
+
+@Composable
+fun SettingsLabel(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier.padding(top = 12.dp, bottom = 4.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodyMedium,
     )
 }
 
@@ -64,6 +78,7 @@ fun SettingsRadioRow(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    labelFontFamily: FontFamily? = null,
 ) {
     Row(
         modifier = modifier
@@ -77,6 +92,7 @@ fun SettingsRadioRow(
         Text(
             text = label,
             modifier = Modifier.padding(start = 12.dp),
+            fontFamily = labelFontFamily,
             style = MaterialTheme.typography.bodyLarge,
         )
     }

@@ -103,6 +103,13 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
+        MainAppearanceSection(
+            appearance = state.appearance,
+            hasBackground = state.hasBackground,
+            isSavingBackground = state.isSavingBackground,
+            onIntent = onIntent,
+        )
+
         MainNotificationsSection(
             options = state.notificationOptions,
             isAccessGranted = state.isNotificationAccessGranted,
@@ -123,7 +130,7 @@ private fun MainSettings(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { onIntent(MainIntent.Preview) },
+            onClick = { onIntent(MainIntent.OpenPreview) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.action_preview))
@@ -138,7 +145,7 @@ private fun MainSettings(
     }
 }
 
-@Preview(widthDp = 360, heightDp = 1900)
+@Preview(widthDp = 360, heightDp = 2700)
 @Composable
 private fun MainContentPreview() {
     AppTheme {

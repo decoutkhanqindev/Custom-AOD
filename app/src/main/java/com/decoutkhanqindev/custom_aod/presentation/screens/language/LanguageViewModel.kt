@@ -33,8 +33,8 @@ class LanguageViewModel(
         Timber.tag(tag).d("onIntent: $intent")
         when (intent) {
             is LanguageIntent.SelectLanguage -> updateState { copy(selectedLanguage = intent.language) }
-            is LanguageIntent.Done -> done()
-            is LanguageIntent.Back -> viewModelScope.launch { sendEffect(LanguageEffect.NavigateBack) }
+            is LanguageIntent.ConfirmLanguage -> confirmLanguage()
+            is LanguageIntent.NavigateBack -> viewModelScope.launch { sendEffect(LanguageEffect.NavigateBack) }
         }
     }
 
@@ -75,7 +75,7 @@ class LanguageViewModel(
     }
 
     // Lần đầu mở app: lưu xong mới không hỏi lại ngôn ngữ ở lần mở sau.
-    private fun done() {
+    private fun confirmLanguage() {
         val language = state.value.selectedLanguage ?: return
         dataStoreManager.saveSelectedLangCode(language.code)
         if (isFirstOpen) dataStoreManager.saveIsFirstOpen(false)

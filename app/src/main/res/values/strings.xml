@@ -43,6 +43,35 @@
   <string name="opt_timeout_never">Go dark after: never</string>
   <string name="opt_timeout_value">Go dark after: %1$d min</string>
 
+  <string name="section_appearance">Clock style</string>
+  <string name="opt_clock_face">Clock face</string>
+  <string name="clock_face_digital">Digital</string>
+  <string name="clock_face_stacked">Digital, stacked</string>
+  <string name="clock_face_analog">Analog</string>
+  <string name="clock_face_analog_minimal">Analog, minimal</string>
+  <string name="opt_clock_font">Font</string>
+  <string name="clock_font_default">Default</string>
+  <string name="clock_font_serif">Serif</string>
+  <string name="clock_font_monospace">Monospace</string>
+  <string name="clock_font_cursive">Handwriting</string>
+  <string name="opt_clock_color">Color</string>
+  <string name="clock_color_grey">Grey</string>
+  <string name="clock_color_white">White</string>
+  <string name="clock_color_mint">Mint</string>
+  <string name="clock_color_blue">Blue</string>
+  <string name="clock_color_purple">Purple</string>
+  <string name="clock_color_orange">Orange</string>
+  <string name="clock_color_pink">Pink</string>
+  <string name="clock_color_red">Red</string>
+  <string name="opt_clock_size_value">Clock size: %1$d%%</string>
+  <string name="opt_landscape">Always landscape (night clock)</string>
+  <string name="opt_background">Background image</string>
+  <string name="background_choose">Choose</string>
+  <string name="background_change">Change</string>
+  <string name="background_saving">Saving…</string>
+  <string name="background_remove">Remove background image</string>
+  <string name="background_save_failed">Could not use this image.</string>
+
   <string name="section_notifications">Notifications on the clock</string>
   <string name="notification_access_needed">Needs Notification access under Permissions.</string>
   <string name="opt_notification_icons">Show notification icons</string>
@@ -78,6 +107,9 @@
   <!-- AOD -->
   <string name="aod_time_pattern_24h" translatable="false">HH:mm</string>
   <string name="aod_time_pattern_12h" translatable="false">h:mm</string>
+  <string name="aod_hour_pattern_24h" translatable="false">HH</string>
+  <string name="aod_hour_pattern_12h" translatable="false">hh</string>
+  <string name="aod_minute_pattern" translatable="false">mm</string>
   <string name="aod_date_pattern" translatable="false">EEE, d MMM</string>
   <string name="aod_hint">Double-tap to exit</string>
   <string name="aod_battery" translatable="false">%1$d%%</string>

@@ -22,7 +22,7 @@ fun MainAppSection(
         SettingsValueRow(
             label = stringResource(R.string.language),
             value = language?.label.orEmpty(),
-            onClick = { onIntent(MainIntent.OpenLanguage) },
+            onClick = { onIntent(MainIntent.NavigateToLanguage) },
         )
     }
 }

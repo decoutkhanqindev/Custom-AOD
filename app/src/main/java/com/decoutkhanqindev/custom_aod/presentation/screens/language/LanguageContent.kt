@@ -42,7 +42,7 @@ fun LanguageContent(
                 title = { Text(text = stringResource(R.string.language)) },
                 navigationIcon = {
                     if (!state.isFirstOpen) {
-                        IconButton(onClick = { onIntent(LanguageIntent.Back) }) {
+                        IconButton(onClick = { onIntent(LanguageIntent.NavigateBack) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.action_back),
@@ -54,12 +54,12 @@ fun LanguageContent(
         },
         bottomBar = {
             Button(
-                onClick = { onIntent(LanguageIntent.Done) },
+                onClick = { onIntent(LanguageIntent.ConfirmLanguage) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(20.dp),
-                enabled = state.isDoneEnabled,
+                enabled = state.isConfirmEnabled,
             ) {
                 Text(text = stringResource(R.string.action_done))
             }

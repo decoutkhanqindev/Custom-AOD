@@ -41,6 +41,35 @@
   <string name="opt_timeout_never">Tối màn hình sau: không bao giờ</string>
   <string name="opt_timeout_value">Tối màn hình sau: %1$d phút</string>
 
+  <string name="section_appearance">Giao diện đồng hồ</string>
+  <string name="opt_clock_face">Mặt đồng hồ</string>
+  <string name="clock_face_digital">Số</string>
+  <string name="clock_face_stacked">Số, xếp chồng</string>
+  <string name="clock_face_analog">Kim</string>
+  <string name="clock_face_analog_minimal">Kim, tối giản</string>
+  <string name="opt_clock_font">Font chữ</string>
+  <string name="clock_font_default">Mặc định</string>
+  <string name="clock_font_serif">Có chân (Serif)</string>
+  <string name="clock_font_monospace">Đơn cách (Monospace)</string>
+  <string name="clock_font_cursive">Viết tay</string>
+  <string name="opt_clock_color">Màu</string>
+  <string name="clock_color_grey">Xám</string>
+  <string name="clock_color_white">Trắng</string>
+  <string name="clock_color_mint">Xanh bạc hà</string>
+  <string name="clock_color_blue">Xanh dương</string>
+  <string name="clock_color_purple">Tím</string>
+  <string name="clock_color_orange">Cam</string>
+  <string name="clock_color_pink">Hồng</string>
+  <string name="clock_color_red">Đỏ</string>
+  <string name="opt_clock_size_value">Cỡ đồng hồ: %1$d%%</string>
+  <string name="opt_landscape">Luôn xoay ngang (đồng hồ đêm)</string>
+  <string name="opt_background">Ảnh nền</string>
+  <string name="background_choose">Chọn ảnh</string>
+  <string name="background_change">Đổi ảnh</string>
+  <string name="background_saving">Đang lưu…</string>
+  <string name="background_remove">Bỏ ảnh nền</string>
+  <string name="background_save_failed">Không dùng được ảnh này.</string>
+
   <string name="section_notifications">Thông báo trên đồng hồ</string>
   <string name="notification_access_needed">Cần quyền Truy cập thông báo ở mục Quyền.</string>
   <string name="opt_notification_icons">Hiện biểu tượng thông báo</string>

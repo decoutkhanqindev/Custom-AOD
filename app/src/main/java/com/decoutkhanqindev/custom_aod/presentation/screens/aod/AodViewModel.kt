@@ -7,10 +7,12 @@ import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
 import com.decoutkhanqindev.custom_aod.data.device.media.MediaStateManager
 import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStateManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
+import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.currentAodAppearance
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodNotificationOptions
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
 import com.decoutkhanqindev.custom_aod.presentation.model.glowColorArgb
@@ -41,8 +43,9 @@ class AodViewModel(
     private val proximityManager: ProximityManager,
     private val notificationStateManager: NotificationStateManager,
     private val mediaStateManager: MediaStateManager,
+    private val backgroundImageManager: BackgroundImageManager,
 ) : BaseViewModel<AodState, AodIntent, AodEffect>(
-    initialState = initialState(batteryStateManager),
+    initialState = initialState(dataStoreManager, batteryStateManager),
 ), Tag {
 
     private val isProximityEnabled =
@@ -68,6 +71,7 @@ class AodViewModel(
         if (notificationOptions.isIconsEnabled) observeNotifications()
         if (notificationOptions.isEdgeGlowEnabled) observeAlerts()
         if (notificationOptions.isMediaControlsEnabled) observeMedia()
+        loadBackground()
         startMinuteTicks()
         scheduleHintHide()
         if (!isPreview) {
@@ -81,15 +85,15 @@ class AodViewModel(
         // Trong túi, vải cọ lên màn hình không được mở màn hình khoá hay bấm nút nhạc.
         if (proximityManager.isNear.value) return
         when (intent) {
-            is AodIntent.DoubleTap -> requestClose()
-            is AodIntent.MediaPlayPause -> mediaStateManager.playPause()
-            is AodIntent.MediaSkipPrevious -> mediaStateManager.skipToPrevious()
-            is AodIntent.MediaSkipNext -> mediaStateManager.skipToNext()
+            is AodIntent.DoubleTap -> closeAod()
+            is AodIntent.PlayPauseMedia -> mediaStateManager.playPause()
+            is AodIntent.SkipToPreviousTrack -> mediaStateManager.skipToPrevious()
+            is AodIntent.SkipToNextTrack -> mediaStateManager.skipToNext()
         }
     }
 
-    private fun requestClose() {
-        viewModelScope.launch { sendEffect(AodEffect.Close) }
+    private fun closeAod() {
+        viewModelScope.launch { sendEffect(AodEffect.CloseAod) }
     }
 
     private fun observeBattery() {
@@ -128,7 +132,7 @@ class AodViewModel(
                 .drop(1)
                 .filter { isBusy -> isBusy }
                 .collectCatching(
-                    action = { requestClose() },
+                    action = { closeAod() },
                     catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
                 )
         }
@@ -161,6 +165,14 @@ class AodViewModel(
                 action = { playback -> updateState { copy(media = playback?.toUiModel()) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
+        }
+    }
+
+    // Giải mã ảnh nền tốn vài chục ms: đồng hồ hiện trước, ảnh nền hiện dần sau, không chặn khung đầu tiên.
+    private fun loadBackground() {
+        viewModelScope.launch {
+            val background = backgroundImageManager.loadImage() ?: return@launch
+            updateState { copy(background = background) }
         }
     }
 
@@ -268,9 +280,13 @@ class AodViewModel(
         private const val MAX_SHIFT_X_DP = 24
         private const val MAX_SHIFT_Y_DP = 64
 
-        // Pin đọc đồng bộ từ broadcast sticky để khung đầu tiên đã có dòng pin, bố cục không bị nhảy.
-        private fun initialState(batteryStateManager: BatteryStateManager): AodState = AodState(
+        // Pin đọc đồng bộ từ broadcast sticky để khung đầu tiên đã có dòng pin, bố cục không bị nhảy; giao diện đồng hồ cũng có ngay từ khung đầu.
+        private fun initialState(
+            dataStoreManager: DataStoreManager,
+            batteryStateManager: BatteryStateManager,
+        ): AodState = AodState(
             nowMillis = System.currentTimeMillis(),
+            appearance = dataStoreManager.currentAodAppearance(),
             battery = batteryStateManager.readLevelPercent()?.let { percent ->
                 BatteryUiModel(percent = percent, isCharging = batteryStateManager.readIsCharging() == true)
             },

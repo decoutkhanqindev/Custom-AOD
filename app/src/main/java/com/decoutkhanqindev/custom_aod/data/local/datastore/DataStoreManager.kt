@@ -97,6 +97,26 @@ class DataStoreManager(
     val isAodMediaControlsEnabled: StateFlow<Boolean?> =
         isAodMediaControlsEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED)
 
+    private val aodClockFaceKey: Preferences.Key<Int> = intPreferencesKey(AOD_CLOCK_FACE_KEY)
+    val aodClockFace: StateFlow<Int?> =
+        aodClockFaceKey.asStateFlow(default = DEFAULT_AOD_CLOCK_FACE)
+
+    private val aodClockFontKey: Preferences.Key<Int> = intPreferencesKey(AOD_CLOCK_FONT_KEY)
+    val aodClockFont: StateFlow<Int?> =
+        aodClockFontKey.asStateFlow(default = DEFAULT_AOD_CLOCK_FONT)
+
+    private val aodClockColorKey: Preferences.Key<Int> = intPreferencesKey(AOD_CLOCK_COLOR_KEY)
+    val aodClockColor: StateFlow<Int?> =
+        aodClockColorKey.asStateFlow(default = DEFAULT_AOD_CLOCK_COLOR)
+
+    private val aodClockSizePercentKey: Preferences.Key<Int> = intPreferencesKey(AOD_CLOCK_SIZE_PERCENT_KEY)
+    val aodClockSizePercent: StateFlow<Int?> =
+        aodClockSizePercentKey.asStateFlow(default = DEFAULT_AOD_CLOCK_SIZE_PERCENT)
+
+    private val isAodLandscapeKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_LANDSCAPE_KEY)
+    val isAodLandscape: StateFlow<Boolean?> =
+        isAodLandscapeKey.asStateFlow(default = DEFAULT_IS_AOD_LANDSCAPE)
+
     private val aodLastWakeKey: Preferences.Key<Int> = intPreferencesKey(AOD_LAST_WAKE_KEY)
     val aodLastWake: StateFlow<Int?> =
         aodLastWakeKey.asStateFlow(default = DEFAULT_AOD_LAST_WAKE)
@@ -166,6 +186,26 @@ class DataStoreManager(
         edit { prefs -> prefs[isAodMediaControlsEnabledKey] = value }
     }
 
+    fun saveAodClockFace(value: Int) {
+        edit { prefs -> prefs[aodClockFaceKey] = value }
+    }
+
+    fun saveAodClockFont(value: Int) {
+        edit { prefs -> prefs[aodClockFontKey] = value }
+    }
+
+    fun saveAodClockColor(value: Int) {
+        edit { prefs -> prefs[aodClockColorKey] = value }
+    }
+
+    fun saveAodClockSizePercent(value: Int) {
+        edit { prefs -> prefs[aodClockSizePercentKey] = value }
+    }
+
+    fun saveIsAodLandscape(value: Boolean) {
+        edit { prefs -> prefs[isAodLandscapeKey] = value }
+    }
+
     fun saveAodLastWake(value: Int) {
         edit { prefs -> prefs[aodLastWakeKey] = value }
     }
@@ -215,6 +255,11 @@ class DataStoreManager(
         private const val IS_AOD_NOTIFICATION_ICONS_ENABLED_KEY = "is_aod_notification_icons_enabled"
         private const val IS_AOD_EDGE_GLOW_ENABLED_KEY = "is_aod_edge_glow_enabled"
         private const val IS_AOD_MEDIA_CONTROLS_ENABLED_KEY = "is_aod_media_controls_enabled"
+        private const val AOD_CLOCK_FACE_KEY = "aod_clock_face"
+        private const val AOD_CLOCK_FONT_KEY = "aod_clock_font"
+        private const val AOD_CLOCK_COLOR_KEY = "aod_clock_color"
+        private const val AOD_CLOCK_SIZE_PERCENT_KEY = "aod_clock_size_percent"
+        private const val IS_AOD_LANDSCAPE_KEY = "is_aod_landscape"
         private const val AOD_LAST_WAKE_KEY = "aod_last_wake"
         private const val IS_NOTIFICATIONS_ASKED_KEY = "is_notifications_asked"
         private const val DEFAULT_SELECTED_LANG_CODE = "en"
@@ -232,6 +277,11 @@ class DataStoreManager(
         const val DEFAULT_IS_AOD_NOTIFICATION_ICONS_ENABLED = true
         const val DEFAULT_IS_AOD_EDGE_GLOW_ENABLED = true
         const val DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED = true
+        private const val DEFAULT_AOD_CLOCK_FACE = 0
+        private const val DEFAULT_AOD_CLOCK_FONT = 0
+        private const val DEFAULT_AOD_CLOCK_COLOR = 0
+        const val DEFAULT_AOD_CLOCK_SIZE_PERCENT = 100
+        const val DEFAULT_IS_AOD_LANDSCAPE = false
         private const val DEFAULT_AOD_LAST_WAKE = 0
         private const val DEFAULT_IS_NOTIFICATIONS_ASKED = false
     }

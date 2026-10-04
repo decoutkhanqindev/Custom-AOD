@@ -4,6 +4,34 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-04 – Giai đoạn 3: giao diện đồng hồ
+
+Mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Không thêm quyền và thư viện: ảnh nền chọn bằng Photo Picker (không cần quyền đọc ảnh), font là họ font của hệ thống. Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 24–28).
+
+### Thêm
+
+- 4 mặt đồng hồ (`ClockFaceValue`): Số (như trước), Số xếp chồng (giờ trên, phút dưới), Kim (có vạch giờ), Kim tối giản. Mặt kim vẽ bằng `Canvas`, nhích mỗi phút.
+- Font (`ClockFontValue`): Mặc định, Có chân, Đơn cách, Viết tay — họ font chung của hệ thống, áp cho giờ và ngày. Dòng chọn font trong cài đặt hiện bằng chính font đó.
+- Màu (`ClockColorValue`): 8 màu dịu trên nền đen (token mới `Blue`, `Purple`, `Orange`, `Pink` trong `Color.kt`), áp cho số giờ hoặc kim; mặc định xám như trước.
+- Cỡ đồng hồ 60–150%, mỗi nấc 10%.
+- Ảnh nền: `BackgroundImageManager` (`data/local/background/`) lưu bản sao JPEG đã thu về cỡ màn hình (Photo Picker chỉ cho đọc tạm). AOD giải mã ở luồng nền rồi hiện dần, mờ 50%, ẩn khi tối.
+- "Luôn xoay ngang (đồng hồ đêm)": `AodActivity` khóa ngang theo cảm biến trước khi cửa sổ hiện. Bố cục ngang (đồng hồ trái, thông tin phải) chọn theo kích thước thật, nên cũng đúng khi hệ thống tự xoay.
+- Màn cài đặt: mục "Giao diện đồng hồ" (`MainAppearanceSection`), bảng chọn màu dạng ô tròn. Keys `aod_clock_face`, `aod_clock_font`, `aod_clock_color`, `aod_clock_size_percent`, `is_aod_landscape`.
+- `SettingsLabel` (nhãn nhóm dùng chung) và tham số `labelFontFamily` của `SettingsRadioRow`.
+- `CLAUDE.md`: manager mới (mục 2), thành phần (mục 20.2), bất biến 25–28, cách thêm mặt đồng hồ hoặc màu (mục 20.6).
+
+### Thay đổi
+
+- `AodContent` tách giờ (`AodClockFace`) khỏi ngày và phần thông tin (`AodDetails`). Ở bố cục ngang, hai biên độ dịch chống burn-in đổi chỗ cho nhau.
+- `AodViewModel` đọc giao diện trong `initialState` và tải ảnh nền lúc mở; nhận thêm `BackgroundImageManager`. `MainViewModel` nhận thêm `BackgroundImageManager`, gom 4 nhóm cài đặt vào một lần cập nhật state.
+- Nhãn "Nguồn điện" của mục quy tắc dùng `SettingsLabel`.
+- Đồng nhất tên Intent/Effect theo quy tắc mới (CLAUDE.md mục 10.2.1, kèm lệnh grep chặn tên ở thì quá khứ):
+  - `MainIntent`: `Preview` → `OpenPreview`, `OpenLanguage` → `NavigateToLanguage`, `OpenPermission` → `OpenPermissionSettings`, `PickBackground` → `OpenBackgroundPicker`, `BackgroundPicked` → `BackgroundPickerResult`, `NotificationPermissionRequested` → `NotificationPermissionDialogShown`.
+  - `MainEffect`: `OpenMiuiPermissionEditor` → `OpenMiuiPermissionSettings`, `LaunchBackgroundPicker` → `OpenBackgroundPicker`. Hàm `Context.openMiuiPermissionEditor()` → `openMiuiPermissionSettings()`.
+  - `LanguageIntent`: `Done` → `ConfirmLanguage`, `Back` → `NavigateBack`; `LanguageState.isDoneEnabled` → `isConfirmEnabled`.
+  - `AodIntent`: `MediaPlayPause` → `PlayPauseMedia`, `MediaSkipPrevious` → `SkipToPreviousTrack`, `MediaSkipNext` → `SkipToNextTrack`; `AodEffect.Close` → `CloseAod`.
+  - Hàm private trong ViewModel đổi theo: `openPermissionSettings()`, `onBackgroundPickerResult()`, `onNotificationPermissionDialogShown()`, `confirmLanguage()`, `closeAod()`.
+
 ## [Chưa phát hành] – 2026-10-04 – Giai đoạn 2: thông báo trên đồng hồ
 
 Ba tính năng dùng chung quyền "Truy cập thông báo" (`NotificationListenerService`): icon thông báo, viền sáng khi có thông báo mới, điều khiển nhạc. Không thêm thư viện và không thêm `uses-permission`; listener chỉ được khai báo là service do hệ thống bind. Bản này build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 19–23).
