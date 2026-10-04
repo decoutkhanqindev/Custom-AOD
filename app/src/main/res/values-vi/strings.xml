@@ -76,6 +76,27 @@
   <string name="opt_edge_glow">Viền sáng khi có thông báo mới</string>
   <string name="opt_media_controls">Điều khiển nhạc</string>
 
+  <string name="section_interaction">Thao tác và cảm biến</string>
+  <string name="aod_gesture_double_tap">Chạm 2 lần</string>
+  <string name="aod_gesture_swipe_up">Vuốt lên</string>
+  <string name="aod_gesture_swipe_down">Vuốt xuống</string>
+  <string name="aod_gesture_volume_up">Phím tăng âm lượng</string>
+  <string name="aod_gesture_volume_down">Phím giảm âm lượng</string>
+  <string name="aod_gesture_back">Quay lại</string>
+  <string name="aod_action_none">Không làm gì</string>
+  <string name="aod_action_close">Về màn hình khóa</string>
+  <string name="aod_action_go_dark">Tối màn hình</string>
+  <string name="aod_action_flashlight">Bật/tắt đèn pin</string>
+  <string name="aod_action_play_pause">Phát/tạm dừng nhạc</string>
+  <string name="aod_action_previous_track">Bài trước</string>
+  <string name="aod_action_next_track">Bài tiếp theo</string>
+  <string name="opt_auto_dim">Tự giảm sáng khi phòng tối</string>
+  <string name="opt_auto_dim_desc">Dùng cảm biến ánh sáng, giảm về mức sáng thấp nhất.</string>
+  <string name="opt_raise_to_wake">Nhấc máy để hiện lại đồng hồ</string>
+  <string name="opt_raise_to_wake_desc">Sau khi đồng hồ đã tối và màn hình đã tắt.</string>
+  <string name="sensor_unsupported_light">Máy không có cảm biến ánh sáng.</string>
+  <string name="sensor_unsupported_pickup">Máy không cho app dùng cảm biến nhấc máy.</string>
+
   <string name="section_rules">Khi nào hiện</string>
   <string name="opt_charging_rule">Nguồn điện</string>
   <string name="charging_rule_always">Luôn hiện</string>
@@ -107,4 +128,5 @@
   <string name="aod_media_play">Phát</string>
   <string name="aod_media_pause">Tạm dừng</string>
   <string name="aod_media_next">Bài tiếp theo</string>
+  <string name="aod_flashlight_on">Đèn pin đang bật</string>
 </resources>

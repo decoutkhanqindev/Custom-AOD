@@ -116,6 +116,15 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
+        MainInteractionSection(
+            interaction = state.interaction,
+            editingGesture = state.editingGesture,
+            isFlashlightAvailable = state.isFlashlightAvailable,
+            isLightSensorAvailable = state.isLightSensorAvailable,
+            isPickupSensorAvailable = state.isPickupSensorAvailable,
+            onIntent = onIntent,
+        )
+
         MainRulesSection(
             rules = state.rules,
             editingScheduleTime = state.editingScheduleTime,
@@ -145,7 +154,7 @@ private fun MainSettings(
     }
 }
 
-@Preview(widthDp = 360, heightDp = 2700)
+@Preview(widthDp = 360, heightDp = 3300)
 @Composable
 private fun MainContentPreview() {
     AppTheme {

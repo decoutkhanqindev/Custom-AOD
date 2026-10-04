@@ -117,6 +117,38 @@ class DataStoreManager(
     val isAodLandscape: StateFlow<Boolean?> =
         isAodLandscapeKey.asStateFlow(default = DEFAULT_IS_AOD_LANDSCAPE)
 
+    private val aodDoubleTapActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_DOUBLE_TAP_ACTION_KEY)
+    val aodDoubleTapAction: StateFlow<Int?> =
+        aodDoubleTapActionKey.asStateFlow(default = DEFAULT_AOD_DOUBLE_TAP_ACTION)
+
+    private val aodSwipeUpActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_SWIPE_UP_ACTION_KEY)
+    val aodSwipeUpAction: StateFlow<Int?> =
+        aodSwipeUpActionKey.asStateFlow(default = DEFAULT_AOD_SWIPE_UP_ACTION)
+
+    private val aodSwipeDownActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_SWIPE_DOWN_ACTION_KEY)
+    val aodSwipeDownAction: StateFlow<Int?> =
+        aodSwipeDownActionKey.asStateFlow(default = DEFAULT_AOD_SWIPE_DOWN_ACTION)
+
+    private val aodVolumeUpActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_VOLUME_UP_ACTION_KEY)
+    val aodVolumeUpAction: StateFlow<Int?> =
+        aodVolumeUpActionKey.asStateFlow(default = DEFAULT_AOD_VOLUME_UP_ACTION)
+
+    private val aodVolumeDownActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_VOLUME_DOWN_ACTION_KEY)
+    val aodVolumeDownAction: StateFlow<Int?> =
+        aodVolumeDownActionKey.asStateFlow(default = DEFAULT_AOD_VOLUME_DOWN_ACTION)
+
+    private val aodBackActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_BACK_ACTION_KEY)
+    val aodBackAction: StateFlow<Int?> =
+        aodBackActionKey.asStateFlow(default = DEFAULT_AOD_BACK_ACTION)
+
+    private val isAodAutoDimEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_AUTO_DIM_ENABLED_KEY)
+    val isAodAutoDimEnabled: StateFlow<Boolean?> =
+        isAodAutoDimEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_AUTO_DIM_ENABLED)
+
+    private val isAodRaiseToWakeEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_RAISE_TO_WAKE_ENABLED_KEY)
+    val isAodRaiseToWakeEnabled: StateFlow<Boolean?> =
+        isAodRaiseToWakeEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED)
+
     private val aodLastWakeKey: Preferences.Key<Int> = intPreferencesKey(AOD_LAST_WAKE_KEY)
     val aodLastWake: StateFlow<Int?> =
         aodLastWakeKey.asStateFlow(default = DEFAULT_AOD_LAST_WAKE)
@@ -206,6 +238,38 @@ class DataStoreManager(
         edit { prefs -> prefs[isAodLandscapeKey] = value }
     }
 
+    fun saveAodDoubleTapAction(value: Int) {
+        edit { prefs -> prefs[aodDoubleTapActionKey] = value }
+    }
+
+    fun saveAodSwipeUpAction(value: Int) {
+        edit { prefs -> prefs[aodSwipeUpActionKey] = value }
+    }
+
+    fun saveAodSwipeDownAction(value: Int) {
+        edit { prefs -> prefs[aodSwipeDownActionKey] = value }
+    }
+
+    fun saveAodVolumeUpAction(value: Int) {
+        edit { prefs -> prefs[aodVolumeUpActionKey] = value }
+    }
+
+    fun saveAodVolumeDownAction(value: Int) {
+        edit { prefs -> prefs[aodVolumeDownActionKey] = value }
+    }
+
+    fun saveAodBackAction(value: Int) {
+        edit { prefs -> prefs[aodBackActionKey] = value }
+    }
+
+    fun saveIsAodAutoDimEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodAutoDimEnabledKey] = value }
+    }
+
+    fun saveIsAodRaiseToWakeEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodRaiseToWakeEnabledKey] = value }
+    }
+
     fun saveAodLastWake(value: Int) {
         edit { prefs -> prefs[aodLastWakeKey] = value }
     }
@@ -260,6 +324,14 @@ class DataStoreManager(
         private const val AOD_CLOCK_COLOR_KEY = "aod_clock_color"
         private const val AOD_CLOCK_SIZE_PERCENT_KEY = "aod_clock_size_percent"
         private const val IS_AOD_LANDSCAPE_KEY = "is_aod_landscape"
+        private const val AOD_DOUBLE_TAP_ACTION_KEY = "aod_double_tap_action"
+        private const val AOD_SWIPE_UP_ACTION_KEY = "aod_swipe_up_action"
+        private const val AOD_SWIPE_DOWN_ACTION_KEY = "aod_swipe_down_action"
+        private const val AOD_VOLUME_UP_ACTION_KEY = "aod_volume_up_action"
+        private const val AOD_VOLUME_DOWN_ACTION_KEY = "aod_volume_down_action"
+        private const val AOD_BACK_ACTION_KEY = "aod_back_action"
+        private const val IS_AOD_AUTO_DIM_ENABLED_KEY = "is_aod_auto_dim_enabled"
+        private const val IS_AOD_RAISE_TO_WAKE_ENABLED_KEY = "is_aod_raise_to_wake_enabled"
         private const val AOD_LAST_WAKE_KEY = "aod_last_wake"
         private const val IS_NOTIFICATIONS_ASKED_KEY = "is_notifications_asked"
         private const val DEFAULT_SELECTED_LANG_CODE = "en"
@@ -282,6 +354,14 @@ class DataStoreManager(
         private const val DEFAULT_AOD_CLOCK_COLOR = 0
         const val DEFAULT_AOD_CLOCK_SIZE_PERCENT = 100
         const val DEFAULT_IS_AOD_LANDSCAPE = false
+        const val DEFAULT_AOD_DOUBLE_TAP_ACTION = 1
+        const val DEFAULT_AOD_SWIPE_UP_ACTION = 0
+        const val DEFAULT_AOD_SWIPE_DOWN_ACTION = 0
+        const val DEFAULT_AOD_VOLUME_UP_ACTION = 0
+        const val DEFAULT_AOD_VOLUME_DOWN_ACTION = 0
+        const val DEFAULT_AOD_BACK_ACTION = 1
+        const val DEFAULT_IS_AOD_AUTO_DIM_ENABLED = true
+        const val DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED = true
         private const val DEFAULT_AOD_LAST_WAKE = 0
         private const val DEFAULT_IS_NOTIFICATIONS_ASKED = false
     }

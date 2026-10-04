@@ -3,6 +3,8 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
@@ -22,6 +24,11 @@ data class MainState(
     val appearance: AodAppearanceUiModel = AodAppearanceUiModel(),
     val hasBackground: Boolean = false,
     val isSavingBackground: Boolean = false,
+    val interaction: AodInteractionUiModel = AodInteractionUiModel(),
+    val editingGesture: AodGestureValue? = null,
+    val isFlashlightAvailable: Boolean = false,
+    val isLightSensorAvailable: Boolean = false,
+    val isPickupSensorAvailable: Boolean = false,
     val rules: AodRulesUiModel = AodRulesUiModel(),
     val permissions: ImmutableList<PermissionUiModel> = persistentListOf(),
     val language: LanguageUiModel? = null,

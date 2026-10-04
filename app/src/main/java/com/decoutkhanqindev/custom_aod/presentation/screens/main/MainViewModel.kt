@@ -2,12 +2,18 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main
 
 import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.R
+import com.decoutkhanqindev.custom_aod.data.device.flashlight.FlashlightManager
+import com.decoutkhanqindev.custom_aod.data.device.light.AmbientLightManager
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
+import com.decoutkhanqindev.custom_aod.data.device.pickup.PickupGestureManager
 import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
@@ -21,6 +27,8 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.gestureActionCode
+import com.decoutkhanqindev.custom_aod.presentation.model.saveGestureAction
 import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
@@ -28,6 +36,7 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -40,8 +49,15 @@ class MainViewModel(
     private val permissionManager: PermissionManager,
     private val languageManager: LanguageManager,
     private val backgroundImageManager: BackgroundImageManager,
+    flashlightManager: FlashlightManager,
+    ambientLightManager: AmbientLightManager,
+    pickupGestureManager: PickupGestureManager,
 ) : BaseViewModel<MainState, MainIntent, MainEffect>(
-    initialState = MainState(),
+    initialState = MainState(
+        isFlashlightAvailable = flashlightManager.isAvailable,
+        isLightSensorAvailable = ambientLightManager.isAvailable,
+        isPickupSensorAvailable = pickupGestureManager.isSupported,
+    ),
 ), Tag {
 
     // Hộp thoại quyền thông báo đang mở là lần hỏi tự động lúc mở app lần đầu (bị từ chối thì để yên) hay do user bấm dòng "Thông báo".
@@ -71,6 +87,11 @@ class MainViewModel(
             is MainIntent.OpenBackgroundPicker -> viewModelScope.launch { sendEffect(MainEffect.OpenBackgroundPicker) }
             is MainIntent.BackgroundPickerResult -> onBackgroundPickerResult(intent.uri)
             is MainIntent.RemoveBackground -> backgroundImageManager.removeImage()
+            is MainIntent.ShowGestureActionPicker -> updateState { copy(editingGesture = intent.gesture) }
+            is MainIntent.DismissGestureActionPicker -> updateState { copy(editingGesture = null) }
+            is MainIntent.ChangeGestureAction -> changeGestureAction(intent.gesture, intent.action)
+            is MainIntent.ToggleAutoDim -> dataStoreManager.saveIsAodAutoDimEnabled(intent.isEnabled)
+            is MainIntent.ToggleRaiseToWake -> dataStoreManager.saveIsAodRaiseToWakeEnabled(intent.isEnabled)
             is MainIntent.ToggleNotificationIcons -> dataStoreManager.saveIsAodNotificationIconsEnabled(intent.isEnabled)
             is MainIntent.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(intent.isEnabled)
             is MainIntent.ToggleMediaControls -> dataStoreManager.saveIsAodMediaControlsEnabled(intent.isEnabled)
@@ -95,12 +116,14 @@ class MainViewModel(
                 optionsFlow(),
                 notificationOptionsFlow(),
                 appearanceFlow(),
+                interactionFlow(),
                 rulesFlow(),
-            ) { options, notificationOptions, appearance, rules ->
+            ) { options, notificationOptions, appearance, interaction, rules ->
                 Settings(
                     options = options,
                     notificationOptions = notificationOptions,
                     appearance = appearance,
+                    interaction = interaction,
                     rules = rules,
                 )
             }.collectCatching(
@@ -111,6 +134,7 @@ class MainViewModel(
                             options = settings.options,
                             notificationOptions = settings.notificationOptions,
                             appearance = settings.appearance,
+                            interaction = settings.interaction,
                             rules = settings.rules,
                         )
                     }
@@ -161,6 +185,25 @@ class MainViewModel(
             color = ClockColorValue.fromCode(color),
             sizePercent = sizePercent,
             isLandscape = isLandscape,
+        )
+    }
+
+    private fun interactionFlow(): Flow<AodInteractionUiModel> = combine(
+        combine(
+            AodGestureValue.entries.map { gesture -> dataStoreManager.gestureActionCode(gesture).filterNotNull() },
+        ) { codes ->
+            AodGestureValue.entries
+                .zip(codes) { gesture, code -> gesture to AodActionValue.fromCode(code) }
+                .toMap()
+                .toImmutableMap()
+        },
+        dataStoreManager.isAodAutoDimEnabled.filterNotNull(),
+        dataStoreManager.isAodRaiseToWakeEnabled.filterNotNull(),
+    ) { actions, isAutoDimEnabled, isRaiseToWakeEnabled ->
+        AodInteractionUiModel(
+            actions = actions,
+            isAutoDimEnabled = isAutoDimEnabled,
+            isRaiseToWakeEnabled = isRaiseToWakeEnabled,
         )
     }
 
@@ -265,6 +308,11 @@ class MainViewModel(
         }
     }
 
+    private fun changeGestureAction(gesture: AodGestureValue, action: AodActionValue) {
+        dataStoreManager.saveGestureAction(gesture, action)
+        updateState { copy(editingGesture = null) }
+    }
+
     private fun changeScheduleTime(time: ScheduleTimeValue, minuteOfDay: Int) {
         when (time) {
             ScheduleTimeValue.START -> dataStoreManager.saveAodScheduleStartMinute(minuteOfDay)
@@ -314,6 +362,7 @@ class MainViewModel(
         val options: AodOptionsUiModel,
         val notificationOptions: AodNotificationOptionsUiModel,
         val appearance: AodAppearanceUiModel,
+        val interaction: AodInteractionUiModel,
         val rules: AodRulesUiModel,
     )
 }

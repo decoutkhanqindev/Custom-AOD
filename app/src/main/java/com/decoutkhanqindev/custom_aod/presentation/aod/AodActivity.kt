@@ -26,6 +26,7 @@ class AodActivity : ComponentActivity() {
     private var isPreview = false
     private var normalBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isDark = false
+    private var isDimmed = false
 
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +60,7 @@ class AodActivity : ComponentActivity() {
                 AodScreen(
                     isPreview = isPreview,
                     onDarkChange = ::renderDark,
+                    onDimChange = ::renderDim,
                     onClose = ::close,
                 )
             }
@@ -95,9 +97,18 @@ class AodActivity : ComponentActivity() {
         } else {
             session.clearSleepRequest()
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            setBrightness(normalBrightness)
+            setBrightness(lightBrightness())
         }
     }
+
+    // Phòng tối: giảm về mức thấp nhất; đang tối hẳn thì renderDark giữ quyền quyết định độ sáng.
+    private fun renderDim(isDimmed: Boolean) {
+        if (isDimmed == this.isDimmed) return
+        this.isDimmed = isDimmed
+        if (!isDark) setBrightness(lightBrightness())
+    }
+
+    private fun lightBrightness(): Float = if (isDimmed) DIM_BRIGHTNESS else normalBrightness
 
     private fun setBrightness(value: Float) {
         window.attributes = window.attributes.apply { screenBrightness = value }
@@ -123,6 +134,7 @@ class AodActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_PREVIEW = "com.decoutkhanqindev.custom_aod.extra.PREVIEW"
         private const val MAX_BRIGHTNESS_PERCENT = 100f
+        private const val DIM_BRIGHTNESS = 0.01f
 
         fun preview(context: Context) {
             context.startActivity(Intent(context, AodActivity::class.java).putExtra(EXTRA_PREVIEW, true))

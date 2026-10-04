@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -52,23 +53,38 @@ fun SettingsSwitchRow(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    description: String? = null,
+    isEnabled: Boolean = true,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
-            .toggleable(value = isChecked, role = Role.Switch, onValueChange = onCheckedChange),
+            .toggleable(value = isChecked, enabled = isEnabled, role = Role.Switch, onValueChange = onCheckedChange),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = label,
+        Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 16.dp),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+                .padding(end = 16.dp)
+                .alpha(if (isEnabled) 1f else 0.38f),
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+            )
 
-        Switch(checked = isChecked, onCheckedChange = null)
+            description?.let { text ->
+                Text(
+                    text = text,
+                    modifier = Modifier.padding(top = 2.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+
+        Switch(checked = isChecked, onCheckedChange = null, enabled = isEnabled)
     }
 }
 

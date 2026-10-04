@@ -4,6 +4,27 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-04 – Giai đoạn 4: thao tác và cảm biến
+
+Gán hành động cho thao tác và phím, đèn pin, tự giảm sáng theo cảm biến ánh sáng, nhấc máy để hiện lại đồng hồ. Không thêm quyền và thư viện: đèn pin dùng `setTorchMode`, không cần quyền `CAMERA`. Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 29–34).
+
+### Thêm
+
+- Hành động cho 6 thao tác (`AodGestureValue`): chạm 2 lần, vuốt lên, vuốt xuống, phím tăng/giảm âm lượng, phím quay lại. 7 hành động (`AodActionValue`): không làm gì, về màn hình khóa, tối màn hình, bật/tắt đèn pin, phát/tạm dừng, bài trước, bài tiếp theo. Mặc định giữ cách chạy trước đây (chạm 2 lần và quay lại về màn hình khóa). Keys `aod_double_tap_action`, `aod_swipe_up_action`, `aod_swipe_down_action`, `aod_volume_up_action`, `aod_volume_down_action`, `aod_back_action`.
+- `FlashlightManager` (`data/device/flashlight/`): bật/tắt đèn pin, theo dõi trạng thái đèn từ mọi nguồn; AOD hiện icon khi đèn đang bật.
+- `AmbientLightManager` (`data/device/light/`) và tùy chọn "Tự giảm sáng khi phòng tối" (`is_aod_auto_dim_enabled`): dưới 5 lux giảm về 1%, trên 20 lux trở lại, phải giữ 2 giây mới đổi. `AodActivity.renderDim()`.
+- `PickupGestureManager` (`data/device/pickup/`) và tùy chọn "Nhấc máy để hiện lại đồng hồ" (`is_aod_raise_to_wake_enabled`): cảm biến `android.sensor.pick_up_gesture`. `AodService` chỉ chờ nhấc máy sau khi đồng hồ tối theo chủ ý và màn hình tắt, không chờ khi máy trong túi.
+- Màn cài đặt: mục "Thao tác và cảm biến" (`MainInteractionSection`), hộp thoại chọn hành động cho từng thao tác. `SettingsSwitchRow` có thêm dòng mô tả và trạng thái tắt (máy không có cảm biến).
+- `collectLatestCatching` trong `utils/CoroutineExt.kt`: như `collectCatching` nhưng huỷ khối đang chạy khi có giá trị mới. `AodViewModel.observeProximity` và `observeAmbientLight` dùng hàm này thay cho `collectLatest` thô.
+- `CLAUDE.md`: 3 manager mới (mục 2), `collectLatestCatching` (mục 13, 13.1, 15, 18 kèm lệnh grep chặn `.collectLatest {` thô), bất biến 29–32, cách thêm thao tác hoặc hành động (mục 20.6).
+
+### Thay đổi
+
+- `AodIntent.DoubleTap` → `PerformGesture(gesture)`: ViewModel tra hành động đã gán. Dòng "Chạm 2 lần để thoát" chỉ hiện khi chạm 2 lần vẫn là về màn hình khóa (`AodState.isExitHintVisible`).
+- `AodContent` giữ focus để nhận phím âm lượng; `AodScreen` xử lý phím quay lại bằng `BackHandler`.
+- `AodService.launch()` → `launchAod()`.
+- `AodViewModel` nhận thêm `FlashlightManager`, `AmbientLightManager`; `MainViewModel` nhận thêm 3 manager mới để biết máy có đèn pin và cảm biến không.
+
 ## [Chưa phát hành] – 2026-10-04 – Giai đoạn 3: giao diện đồng hồ
 
 Mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Không thêm quyền và thư viện: ảnh nền chọn bằng Photo Picker (không cần quyền đọc ảnh), font là họ font của hệ thống. Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 24–28).

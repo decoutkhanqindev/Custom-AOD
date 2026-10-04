@@ -3,9 +3,12 @@ package com.decoutkhanqindev.custom_aod.di
 import com.decoutkhanqindev.custom_aod.ads.AdsManager
 import com.decoutkhanqindev.custom_aod.data.device.audio.AudioStateManager
 import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
+import com.decoutkhanqindev.custom_aod.data.device.flashlight.FlashlightManager
+import com.decoutkhanqindev.custom_aod.data.device.light.AmbientLightManager
 import com.decoutkhanqindev.custom_aod.data.device.media.MediaStateManager
 import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStateManager
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
+import com.decoutkhanqindev.custom_aod.data.device.pickup.PickupGestureManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
 import com.decoutkhanqindev.custom_aod.data.device.screen.ScreenStateManager
 import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
@@ -32,6 +35,9 @@ val managerModule = module {
     single { NotificationStateManager(androidApplication()) }
     single { MediaStateManager(androidApplication(), get()) }
     single { BackgroundImageManager(androidApplication()) }
+    single { FlashlightManager(androidApplication()) }
+    single { AmbientLightManager(androidApplication()) }
+    single { PickupGestureManager(androidApplication()) }
 }
 
 val adsModule = module {
@@ -51,9 +57,9 @@ val useCaseModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get()) }
-    viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { (isPreview: Boolean) -> AodViewModel(isPreview, get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val appModules = listOf(

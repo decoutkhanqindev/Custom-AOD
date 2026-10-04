@@ -4,15 +4,20 @@ import androidx.annotation.ColorInt
 import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.data.device.audio.AudioStateManager
 import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
+import com.decoutkhanqindev.custom_aod.data.device.flashlight.FlashlightManager
+import com.decoutkhanqindev.custom_aod.data.device.light.AmbientLightManager
 import com.decoutkhanqindev.custom_aod.data.device.media.MediaStateManager
 import com.decoutkhanqindev.custom_aod.data.device.notification.NotificationStateManager
 import com.decoutkhanqindev.custom_aod.data.device.proximity.ProximityManager
 import com.decoutkhanqindev.custom_aod.data.local.background.BackgroundImageManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodAppearance
+import com.decoutkhanqindev.custom_aod.presentation.model.currentAodInteraction
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodNotificationOptions
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
 import com.decoutkhanqindev.custom_aod.presentation.model.glowColorArgb
@@ -23,13 +28,15 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
+import com.decoutkhanqindev.custom_aod.utils.collectLatestCatching
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,6 +51,8 @@ class AodViewModel(
     private val notificationStateManager: NotificationStateManager,
     private val mediaStateManager: MediaStateManager,
     private val backgroundImageManager: BackgroundImageManager,
+    private val flashlightManager: FlashlightManager,
+    private val ambientLightManager: AmbientLightManager,
 ) : BaseViewModel<AodState, AodIntent, AodEffect>(
     initialState = initialState(dataStoreManager, batteryStateManager),
 ), Tag {
@@ -72,6 +81,8 @@ class AodViewModel(
         if (notificationOptions.isEdgeGlowEnabled) observeAlerts()
         if (notificationOptions.isMediaControlsEnabled) observeMedia()
         loadBackground()
+        if (flashlightManager.isAvailable) observeFlashlight()
+        if (state.value.interaction.isAutoDimEnabled && ambientLightManager.isAvailable) observeAmbientLight()
         startMinuteTicks()
         scheduleHintHide()
         if (!isPreview) {
@@ -82,13 +93,25 @@ class AodViewModel(
 
     override fun onIntent(intent: AodIntent) {
         Timber.tag(tag).d("onIntent: $intent")
-        // Trong túi, vải cọ lên màn hình không được mở màn hình khoá hay bấm nút nhạc.
+        // Trong túi, vải cọ lên màn hình hay phím bị đè không được mở màn hình khoá, bật đèn pin hay bấm nút nhạc.
         if (proximityManager.isNear.value) return
         when (intent) {
-            is AodIntent.DoubleTap -> closeAod()
+            is AodIntent.PerformGesture -> performGesture(intent.gesture)
             is AodIntent.PlayPauseMedia -> mediaStateManager.playPause()
             is AodIntent.SkipToPreviousTrack -> mediaStateManager.skipToPrevious()
             is AodIntent.SkipToNextTrack -> mediaStateManager.skipToNext()
+        }
+    }
+
+    private fun performGesture(gesture: AodGestureValue) {
+        when (state.value.interaction.actionOf(gesture)) {
+            AodActionValue.NONE -> Unit
+            AodActionValue.CLOSE -> closeAod()
+            AodActionValue.GO_DARK -> goDark()
+            AodActionValue.FLASHLIGHT -> flashlightManager.toggle()
+            AodActionValue.PLAY_PAUSE -> mediaStateManager.playPause()
+            AodActionValue.PREVIOUS_TRACK -> mediaStateManager.skipToPrevious()
+            AodActionValue.NEXT_TRACK -> mediaStateManager.skipToNext()
         }
     }
 
@@ -168,6 +191,39 @@ class AodViewModel(
         }
     }
 
+    private fun observeFlashlight() {
+        viewModelScope.launch {
+            flashlightManager.isOn.collectCatching(
+                action = { isOn -> updateState { copy(isFlashlightOn = isOn) } },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    // Phòng tối thì giảm về mức thấp nhất. Ngưỡng tối và sáng lệch nhau, mức mới phải giữ LIGHT_SETTLE_MILLIS mới đổi: bóng tay hay đèn chớp không làm màn hình nhấp nháy.
+    private fun observeAmbientLight() {
+        viewModelScope.launch {
+            ambientLightManager.lux
+                .filterNotNull()
+                .map { lux ->
+                    when {
+                        lux <= DIM_LUX -> true
+                        lux >= UNDIM_LUX -> false
+                        else -> null
+                    }
+                }
+                .distinctUntilChanged()
+                .collectLatestCatching(
+                    action = { isDarkRoom ->
+                        if (isDarkRoom == null || isDarkRoom == state.value.isDimmed) return@collectLatestCatching
+                        delay(LIGHT_SETTLE_MILLIS)
+                        updateState { copy(isDimmed = isDarkRoom) }
+                    },
+                    catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+                )
+        }
+    }
+
     // Giải mã ảnh nền tốn vài chục ms: đồng hồ hiện trước, ảnh nền hiện dần sau, không chặn khung đầu tiên.
     private fun loadBackground() {
         viewModelScope.launch {
@@ -188,17 +244,20 @@ class AodViewModel(
     // Phải bị che liên tục COVER_DELAY_MILLIS (trong túi, úp mặt); bàn tay lướt qua ngắn hơn nên bị bỏ qua.
     private fun observeProximity() {
         viewModelScope.launch {
-            proximityManager.isNear.collectLatest { isNear ->
-                if (isNear) {
-                    if (isCovered) return@collectLatest
-                    delay(COVER_DELAY_MILLIS)
-                    isCovered = true
-                    goDark(isUntilUncovered = true)
-                } else if (isCovered) {
-                    isCovered = false
-                    lightUpAgain()
-                }
-            }
+            proximityManager.isNear.collectLatestCatching(
+                action = { isNear ->
+                    if (isNear) {
+                        if (isCovered) return@collectLatestCatching
+                        delay(COVER_DELAY_MILLIS)
+                        isCovered = true
+                        goDark(isUntilUncovered = true)
+                    } else if (isCovered) {
+                        isCovered = false
+                        lightUpAgain()
+                    }
+                },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
         }
     }
 
@@ -277,6 +336,9 @@ class AodViewModel(
         private const val COVER_DELAY_MILLIS = 3_000L
         private const val HINT_VISIBLE_MILLIS = 3_000L
         private const val GLOW_MILLIS = 4_000L
+        private const val LIGHT_SETTLE_MILLIS = 2_000L
+        private const val DIM_LUX = 5f
+        private const val UNDIM_LUX = 20f
         private const val MAX_SHIFT_X_DP = 24
         private const val MAX_SHIFT_Y_DP = 64
 
@@ -287,6 +349,7 @@ class AodViewModel(
         ): AodState = AodState(
             nowMillis = System.currentTimeMillis(),
             appearance = dataStoreManager.currentAodAppearance(),
+            interaction = dataStoreManager.currentAodInteraction(),
             battery = batteryStateManager.readLevelPercent()?.let { percent ->
                 BatteryUiModel(percent = percent, isCharging = batteryStateManager.readIsCharging() == true)
             },

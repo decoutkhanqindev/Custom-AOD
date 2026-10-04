@@ -19,7 +19,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -34,6 +36,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FlashlightOn
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
@@ -41,6 +44,7 @@ import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -48,6 +52,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -57,6 +63,11 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -73,7 +84,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
+import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
@@ -99,6 +112,7 @@ fun AodContent(
     modifier: Modifier = Modifier,
 ) {
     val currentOnIntent by rememberUpdatedState(onIntent)
+    val focusRequester = remember { FocusRequester() }
     val shiftX = animateDpAsState(
         targetValue = state.shiftXDp.dp,
         animationSpec = tween(durationMillis = 1_500),
@@ -110,12 +124,55 @@ fun AodContent(
         label = "AodShiftY",
     )
 
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(Black)
+            .onPreviewKeyEvent { event ->
+                val gesture = when (event.key) {
+                    Key.VolumeUp -> AodGestureValue.VOLUME_UP
+                    Key.VolumeDown -> AodGestureValue.VOLUME_DOWN
+                    else -> null
+                }
+                if (gesture == null || state.interaction.actionOf(gesture) == AodActionValue.NONE) {
+                    false
+                } else {
+                    if (event.type == KeyEventType.KeyDown && event.nativeKeyEvent.repeatCount == 0) {
+                        currentOnIntent(AodIntent.PerformGesture(gesture))
+                    }
+                    true
+                }
+            }
+            .focusRequester(focusRequester)
+            .focusable()
             .pointerInput(Unit) {
-                detectTapGestures(onDoubleTap = { currentOnIntent(AodIntent.DoubleTap) })
+                detectTapGestures(
+                    onDoubleTap = { currentOnIntent(AodIntent.PerformGesture(AodGestureValue.DOUBLE_TAP)) },
+                )
+            }
+            .pointerInput(Unit) {
+                var dragTotal = 0f
+                detectVerticalDragGestures(
+                    onDragStart = { dragTotal = 0f },
+                    onDragEnd = {
+                        val threshold = 80.dp.toPx()
+                        when {
+                            dragTotal <= -threshold ->
+                                currentOnIntent(AodIntent.PerformGesture(AodGestureValue.SWIPE_UP))
+
+                            dragTotal >= threshold ->
+                                currentOnIntent(AodIntent.PerformGesture(AodGestureValue.SWIPE_DOWN))
+                        }
+                    },
+                    onVerticalDrag = { change, dragAmount ->
+                        change.consume()
+                        dragTotal += dragAmount
+                    },
+                )
             },
         contentAlignment = Alignment.Center,
     ) {
@@ -192,13 +249,24 @@ private fun AodDetails(
             )
         }
 
+        AnimatedVisibility(visible = state.isFlashlightOn) {
+            Icon(
+                imageVector = Icons.Default.FlashlightOn,
+                contentDescription = stringResource(R.string.aod_flashlight_on),
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .size(18.dp),
+                tint = Mint,
+            )
+        }
+
         AodMediaControls(
             media = state.media,
             onIntent = onIntent,
         )
 
         Spacer(modifier = Modifier.height(28.dp))
-        AodExitHint(isVisible = state.isHintVisible)
+        AodExitHint(isVisible = state.isExitHintVisible)
     }
 }
 

@@ -78,6 +78,27 @@
   <string name="opt_edge_glow">Glow the screen edges for new notifications</string>
   <string name="opt_media_controls">Music controls</string>
 
+  <string name="section_interaction">Gestures and sensors</string>
+  <string name="aod_gesture_double_tap">Double-tap</string>
+  <string name="aod_gesture_swipe_up">Swipe up</string>
+  <string name="aod_gesture_swipe_down">Swipe down</string>
+  <string name="aod_gesture_volume_up">Volume up key</string>
+  <string name="aod_gesture_volume_down">Volume down key</string>
+  <string name="aod_gesture_back">Back</string>
+  <string name="aod_action_none">Do nothing</string>
+  <string name="aod_action_close">Go to the lock screen</string>
+  <string name="aod_action_go_dark">Darken the screen</string>
+  <string name="aod_action_flashlight">Flashlight on/off</string>
+  <string name="aod_action_play_pause">Play/pause music</string>
+  <string name="aod_action_previous_track">Previous track</string>
+  <string name="aod_action_next_track">Next track</string>
+  <string name="opt_auto_dim">Dim in a dark room</string>
+  <string name="opt_auto_dim_desc">Uses the light sensor and drops to the lowest brightness.</string>
+  <string name="opt_raise_to_wake">Lift to show the clock again</string>
+  <string name="opt_raise_to_wake_desc">After the clock has gone dark and the screen has turned off.</string>
+  <string name="sensor_unsupported_light">This phone has no light sensor.</string>
+  <string name="sensor_unsupported_pickup">This phone does not offer a lift sensor to apps.</string>
+
   <string name="section_rules">When to show</string>
   <string name="opt_charging_rule">Power</string>
   <string name="charging_rule_always">Always</string>
@@ -119,4 +140,5 @@
   <string name="aod_media_play">Play</string>
   <string name="aod_media_pause">Pause</string>
   <string name="aod_media_next">Next</string>
+  <string name="aod_flashlight_on">Flashlight on</string>
 </resources>

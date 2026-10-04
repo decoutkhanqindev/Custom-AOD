@@ -117,13 +117,13 @@ Quyền riêng của Xiaomi:
 | | Font, màu, cỡ chữ | ✓ [Play] | ✓ (4 họ font hệ thống, 8 màu, cỡ 60–150%) |
 | | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ⚠️ ảnh tự chọn bằng Photo Picker, hiện mờ 50%; chưa có bộ ảnh AMOLED sẵn |
 | | Độ sáng | ✓ chỉnh mức [2017] | ✓ (1–100%, hoặc theo hệ thống) |
-| | Tự giảm sáng khi trời tối (cảm biến ánh sáng) | ✓ [Play] | ✗ |
+| | Tự giảm sáng khi trời tối (cảm biến ánh sáng) | ✓ [Play] | ✓ (dưới 5 lux giảm về 1%, chờ 2 giây để không nhấp nháy) |
 | | Ép xoay ngang, dùng làm đồng hồ đêm | ✓ [Play] | ✓ (ngang theo cảm biến, bố cục đồng hồ trái, thông tin phải) |
 | Tương tác | Chạm 2 lần để thoát | ✓ [Play] | ✓ |
-| | Vuốt lên/xuống, phím âm lượng, phím back | ✓ [Play] | ✗ |
+| | Vuốt lên/xuống, phím âm lượng, phím back | ✓ [Play] | ✓ (6 thao tác, mỗi thao tác chọn 1 trong 7 hành động) |
 | | Nút nguồn khi AOD đang hiện | Mở lại AOD [máy] | Về màn hình khóa |
-| | Bật đèn pin bằng cử chỉ | ✓ [2017] | ✗ |
-| | Nhấc máy để bật (raise to wake) | ✓ [Play] | ✗ |
+| | Bật đèn pin bằng cử chỉ | ✓ [2017] | ✓ (gán cho bất kỳ thao tác nào, không cần quyền `CAMERA`) |
+| | Nhấc máy để bật (raise to wake) | ✓ [Play] | ⚠️ hiện lại đồng hồ sau khi đã tối; chỉ máy có cảm biến nhấc máy chuẩn của Android |
 | Pin và quy tắc | Dịch vị trí chống burn-in | ✓ [Play] | ✓ (mỗi phút) |
 | | Chế độ trong túi | ✓ [Play] | ✓ (đen, sáng lại khi lấy ra) |
 | | Bỏ qua khi pin dưới ngưỡng | ✓ [2017] | ✓ |
@@ -156,7 +156,8 @@ Quyền riêng của Xiaomi:
 - **Giai đoạn 1 (2026-10-04) đã thêm**, không cần quyền mới: luật theo sạc, lịch theo giờ, chỉnh mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Chưa chạy trên máy.
 - **Giai đoạn 2 (2026-10-04) đã thêm**, cần quyền đặc biệt "Truy cập thông báo": icon thông báo, viền sáng, điều khiển nhạc. Khác đối thủ: chỉ hiện icon, không hiện nội dung thông báo. Chưa chạy trên máy.
 - **Giai đoạn 3 (2026-10-04) đã thêm**, không cần quyền mới: 4 mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Chưa chạy trên máy.
-- **Khoảng trống lớn nhất còn lại là tương tác và nội dung.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
-  1. Cử chỉ vuốt, phím âm lượng, đèn pin, tự giảm sáng theo cảm biến ánh sáng, nhấc máy để bật.
-  2. Widget bật/tắt, tùy chọn hiện nội dung thông báo.
-  3. Memo, ghi chú, lịch, thời tiết.
+- **Giai đoạn 4 (2026-10-04) đã thêm**, không cần quyền mới: hành động cho thao tác và phím, đèn pin, tự giảm sáng, nhấc máy để hiện lại đồng hồ. Chưa chạy trên máy.
+- **Khoảng trống lớn nhất còn lại là nội dung và tích hợp.** Theo mức ảnh hưởng tới người dùng, nên làm theo thứ tự:
+  1. Widget bật/tắt, tùy chọn hiện nội dung thông báo.
+  2. Memo, ghi chú, lịch, thời tiết.
+  3. Tasker, Premium.

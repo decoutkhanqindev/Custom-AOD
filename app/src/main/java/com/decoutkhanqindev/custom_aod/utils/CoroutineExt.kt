@@ -3,6 +3,7 @@ package com.decoutkhanqindev.custom_aod.utils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -37,6 +38,18 @@ suspend inline fun <T> Flow<T>.collectCatching(
     crossinline catch: (Exception) -> Unit,
 ) = try {
     collect { action(it) }
+} catch (c: CancellationException) {
+    throw c
+} catch (e: Exception) {
+    catch(e)
+}
+
+// Giá trị mới huỷ khối action đang chạy (huỷ đó nằm trong collectLatest, không tới catch); lỗi thật của upstream hay action thì tới catch.
+suspend inline fun <T> Flow<T>.collectLatestCatching(
+    crossinline action: suspend (T) -> Unit,
+    crossinline catch: (Exception) -> Unit,
+) = try {
+    collectLatest { action(it) }
 } catch (c: CancellationException) {
     throw c
 } catch (e: Exception) {

@@ -15,7 +15,7 @@ Tài liệu khác:
 
 ## Trạng thái kiểm thử
 
-Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy trên máy**. Lõi đã được viết lại theo MVI và manager, giai đoạn 1 (quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ) giai đoạn 2 (icon thông báo, viền sáng, điều khiển nhạc trên đồng hồ) và giai đoạn 3 (mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang) mới được thêm (xem CHANGELOG), nên cần chạy lại toàn bộ mục "Kiểm tra trên máy thật".
+Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy trên máy**. Lõi đã được viết lại theo MVI và manager, giai đoạn 1 (quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ), giai đoạn 2 (icon thông báo, viền sáng, điều khiển nhạc trên đồng hồ), giai đoạn 3 (mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang) và giai đoạn 4 (thao tác, đèn pin, tự giảm sáng, nhấc máy) mới được thêm (xem CHANGELOG), nên cần chạy lại toàn bộ mục "Kiểm tra trên máy thật".
 
 Kết quả của demo FakeAOD trước khi chuyển sang base:
 
@@ -28,7 +28,7 @@ Kết quả trên là của bản FakeAOD `targetSdk` 33. Bản `minSdk` 30 / `t
 
 Chưa kiểm tra:
 
-- Toàn bộ Custom AOD trên máy thật: Splash (consent, quảng cáo test), màn chọn ngôn ngữ, màn cài đặt, AOD, ô Cài đặt nhanh, thông báo và nhạc trên đồng hồ, giao diện đồng hồ.
+- Toàn bộ Custom AOD trên máy thật: Splash (consent, quảng cáo test), màn chọn ngôn ngữ, màn cài đặt, AOD, ô Cài đặt nhanh, thông báo và nhạc trên đồng hồ, giao diện đồng hồ, thao tác và cảm biến.
 - Khởi động lại máy. Trên Xiaomi, app không xin quyền "Tự khởi chạy", xem mục "Giới hạn đã biết".
 - Khóa máy lâu, ví dụ qua đêm.
 - Cuộc gọi đến và báo thức reo khi đồng hồ đang hiện.
@@ -136,7 +136,10 @@ Hai service còn được bảo vệ bằng quyền của hệ thống, để ch
 - **Màn hình tắt** (nút nguồn hoặc hết thời gian chờ): khoảng 1 giây sau, đồng hồ hiện lên. Phần này không cần mạng.
 - **Bấm nút nguồn khi đồng hồ đang hiện:** màn hình nháy tắt rồi sáng lên màn hình khóa, giống AOD thật. Bấm nguồn lần nữa thì màn hình tắt và đồng hồ hiện lại.
 - **Bấm nguồn bật màn hình lại ngay sau khi vừa tắt:** vào màn hình khóa, đồng hồ không chen vào.
-- **Chạm 2 lần:** thoát đồng hồ, về màn hình khóa. Mở khóa bằng khuôn mặt hoặc vân tay từ đây.
+- **Chạm 2 lần:** thoát đồng hồ, về màn hình khóa (mặc định, đổi được). Mở khóa bằng khuôn mặt hoặc vân tay từ đây.
+- **Thao tác và phím:** chạm 2 lần, vuốt lên, vuốt xuống, phím tăng/giảm âm lượng, phím quay lại đều gán được một trong các hành động: về màn hình khóa, tối màn hình, bật/tắt đèn pin, phát/tạm dừng nhạc, bài trước, bài tiếp theo. Khi đèn pin đang bật, đồng hồ hiện icon đèn pin. Phím âm lượng chưa gán thì vẫn chỉnh âm lượng như thường.
+- **Phòng tối:** nếu bật "Tự giảm sáng khi phòng tối", đồng hồ giảm về mức sáng thấp nhất sau khoảng 2 giây ở nơi tối, và sáng lại khi ra chỗ sáng.
+- **Nhấc máy:** sau khi đồng hồ đã tối (hết giờ, sai quy tắc) và màn hình tắt, nhấc máy lên thì đồng hồ hiện lại. Cần máy có cảm biến nhấc máy chuẩn của Android.
 - **Mở khóa:** đồng hồ tự đóng.
 - **Có cuộc gọi đến hoặc báo thức reo:** màn hình cuộc gọi, báo thức nằm trên đồng hồ, và đồng hồ tự đóng.
 - **Hết thời gian đã chọn, máy trong túi, pin yếu, hết khung giờ, hoặc cắm/rút sạc trái với quy tắc nguồn điện:** đồng hồ chuyển sang đen. Sau đó màn hình tự tắt theo thời gian chờ của máy.
@@ -180,6 +183,19 @@ Mục "Giao diện đồng hồ":
 | Cỡ đồng hồ | `aod_clock_size_percent` | 100% | Từ 60 đến 150%, mỗi nấc 10% |
 | Luôn xoay ngang (đồng hồ đêm) | `is_aod_landscape` | Tắt | Đồng hồ luôn nằm ngang theo chiều dựng máy |
 | Ảnh nền | (file `aod_background.jpg` trong bộ nhớ riêng của app) | Không có | Chọn bằng Photo Picker, không cần quyền đọc ảnh. App lưu một bản sao đã thu về cỡ màn hình; ảnh hiện mờ 50% sau đồng hồ |
+
+Mục "Thao tác và cảm biến":
+
+| Tùy chọn | Key | Mặc định | Tác dụng |
+|---|---|---|---|
+| Chạm 2 lần | `aod_double_tap_action` | Về màn hình khóa | Hành động khi chạm 2 lần vào đồng hồ |
+| Vuốt lên, Vuốt xuống | `aod_swipe_up_action`, `aod_swipe_down_action` | Không làm gì | Vuốt dọc quá khoảng 80dp |
+| Phím tăng, giảm âm lượng | `aod_volume_up_action`, `aod_volume_down_action` | Không làm gì | Không gán thì phím vẫn chỉnh âm lượng |
+| Quay lại | `aod_back_action` | Về màn hình khóa | Phím hoặc cử chỉ quay lại của hệ thống |
+| Tự giảm sáng khi phòng tối | `is_aod_auto_dim_enabled` | Bật | Dưới 5 lux giảm về 1%, trên 20 lux trở lại độ sáng đã chọn; phải giữ 2 giây mới đổi. Máy không có cảm biến ánh sáng thì tắt |
+| Nhấc máy để hiện lại đồng hồ | `is_aod_raise_to_wake_enabled` | Bật | Chỉ sau khi đồng hồ tối theo chủ ý rồi màn hình tắt, không áp dụng khi máy trong túi. Máy không có cảm biến nhấc máy thì tắt |
+
+Hành động có thể gán: Không làm gì, Về màn hình khóa, Tối màn hình (chuyển đen để màn hình tự tắt theo thời gian chờ của máy), Bật/tắt đèn pin (chỉ máy có đèn flash), Phát/tạm dừng nhạc, Bài trước, Bài tiếp theo.
 
 Mục "Khi nào hiện" (quy tắc). Đồng hồ chỉ hiện khi đủ mọi quy tắc:
 
@@ -243,6 +259,9 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, truy cập thông báo, và quyền riêng của Xiaomi |
 | `data/local/datastore/DataStoreManager.kt` | Lưu tùy chọn AOD cùng các prefs của base |
 | `data/local/background/BackgroundImageManager.kt` | Lưu, đọc, xóa ảnh nền (bản sao đã thu nhỏ) |
+| `data/device/flashlight/FlashlightManager.kt` | Bật/tắt và theo dõi đèn pin |
+| `data/device/light/AmbientLightManager.kt` | Cảm biến ánh sáng |
+| `data/device/pickup/PickupGestureManager.kt` | Cảm biến nhấc máy |
 | `utils/ContextExt.kt` | `registerSystemReceiver`; mở trang cài đặt: `openSettingsPage` (ROM không có trang đó thì mở Thông tin ứng dụng), `openOverlaySettings`, `openNotificationSettings`, `openNotificationListenerSettings`, `openMiuiPermissionSettings`; `packageUri` |
 | `res/values-v31/themes.xml` | Splash màu đen cho AOD trên Android 12+, thay vì icon app |
 | `res/xml/data_extraction_rules.xml` | Không sao lưu và không chuyển dữ liệu app sang máy mới (Android 12+) |
@@ -280,6 +299,7 @@ Từ FakeAOD sang Custom AOD:
 - **Không tự tắt màn hình:** app thường không có cách tắt màn hình, việc đó cần dịch vụ trợ năng hoặc quyền quản trị thiết bị. Khi cần kết thúc (hết giờ, trong túi, sai quy tắc hiện), AOD chuyển sang đen hoàn toàn ở độ sáng thấp nhất và bỏ `FLAG_KEEP_SCREEN_ON`. Sau đó thời gian chờ của máy sẽ tắt màn hình. Lần tắt đó được đánh dấu là chủ ý, nên AOD không mở lại. Trong túi, cảm biến tiệm cận đang bị che thì service cũng không bật lại màn hình khóa.
 - **Độ sáng:** chỉnh bằng `screenBrightness` của cửa sổ AOD (1–100%, hoặc theo hệ thống khi tắt độ sáng riêng), không cần quyền "Sửa đổi cài đặt hệ thống" và không đổi độ sáng của máy. Độ sáng được đặt trong `onCreate`, trước khi cửa sổ hiện, để khung đầu tiên đã đúng mức. Pin cũng được đọc đồng bộ lúc mở để khung đầu tiên có ngay dòng pin.
 - **Thông báo trên đồng hồ:** app chỉ nhận được thông báo qua `NotificationListenerService` do hệ thống bind, nên cần quyền "Truy cập thông báo". Thông báo được lọc giống màn hình chờ của hệ thống, và chỉ hiện icon vì đồng hồ nằm trên màn hình khóa. Icon được nạp sẵn ở luồng nền mỗi khi có thông báo, nên khung đầu tiên của đồng hồ đã có icon. Nhạc lấy từ phiên nhạc trong thông báo nhạc mới nhất, giống trình phát trên màn hình khóa của hệ thống; không hiện ảnh bìa vì sáng và dễ burn-in. Viền sáng vẽ bằng gradient vì làm mờ (`blur`) cần Android 12.
+- **Thao tác, đèn pin, cảm biến:** mỗi thao tác lưu một hành động, AOD đọc một lần lúc mở. Phím âm lượng chỉ bị app giữ lại khi đã gán hành động. Đèn pin dùng `setTorchMode`, nên không cần quyền camera. Tự giảm sáng có hai ngưỡng lệch nhau và phải giữ 2 giây để bóng tay hay đèn chớp không làm màn hình nhấp nháy. Nhấc máy chỉ dùng cảm biến nhấc máy chuẩn của Android: nó chạy trên chip cảm biến nên chờ lúc màn hình tắt gần như không tốn pin. App không đoán cảm biến riêng của từng hãng. Không chờ nhấc máy khi đồng hồ tối vì nằm trong túi, để đi bộ không làm sáng màn hình.
 - **Giao diện đồng hồ:** đọc một lần lúc mở AOD, để khung đầu tiên đã đúng mặt, font, màu, cỡ. Hướng ngang được đặt trước khi cửa sổ hiện. Bố cục ngang hay dọc theo kích thước thật của màn hình, nên tự xoay của hệ thống cũng hiển thị đúng. Ảnh nền là bản sao đã thu nhỏ, vì Photo Picker chỉ cho đọc ảnh tạm thời; nó được giải mã ở luồng nền rồi hiện dần, không làm chậm lúc đồng hồ hiện. Font là các họ font có sẵn của hệ thống, không thêm file font.
 - **Quy tắc hiện ở một chỗ:** nguồn điện, khung giờ và ngưỡng pin nằm trong `AodRulesUiModel.allows()`. Service gọi hàm này lúc màn hình tắt để quyết định có mở AOD không; `AodViewModel` gọi lại khi pin, nguồn cắm đổi và mỗi phút để chuyển AOD đang hiện sang đen. Không đọc được trạng thái pin hay nguồn cắm thì không chặn AOD.
 - **Ô Cài đặt nhanh mở app trên Android 15:** từ Android 15, app có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có cửa sổ nổi hiển thị, và ô Cài đặt nhanh không được miễn. Khi `startForegroundService` bị chặn, ô mở app (`startActivityAndCollapse`, mở khóa trước nếu đang khóa) và `MainActivity` khởi động service từ tiền cảnh. Tắt AOD từ ô thì chỉ cần dừng service, không cần mở app.
@@ -316,6 +336,12 @@ Từ FakeAOD sang Custom AOD:
 26. Ảnh nền: chọn một ảnh dọc và một ảnh ngang lớn (vd ảnh chụp 50 MP): dòng "Ảnh nền" chuyển sang "Đang lưu…" rồi "Đổi ảnh". Khóa máy: ảnh hiện dần sau đồng hồ, mờ, không méo. Đóng app, mở lại: ảnh nền vẫn còn. "Bỏ ảnh nền": lần AOD sau nền đen.
 27. Luôn xoay ngang: bật, dựng máy nằm ngang rồi khóa máy: đồng hồ hiện ngang, đồng hồ bên trái, thông tin bên phải; lật ngược máy thì đồng hồ xoay theo. Mở khóa: màn hình khóa và app trở về dọc như cũ.
 28. Tự xoay của hệ thống (tắt "Luôn xoay ngang", bật tự xoay của máy): xoay máy khi đồng hồ đang hiện, bố cục chuyển ngang/dọc đúng.
+29. Thao tác: gán lần lượt từng hành động cho vuốt lên, vuốt xuống, chạm 2 lần rồi thử trên đồng hồ. Đổi chạm 2 lần sang hành động khác thì dòng "Chạm 2 lần để thoát" không hiện nữa.
+30. Phím âm lượng: chưa gán thì bấm vẫn hiện thanh âm lượng; gán "Bật/tắt đèn pin" thì bấm bật đèn, đồng hồ hiện icon đèn pin, không hiện thanh âm lượng. Che cảm biến tiệm cận rồi bấm: không có tác dụng.
+31. Phím quay lại: mặc định về màn hình khóa; gán "Không làm gì" thì quay lại không thoát đồng hồ.
+32. Đèn pin: bật từ đồng hồ, mở khóa: đèn vẫn sáng như khi bật từ thanh thông báo. Bật đèn từ thanh thông báo rồi khóa máy: đồng hồ hiện icon đèn pin.
+33. Tự giảm sáng: đặt độ sáng 50%, khóa máy ở phòng sáng rồi che tay lên cảm biến ánh sáng (hoặc vào phòng tối): sau khoảng 2 giây đồng hồ giảm sáng; ra chỗ sáng thì sáng lại. Vẫy tay nhanh qua cảm biến không làm nhấp nháy.
+34. Nhấc máy: đặt "Tối màn hình sau" 5 phút, để máy nằm yên tới khi đồng hồ tối và màn hình tắt, rồi nhấc máy: đồng hồ hiện lại. Để máy trong túi tới khi tối rồi đi bộ: màn hình không sáng. Máy không hỗ trợ thì công tắc bị tắt kèm dòng giải thích.
 
 Lưu ý khi test trên máy ảo hoặc ngay sau khi vừa dùng app: trong 10 giây sau khi app vừa mở hoặc đóng một Activity, Android cho phép mở Activity từ nền mà không cần quyền gì (log ghi `BAL_ALLOW_GRACE_PERIOD`). Vì vậy đồng hồ có thể hiện dù chưa bật "Hiển thị trên ứng dụng khác". Muốn test đúng thì về màn hình chính, đợi hơn 10 giây rồi mới khóa máy.
 
@@ -351,6 +377,8 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
 - **Icon thông báo vẫn hiện khi đã tắt "Hiện thông báo trên màn hình khóa" của hệ thống** (chỉ icon, không nội dung). Thông báo hoặc kênh đặt ẩn hẳn trên màn hình khóa thì không hiện; riêng tùy chỉnh theo kênh chỉ đọc được từ Android 12. Muốn ẩn hết thì tắt "Hiện biểu tượng thông báo".
 - **Ảnh nền đứng yên** (chỉ đồng hồ dịch vị trí), nên để lâu dễ burn-in và tốn pin hơn nền đen; nên chọn ảnh tối.
 - **Xoay ngang** có thể thấy màn hình xoay lúc đồng hồ hiện và lúc mở khóa. Từ Android 16, màn hình lớn (sw ≥ 600dp) bỏ qua yêu cầu xoay này.
+- **Nhấc máy để hiện lại đồng hồ** chỉ chạy trên máy cho app dùng cảm biến nhấc máy chuẩn của Android. Nhiều máy (có thể cả Xiaomi) chỉ có cảm biến riêng của hãng, khi đó tùy chọn bị tắt. Lúc đồng hồ đã tối nhưng màn hình chưa tắt thì nhấc máy chưa có tác dụng.
+- **Đèn pin bật từ đồng hồ không tự tắt** khi đồng hồ đóng, giống ô Đèn pin của hệ thống.
 - **Font tùy ROM:** "Viết tay" hay "Có chân" là họ font chung, mỗi hãng gán một font khác nhau; máy không có font mỏng thì dùng độ đậm gần nhất.
 - **Trên Xiaomi, phần thông báo cũng cần app đang chạy:** app bị đóng mà không có "Tự khởi chạy" thì hệ thống có thể không bind lại `AodNotificationListener` cho tới khi mở app.
 - **Form consent có thể hiện trên AOD** nếu nó tải xong đúng lúc AOD đang mở (rất hiếm), xem CLAUDE.md › 20.5.
@@ -419,8 +447,8 @@ admob.test.device.ids=HASH_1,HASH_2
 
 Các tính năng Always On AMOLED có mà app này chưa có được liệt kê trong [COMPARISON.md](COMPARISON.md). Ưu tiên gợi ý:
 
-- Cử chỉ vuốt, phím âm lượng, đèn pin, tự giảm sáng theo cảm biến ánh sáng.
+- Memo, ghi chú nhanh, lịch, thời tiết trên đồng hồ.
 - Tùy chọn hiện nội dung thông báo mới nhất (tên app, tiêu đề) cho ai không ngại hiện trên màn hình khóa.
 - Nhận diện cuộc gọi chắc chắn hơn bằng `READ_PHONE_STATE` và `TelephonyCallback`, nếu chấp nhận thêm một quyền.
 
-Đã làm ở giai đoạn 1: quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Giai đoạn 2: icon thông báo, viền sáng, điều khiển nhạc. Giai đoạn 3: mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm.
+Đã làm ở giai đoạn 1: quy tắc nguồn điện, khung giờ, mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ. Giai đoạn 2: icon thông báo, viền sáng, điều khiển nhạc. Giai đoạn 3: mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Giai đoạn 4: gán hành động cho thao tác và phím, đèn pin, tự giảm sáng, nhấc máy để hiện lại đồng hồ.

@@ -14,6 +14,7 @@ import android.os.SystemClock
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.data.device.audio.AudioStateManager
 import com.decoutkhanqindev.custom_aod.data.device.battery.BatteryStateManager
+import com.decoutkhanqindev.custom_aod.data.device.pickup.PickupGestureManager
 import com.decoutkhanqindev.custom_aod.data.device.screen.ScreenStateManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
@@ -32,6 +33,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -44,10 +46,12 @@ class AodService : Service(), Tag {
     private val screenStateManager: ScreenStateManager by inject()
     private val audioStateManager: AudioStateManager by inject()
     private val batteryStateManager: BatteryStateManager by inject()
+    private val pickupGestureManager: PickupGestureManager by inject()
     private val session: AodSession by inject()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var launchCheckJob: Job? = null
+    private var raiseToWakeJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -89,18 +93,19 @@ class AodService : Service(), Tag {
 
     private fun onScreenOff() {
         launchCheckJob?.cancel()
+        raiseToWakeJob?.cancel()
         val wasShowing = session.isShowing
         val wasCovered = session.isCovered
         val isSleepRequested = session.consumeSleepRequest()
         session.finish()
         when {
             // AOD đã chuyển sang đen và màn hình hết giờ chờ theo chủ ý: giữ tắt.
-            isSleepRequested -> Unit
+            isSleepRequested -> if (!wasCovered) armRaiseToWake()
             // Trong túi, ROM có thể tự tắt màn hình: không bao giờ bật lên ở đó.
             wasCovered -> Unit
             // AOD giữ màn hình sáng nên lần tắt này là nút nguồn (app không bắt được phím): về màn hình khoá như AOD thật.
             wasShowing -> screenStateManager.wakeUp(holdMillis = WAKE_HOLD_MILLIS)
-            shouldEnter() -> launch()
+            shouldEnter() -> launchAod()
         }
     }
 
@@ -131,7 +136,7 @@ class AodService : Service(), Tag {
     }
 
     // Mở Activity từ nền được là nhờ user đã cấp "Hiển thị trên ứng dụng khác".
-    private fun launch() {
+    private fun launchAod() {
         val intent = Intent(this, AodActivity::class.java).addFlags(
             Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK or
@@ -147,6 +152,17 @@ class AodService : Service(), Tag {
         launchCheckJob = scope.launch {
             delay(LAUNCH_CHECK_MILLIS)
             checkLaunch()
+        }
+    }
+
+    // Đồng hồ đã tối theo chủ ý (hết giờ, sai quy tắc) rồi màn hình tắt: nhấc máy lên thì hiện lại nếu quy tắc vẫn cho. Tối vì bị che thì không chờ, để đi bộ không làm sáng màn hình trong túi.
+    private fun armRaiseToWake() {
+        val isEnabled = dataStoreManager.isAodRaiseToWakeEnabled.value
+            ?: DataStoreManager.DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED
+        if (!isEnabled || !pickupGestureManager.isSupported) return
+        raiseToWakeJob = scope.launch {
+            pickupGestureManager.pickups.firstOrNull() ?: return@launch
+            if (shouldEnter()) launchAod()
         }
     }
 

@@ -1,5 +1,7 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 
+import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
@@ -21,6 +23,11 @@ sealed interface MainIntent {
     data object OpenBackgroundPicker : MainIntent
     data class BackgroundPickerResult(val uri: String?) : MainIntent
     data object RemoveBackground : MainIntent
+    data class ShowGestureActionPicker(val gesture: AodGestureValue) : MainIntent
+    data object DismissGestureActionPicker : MainIntent
+    data class ChangeGestureAction(val gesture: AodGestureValue, val action: AodActionValue) : MainIntent
+    data class ToggleAutoDim(val isEnabled: Boolean) : MainIntent
+    data class ToggleRaiseToWake(val isEnabled: Boolean) : MainIntent
     data class ToggleNotificationIcons(val isEnabled: Boolean) : MainIntent
     data class ToggleEdgeGlow(val isEnabled: Boolean) : MainIntent
     data class ToggleMediaControls(val isEnabled: Boolean) : MainIntent
