@@ -267,13 +267,14 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/aod/BootReceiver.kt` | Chạy lại service sau khi khởi động máy hoặc cập nhật app |
 | `presentation/aod/AodTileService.kt` | Ô Cài đặt nhanh bật/tắt đồng hồ; mở app khi hệ thống không cho khởi động service |
 | `presentation/screens/aod/AodViewModel.kt` | Logic của AOD: giờ hiện tại và chống burn-in (cập nhật mỗi phút), pin, ẩn dòng gợi ý sau 3 giây, hết giờ, trong túi, quy tắc hiện, đóng khi có cuộc gọi hoặc báo thức, chạm 2 lần, thời tiết (tải lại khi bản đã lưu cũ), sự kiện lịch |
-| `presentation/screens/aod/AodContent.kt` · `AodScreen.kt` · `state/` | Giao diện đồng hồ (4 mặt, ngày, thời tiết, sự kiện, ghi nhớ, hình vẽ, icon thông báo, pin, nhạc, gợi ý, viền sáng, ảnh nền, bố cục ngang, dịch vị trí) và phần nối với ViewModel |
+| `presentation/screens/aod/AodContent.kt` (+ `AodClockFace`, `AodDetails`, `AodExtras`, `AodNotifications`, `AodMediaControls`, `AodBackdrop`, `AodTimeFormat`) · `AodScreen.kt` · `state/` | Giao diện đồng hồ (4 mặt, ngày, thời tiết, sự kiện, ghi nhớ, hình vẽ, icon thông báo, pin, nhạc, gợi ý, viền sáng, ảnh nền, bố cục ngang, dịch vị trí) và phần nối với ViewModel |
 | `presentation/aod/AodNotificationListener.kt` | Nhận thông báo từ hệ thống (khi đã cấp "Truy cập thông báo") và chuyển cho `NotificationStateManager` |
 | `presentation/screens/main/` | Màn hình cài đặt (MVI): quyền, tùy chọn, thông tin thêm (ô nhập ghi nhớ, khung vẽ, lịch, thời tiết; hỏi quyền Lịch và Vị trí khi bật), quy tắc hiện, ngôn ngữ, xem thử; hỏi quyền thông báo ở lần mở đầu tiên. Mỗi mục một file `MainXxxSection.kt` |
 | `presentation/screens/language/` | Màn chọn ngôn ngữ (MVI): lần mở đầu tiên và từ màn hình cài đặt |
 | `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`, `AodExtrasUiModel`, `WeatherUiModel` (ẩn bản cũ từ 3 giờ), `WeatherConditionValue`, `CalendarEventUiModel`, `AodNotificationsUiModel` (icon và nội dung thông báo mới nhất), `WallpaperValue` (ảnh nền có sẵn) |
 | `presentation/components/AppLanguageProvider.kt` | Áp ngôn ngữ đã chọn cho `MainActivity` và `AodActivity` |
-| `presentation/components/SettingsRows.kt` | Các dòng cài đặt dùng chung: tiêu đề mục, công tắc, radio, dòng giá trị, thanh trượt |
+| `presentation/components/AodsSettingsRows.kt` | Các dòng cài đặt dùng chung (`AodsSectionHeader`, `AodsSwitchRow`, `AodsRadioRow`, `AodsValueRow`, `AodsSliderRow`…) |
+| `presentation/theme/AodsTheme.kt` · `tokens/` | Design system `Aods`: token 3 tầng (Primitive → Semantic → Component) và `AodsTheme`, nối sang Material 3; màn AOD đọc `AodsTheme.clock` |
 | `presentation/MainActivity.kt` | Activity chính: consent, ngôn ngữ, theme, khởi động service |
 | `data/device/screen/ScreenStateManager.kt` | Sự kiện tắt màn hình / mở khóa, màn hình có đang sáng, có khóa bảo mật, wake lock bật lại màn hình |
 | `data/device/battery/BatteryStateManager.kt` | Phần trăm pin, trạng thái sạc, có đang cắm nguồn |
@@ -308,9 +309,9 @@ Từ FakeAOD sang Custom AOD:
 | `AodSession.kt` | `presentation/aod/AodSession.kt`, từ `object` thành Koin `single` |
 | `BootReceiver.kt` | `presentation/aod/BootReceiver.kt` |
 | `ProximityGate.kt` | `ProximityManager` (cảm biến) + `AodViewModel` (đếm 3 giây, sáng lại) |
-| `ui/AodScreen.kt` | `presentation/screens/aod/AodContent.kt` |
+| `ui/AodScreen.kt` | `presentation/screens/aod/AodContent.kt` và các file tách ra cùng thư mục |
 | `ui/SettingsScreen.kt` | `presentation/screens/main/` |
-| `ui/Theme.kt` | `presentation/theme/Theme.kt` + `Color.kt` |
+| `ui/Theme.kt` | `presentation/theme/AodsTheme.kt` + `tokens/` |
 | `AodPrefs.kt` | Các key trong `DataStoreManager` |
 | `MiuiPerm.kt` | `PermissionManager` (đọc quyền) + `utils/ContextExt.kt` (`openMiuiPermissionSettings`, mở trang "Quyền khác") |
 | `SystemPages.kt` | `utils/ContextExt.kt` (`registerSystemReceiver`, `openSettingsPage`, `openOverlaySettings`, `openNotificationSettings`, `packageUri`) |
@@ -474,7 +475,7 @@ Còn phải làm (tìm `TODO` trong Android Studio › View › Tool Windows ›
 | Ad unit id thật cho từng placement | `app/build.gradle.kts` › `release { buildConfigField("String", "<PLACEMENT>_ALL_ID", …) }` (debug giữ test id) |
 | Form consent | AdMob console › Privacy & messaging › publish message cho App ID thật |
 | Onboarding (nếu cần) | Sau màn chọn ngôn ngữ ở lần mở đầu tiên, CLAUDE.md › 5 |
-| Font, type scale | `presentation/theme/Type.kt` |
+| Font, type scale | `presentation/theme/tokens/AodsPrimitiveTypography.kt` · `AodsTypographyTokens.kt` |
 
 `local.properties` (đã gitignore):
 

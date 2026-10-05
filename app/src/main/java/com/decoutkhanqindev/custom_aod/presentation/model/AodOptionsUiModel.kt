@@ -2,6 +2,9 @@ package com.decoutkhanqindev.custom_aod.presentation.model
 
 import androidx.compose.runtime.Immutable
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 
 @Immutable
 data class AodOptionsUiModel(
@@ -17,4 +20,20 @@ data class AodOptionsUiModel(
         const val TIMEOUT_STEP_MINUTES = 5
         const val TIMEOUT_MAX_MINUTES = 120
     }
+}
+
+fun DataStoreManager.observeAodOptions(): Flow<AodOptionsUiModel> = combine(
+    isAodEnabled.filterNotNull(),
+    isAodCustomBrightness.filterNotNull(),
+    aodBrightnessPercent.filterNotNull(),
+    isAodProximityEnabled.filterNotNull(),
+    aodTimeoutMinutes.filterNotNull(),
+) { isEnabled, isCustomBrightness, brightnessPercent, isProximityEnabled, timeoutMinutes ->
+    AodOptionsUiModel(
+        isEnabled = isEnabled,
+        isCustomBrightness = isCustomBrightness,
+        brightnessPercent = brightnessPercent,
+        isProximityEnabled = isProximityEnabled,
+        timeoutMinutes = timeoutMinutes,
+    )
 }

@@ -6,9 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSectionHeader
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSlider
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSwitchRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSliderRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 
@@ -19,16 +19,16 @@ fun MainOptionsSection(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        SettingsSectionHeader(title = stringResource(R.string.section_options))
+        AodsSectionHeader(title = stringResource(R.string.section_options))
 
-        SettingsSwitchRow(
+        AodsSwitchRow(
             label = stringResource(R.string.opt_custom_brightness),
             isChecked = options.isCustomBrightness,
             onCheckedChange = { onIntent(MainIntent.ToggleCustomBrightness(it)) },
         )
 
         AnimatedVisibility(visible = options.isCustomBrightness) {
-            SettingsSlider(
+            AodsSliderRow(
                 label = stringResource(R.string.opt_brightness_value, options.brightnessPercent),
                 value = options.brightnessPercent,
                 valueRange = AodOptionsUiModel.BRIGHTNESS_MIN_PERCENT..AodOptionsUiModel.BRIGHTNESS_MAX_PERCENT,
@@ -37,13 +37,13 @@ fun MainOptionsSection(
             )
         }
 
-        SettingsSwitchRow(
+        AodsSwitchRow(
             label = stringResource(R.string.opt_proximity),
             isChecked = options.isProximityEnabled,
             onCheckedChange = { onIntent(MainIntent.ToggleProximity(it)) },
         )
 
-        SettingsSlider(
+        AodsSliderRow(
             label = if (options.timeoutMinutes == 0) {
                 stringResource(R.string.opt_timeout_never)
             } else {

@@ -19,14 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsRadioRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsRadioRow
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageState
-import com.decoutkhanqindev.custom_aod.presentation.theme.AppTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +57,7 @@ fun LanguageContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(20.dp),
+                    .padding(AodsTheme.spacing.screenPadding),
                 enabled = state.isConfirmEnabled,
             ) {
                 Text(text = stringResource(R.string.action_done))
@@ -70,11 +69,11 @@ fun LanguageContent(
             contentPadding = innerPadding,
         ) {
             items(items = state.languages, key = { it.language.name }) { language ->
-                SettingsRadioRow(
+                AodsRadioRow(
                     label = language.label,
                     isSelected = language.language == state.selectedLanguage,
                     onClick = { onIntent(LanguageIntent.SelectLanguage(language.language)) },
-                    modifier = Modifier.padding(horizontal = 20.dp),
+                    modifier = Modifier.padding(horizontal = AodsTheme.spacing.screenPadding),
                 )
             }
         }
@@ -84,7 +83,7 @@ fun LanguageContent(
 @Preview(widthDp = 360, heightDp = 640)
 @Composable
 private fun LanguageContentPreview() {
-    AppTheme {
+    AodsTheme {
         LanguageContent(
             state = LanguageState(
                 languages = persistentListOf(

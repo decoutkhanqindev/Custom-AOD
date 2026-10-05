@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -19,37 +18,43 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlin.math.roundToInt
 
 @Composable
-fun SettingsSectionHeader(
+fun AodsSectionHeader(
     title: String,
     modifier: Modifier = Modifier,
 ) {
     Text(
         text = title.uppercase(),
-        modifier = modifier.padding(top = 28.dp, bottom = 4.dp),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelMedium,
+        modifier = modifier.padding(
+            top = AodsTheme.settingsRow.sectionHeaderTopPadding,
+            bottom = AodsTheme.settingsRow.sectionHeaderBottomPadding,
+        ),
+        color = AodsTheme.colors.primary,
+        style = AodsTheme.typography.labelMedium,
     )
 }
 
 @Composable
-fun SettingsLabel(
+fun AodsSectionLabel(
     text: String,
     modifier: Modifier = Modifier,
 ) {
     Text(
         text = text,
-        modifier = modifier.padding(top = 12.dp, bottom = 4.dp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = MaterialTheme.typography.bodyMedium,
+        modifier = modifier.padding(
+            top = AodsTheme.settingsRow.sectionLabelTopPadding,
+            bottom = AodsTheme.settingsRow.sectionLabelBottomPadding,
+        ),
+        color = AodsTheme.colors.onSurfaceVariant,
+        style = AodsTheme.typography.bodyMedium,
     )
 }
 
 @Composable
-fun SettingsSwitchRow(
+fun AodsSwitchRow(
     label: String,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
@@ -60,27 +65,27 @@ fun SettingsSwitchRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 56.dp)
+            .heightIn(min = AodsTheme.settingsRow.minHeight)
             .toggleable(value = isChecked, enabled = isEnabled, role = Role.Switch, onValueChange = onCheckedChange),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 16.dp)
-                .alpha(if (isEnabled) 1f else 0.38f),
+                .padding(end = AodsTheme.settingsRow.labelEndPadding)
+                .alpha(if (isEnabled) 1f else AodsTheme.opacity.disabled),
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyLarge,
+                style = AodsTheme.typography.bodyLarge,
             )
 
             description?.let { text ->
                 Text(
                     text = text,
-                    modifier = Modifier.padding(top = 2.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = AodsTheme.spacing.textGap),
+                    color = AodsTheme.colors.onSurfaceVariant,
+                    style = AodsTheme.typography.bodySmall,
                 )
             }
         }
@@ -90,7 +95,7 @@ fun SettingsSwitchRow(
 }
 
 @Composable
-fun SettingsRadioRow(
+fun AodsRadioRow(
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -100,7 +105,7 @@ fun SettingsRadioRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 48.dp)
+            .heightIn(min = AodsTheme.settingsRow.compactMinHeight)
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -108,15 +113,15 @@ fun SettingsRadioRow(
 
         Text(
             text = label,
-            modifier = Modifier.padding(start = 12.dp),
+            modifier = Modifier.padding(start = AodsTheme.settingsRow.radioLabelStartPadding),
             fontFamily = labelFontFamily,
-            style = MaterialTheme.typography.bodyLarge,
+            style = AodsTheme.typography.bodyLarge,
         )
     }
 }
 
 @Composable
-fun SettingsValueRow(
+fun AodsValueRow(
     label: String,
     value: String,
     onClick: () -> Unit,
@@ -126,42 +131,42 @@ fun SettingsValueRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .onClick(shape = MaterialTheme.shapes.small, action = onClick),
+            .heightIn(min = AodsTheme.settingsRow.minHeight)
+            .onClick(shape = AodsTheme.shapes.small, action = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 16.dp),
+                .padding(end = AodsTheme.settingsRow.labelEndPadding),
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyLarge,
+                style = AodsTheme.typography.bodyLarge,
             )
 
             description?.let { text ->
                 Text(
                     text = text,
-                    modifier = Modifier.padding(top = 2.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = AodsTheme.spacing.textGap),
+                    color = AodsTheme.colors.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = AodsTheme.typography.bodySmall,
                 )
             }
         }
 
         Text(
             text = value,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyLarge,
+            color = AodsTheme.colors.primary,
+            style = AodsTheme.typography.bodyLarge,
         )
     }
 }
 
 @Composable
-fun SettingsSlider(
+fun AodsSliderRow(
     label: String,
     value: Int,
     valueRange: IntRange,
@@ -171,10 +176,10 @@ fun SettingsSlider(
 ) {
     val stepCount = (valueRange.last - valueRange.first) / step
 
-    Column(modifier = modifier.padding(top = 12.dp)) {
+    Column(modifier = modifier.padding(top = AodsTheme.settingsRow.sliderTopPadding)) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = AodsTheme.typography.bodyLarge,
         )
 
         Slider(

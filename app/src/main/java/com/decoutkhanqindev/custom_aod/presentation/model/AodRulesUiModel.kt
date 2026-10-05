@@ -2,6 +2,9 @@ package com.decoutkhanqindev.custom_aod.presentation.model
 
 import androidx.compose.runtime.Immutable
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 
 @Immutable
 data class AodRulesUiModel(
@@ -33,3 +36,21 @@ fun DataStoreManager.currentAodRules(): AodRulesUiModel = AodRulesUiModel(
         endMinute = aodScheduleEndMinute.value ?: DataStoreManager.DEFAULT_AOD_SCHEDULE_END_MINUTE,
     ),
 )
+
+fun DataStoreManager.observeAodRules(): Flow<AodRulesUiModel> = combine(
+    aodMinBattery.filterNotNull(),
+    aodChargingRule.filterNotNull(),
+    isAodScheduleEnabled.filterNotNull(),
+    aodScheduleStartMinute.filterNotNull(),
+    aodScheduleEndMinute.filterNotNull(),
+) { minBattery, chargingRule, isScheduleEnabled, scheduleStartMinute, scheduleEndMinute ->
+    AodRulesUiModel(
+        minBattery = minBattery,
+        chargingRule = ChargingRuleValue.fromCode(chargingRule),
+        schedule = AodScheduleUiModel(
+            isEnabled = isScheduleEnabled,
+            startMinute = scheduleStartMinute,
+            endMinute = scheduleEndMinute,
+        ),
+    )
+}

@@ -4,6 +4,28 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-05 – Bộ skill Claude, design system Aods
+
+Đưa bộ skill của kotlin-accelerator-ai vào project và refactor UI theo chuẩn token của skill. Giá trị hình ảnh giữ nguyên nên giao diện không đổi. Không thêm quyền và thư viện. Bản này build được (`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.
+
+### Thêm
+
+- `.claude/`: agent `compose-implementer` và 8 skill: `idea-pipeline` → `prd-pipeline` → `design-spec` → `design-tokens` (từ ý tưởng đến token rồi dựng màn), `compose-optimizer`, `kotlin-review`, `unit-testing`, `gradle-module`. Bỏ DRE (dre-kt), Supabase và prefix `kta-` của bản gốc. Đã sửa theo project: MVI + Navigation 3, 1 module `:app`, theme luôn tối, CLAUDE.md là chuẩn, mỗi skill có mục "Project notes (Custom-AOD)". `CLAUDE.md` mục 21.
+- Design system `Aods` trong `presentation/theme/`: token Primitive (`AodsPrimitiveColors`, `Spacing`, `IconSize`, `Shape`, `Border`, `Typography`, `Motion`, `Opacity`, `Elevation`) → Semantic (`AodsColorTokens`, `AodsSpacingTokens`, `AodsShapeTokens`, `AodsTypographyTokens`, `AodsMotionTokens`, `AodsOpacityTokens`, `AodsElevationTokens`) → component/domain (`AodsSettingsRowTokens`, `AodsPickerTokens`, `AodsDrawingPadTokens`, `AodsClockTokens`, `AodsSplashTokens`, `AodsAdTokens`). `AodsTheme { }` cấp token và nối sang Material 3; đọc bằng `AodsTheme.colors/.spacing/…`.
+- `DataStoreManager.observeAodOptions/NotificationOptions/Appearance/Interaction/Rules/Extras()` trong các file UiModel, cạnh `currentAodXxx()`.
+- 3 lệnh grep mới ở `CLAUDE.md` mục 18: số `dp`/`sp`, `durationMillis` viết thẳng, `MaterialTheme.*`/`CircleShape` ngoài `presentation/theme/`.
+
+### Thay đổi
+
+- Component dùng chung mang prefix `Aods`: `SettingsRows.kt` → `AodsSettingsRows.kt` (`AodsSectionHeader`, `AodsSectionLabel`, `AodsSwitchRow`, `AodsRadioRow`, `AodsValueRow`, `AodsSliderRow`), `AppLottie` → `AodsLottie`, `NoInternetDialog` → `AodsNoInternetDialog`, `AppTheme` → `AodsTheme`.
+- Mọi màn (Main, Language, Splash, AOD), `Modifiers.kt`, composable quảng cáo và `ClockColorValue` đọc token thay cho `MaterialTheme.*`, màu trong `Color.kt` và số viết thẳng.
+- `AodContent.kt` (934 dòng) tách thành `AodContent`, `AodClockFace`, `AodDetails`, `AodExtras`, `AodNotifications`, `AodMediaControls`, `AodBackdrop`, `AodTimeFormat`; `MainAppearanceSection` tách picker sang `MainAppearancePickers.kt`; `MainExtrasSection` tách hộp thoại sang `MainExtrasDialogs.kt`; `MainViewModel` bỏ 5 hàm dựng luồng cài đặt (dùng `observeAodXxx()`).
+- `.gitignore`: `.claude/settings.local.json`, `__pycache__/`.
+
+### Xóa
+
+- `presentation/theme/Color.kt`, `Theme.kt`, `Type.kt` (thay bằng token).
+
 ## [Chưa phát hành] – 2026-10-05 – Nội dung thông báo, ảnh nền AMOLED có sẵn
 
 Hai khoảng trống còn lại so với Always On AMOLED. Không thêm quyền và thư viện. Bản này build được (`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 40–41).

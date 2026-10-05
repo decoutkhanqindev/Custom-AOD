@@ -17,7 +17,7 @@ import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
 import com.decoutkhanqindev.custom_aod.presentation.components.AppLanguageProvider
 import com.decoutkhanqindev.custom_aod.presentation.navigation.AppNavDisplay
-import com.decoutkhanqindev.custom_aod.presentation.theme.AppTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         adsManager.requestConsent(this)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        // AppTheme luôn tối: icon thanh hệ thống luôn sáng, không theo theme hệ thống.
+        // AodsTheme luôn tối: icon thanh hệ thống luôn sáng, không theo theme hệ thống.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         startAodServiceIfEnabled()
         setContent {
             AppLanguageProvider {
-                AppTheme {
+                AodsTheme {
                     AppNavDisplay(modifier = Modifier.fillMaxSize())
                 }
             }

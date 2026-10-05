@@ -16,3 +16,6 @@
 .cxx
 local.properties
 .kotlin
+# Claude Code: quyền cục bộ của từng máy; cache của script trong skill
+.claude/settings.local.json
+__pycache__/

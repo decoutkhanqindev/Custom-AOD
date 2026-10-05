@@ -3,7 +3,6 @@ package com.decoutkhanqindev.custom_aod.ads.composables
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.BannerAdUnit
 import com.decoutkhanqindev.custom_aod.presentation.components.shimmerLoading
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
 fun BannerAdView(
@@ -64,7 +64,7 @@ fun BannerAdView(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .shimmerLoading(backgroundColor = MaterialTheme.colorScheme.surfaceVariant),
+                    .shimmerLoading(backgroundColor = AodsTheme.colors.surfaceVariant),
             )
         }
     }

@@ -2,6 +2,9 @@ package com.decoutkhanqindev.custom_aod.presentation.model
 
 import androidx.compose.runtime.Immutable
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 
 @Immutable
 data class AodNotificationOptionsUiModel(
@@ -18,3 +21,17 @@ fun DataStoreManager.currentAodNotificationOptions(): AodNotificationOptionsUiMo
     isEdgeGlowEnabled = isAodEdgeGlowEnabled.value ?: DataStoreManager.DEFAULT_IS_AOD_EDGE_GLOW_ENABLED,
     isMediaControlsEnabled = isAodMediaControlsEnabled.value ?: DataStoreManager.DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED,
 )
+
+fun DataStoreManager.observeAodNotificationOptions(): Flow<AodNotificationOptionsUiModel> = combine(
+    isAodNotificationIconsEnabled.filterNotNull(),
+    isAodNotificationContentEnabled.filterNotNull(),
+    isAodEdgeGlowEnabled.filterNotNull(),
+    isAodMediaControlsEnabled.filterNotNull(),
+) { isIconsEnabled, isContentEnabled, isEdgeGlowEnabled, isMediaControlsEnabled ->
+    AodNotificationOptionsUiModel(
+        isIconsEnabled = isIconsEnabled,
+        isContentEnabled = isContentEnabled,
+        isEdgeGlowEnabled = isEdgeGlowEnabled,
+        isMediaControlsEnabled = isMediaControlsEnabled,
+    )
+}

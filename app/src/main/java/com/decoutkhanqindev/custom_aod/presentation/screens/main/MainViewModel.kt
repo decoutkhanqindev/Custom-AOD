@@ -20,18 +20,18 @@ import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockFontValue
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.model.gestureActionCode
+import com.decoutkhanqindev.custom_aod.presentation.model.observeAodAppearance
+import com.decoutkhanqindev.custom_aod.presentation.model.observeAodExtras
+import com.decoutkhanqindev.custom_aod.presentation.model.observeAodInteraction
+import com.decoutkhanqindev.custom_aod.presentation.model.observeAodNotificationOptions
+import com.decoutkhanqindev.custom_aod.presentation.model.observeAodOptions
+import com.decoutkhanqindev.custom_aod.presentation.model.observeAodRules
 import com.decoutkhanqindev.custom_aod.presentation.model.saveGestureAction
 import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
@@ -40,8 +40,6 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -135,11 +133,11 @@ class MainViewModel(
     private fun observeSettings() {
         viewModelScope.launch {
             combine(
-                optionsFlow(),
-                notificationOptionsFlow(),
-                appearanceFlow(),
-                interactionFlow(),
-                rulesFlow(),
+                dataStoreManager.observeAodOptions(),
+                dataStoreManager.observeAodNotificationOptions(),
+                dataStoreManager.observeAodAppearance(),
+                dataStoreManager.observeAodInteraction(),
+                dataStoreManager.observeAodRules(),
             ) { options, notificationOptions, appearance, interaction, rules ->
                 Settings(
                     options = options,
@@ -166,89 +164,6 @@ class MainViewModel(
         }
     }
 
-    private fun optionsFlow(): Flow<AodOptionsUiModel> = combine(
-        dataStoreManager.isAodEnabled.filterNotNull(),
-        dataStoreManager.isAodCustomBrightness.filterNotNull(),
-        dataStoreManager.aodBrightnessPercent.filterNotNull(),
-        dataStoreManager.isAodProximityEnabled.filterNotNull(),
-        dataStoreManager.aodTimeoutMinutes.filterNotNull(),
-    ) { isEnabled, isCustomBrightness, brightnessPercent, isProximityEnabled, timeoutMinutes ->
-        AodOptionsUiModel(
-            isEnabled = isEnabled,
-            isCustomBrightness = isCustomBrightness,
-            brightnessPercent = brightnessPercent,
-            isProximityEnabled = isProximityEnabled,
-            timeoutMinutes = timeoutMinutes,
-        )
-    }
-
-    private fun notificationOptionsFlow(): Flow<AodNotificationOptionsUiModel> = combine(
-        dataStoreManager.isAodNotificationIconsEnabled.filterNotNull(),
-        dataStoreManager.isAodNotificationContentEnabled.filterNotNull(),
-        dataStoreManager.isAodEdgeGlowEnabled.filterNotNull(),
-        dataStoreManager.isAodMediaControlsEnabled.filterNotNull(),
-    ) { isIconsEnabled, isContentEnabled, isEdgeGlowEnabled, isMediaControlsEnabled ->
-        AodNotificationOptionsUiModel(
-            isIconsEnabled = isIconsEnabled,
-            isContentEnabled = isContentEnabled,
-            isEdgeGlowEnabled = isEdgeGlowEnabled,
-            isMediaControlsEnabled = isMediaControlsEnabled,
-        )
-    }
-
-    private fun appearanceFlow(): Flow<AodAppearanceUiModel> = combine(
-        dataStoreManager.aodClockFace.filterNotNull(),
-        dataStoreManager.aodClockFont.filterNotNull(),
-        dataStoreManager.aodClockColor.filterNotNull(),
-        dataStoreManager.aodClockSizePercent.filterNotNull(),
-        dataStoreManager.isAodLandscape.filterNotNull(),
-    ) { face, font, color, sizePercent, isLandscape ->
-        AodAppearanceUiModel(
-            face = ClockFaceValue.fromCode(face),
-            font = ClockFontValue.fromCode(font),
-            color = ClockColorValue.fromCode(color),
-            sizePercent = sizePercent,
-            isLandscape = isLandscape,
-        )
-    }
-
-    private fun interactionFlow(): Flow<AodInteractionUiModel> = combine(
-        combine(
-            AodGestureValue.entries.map { gesture -> dataStoreManager.gestureActionCode(gesture).filterNotNull() },
-        ) { codes ->
-            AodGestureValue.entries
-                .zip(codes) { gesture, code -> gesture to AodActionValue.fromCode(code) }
-                .toMap()
-                .toImmutableMap()
-        },
-        dataStoreManager.isAodAutoDimEnabled.filterNotNull(),
-        dataStoreManager.isAodRaiseToWakeEnabled.filterNotNull(),
-    ) { actions, isAutoDimEnabled, isRaiseToWakeEnabled ->
-        AodInteractionUiModel(
-            actions = actions,
-            isAutoDimEnabled = isAutoDimEnabled,
-            isRaiseToWakeEnabled = isRaiseToWakeEnabled,
-        )
-    }
-
-    private fun rulesFlow(): Flow<AodRulesUiModel> = combine(
-        dataStoreManager.aodMinBattery.filterNotNull(),
-        dataStoreManager.aodChargingRule.filterNotNull(),
-        dataStoreManager.isAodScheduleEnabled.filterNotNull(),
-        dataStoreManager.aodScheduleStartMinute.filterNotNull(),
-        dataStoreManager.aodScheduleEndMinute.filterNotNull(),
-    ) { minBattery, chargingRule, isScheduleEnabled, scheduleStartMinute, scheduleEndMinute ->
-        AodRulesUiModel(
-            minBattery = minBattery,
-            chargingRule = ChargingRuleValue.fromCode(chargingRule),
-            schedule = AodScheduleUiModel(
-                isEnabled = isScheduleEnabled,
-                startMinute = scheduleStartMinute,
-                endMinute = scheduleEndMinute,
-            ),
-        )
-    }
-
     private fun observeBackground() {
         viewModelScope.launch {
             aodImageManager.hasBackground.filterNotNull().collectCatching(
@@ -269,19 +184,7 @@ class MainViewModel(
 
     private fun observeExtras() {
         viewModelScope.launch {
-            combine(
-                dataStoreManager.aodMemo.filterNotNull(),
-                dataStoreManager.isAodCalendarEnabled.filterNotNull(),
-                dataStoreManager.isAodWeatherEnabled.filterNotNull(),
-                dataStoreManager.isAodWeatherFahrenheit.filterNotNull(),
-            ) { memo, isCalendarEnabled, isWeatherEnabled, isWeatherFahrenheit ->
-                AodExtrasUiModel(
-                    memo = memo,
-                    isCalendarEnabled = isCalendarEnabled,
-                    isWeatherEnabled = isWeatherEnabled,
-                    isWeatherFahrenheit = isWeatherFahrenheit,
-                )
-            }.collectCatching(
+            dataStoreManager.observeAodExtras().collectCatching(
                 action = { extras -> updateState { copy(extras = extras) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )

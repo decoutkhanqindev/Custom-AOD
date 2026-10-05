@@ -8,10 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsRadioRow
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSectionHeader
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSwitchRow
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsValueRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsRadioRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsValueRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
@@ -28,17 +28,17 @@ fun MainInteractionSection(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        SettingsSectionHeader(title = stringResource(R.string.section_interaction))
+        AodsSectionHeader(title = stringResource(R.string.section_interaction))
 
         AodGestureValue.entries.forEach { gesture ->
-            SettingsValueRow(
+            AodsValueRow(
                 label = stringResource(gesture.labelRes),
                 value = stringResource(interaction.actionOf(gesture).labelRes),
                 onClick = { onIntent(MainIntent.ShowGestureActionPicker(gesture)) },
             )
         }
 
-        SettingsSwitchRow(
+        AodsSwitchRow(
             label = stringResource(R.string.opt_auto_dim),
             isChecked = interaction.isAutoDimEnabled && isLightSensorAvailable,
             onCheckedChange = { onIntent(MainIntent.ToggleAutoDim(it)) },
@@ -48,7 +48,7 @@ fun MainInteractionSection(
             isEnabled = isLightSensorAvailable,
         )
 
-        SettingsSwitchRow(
+        AodsSwitchRow(
             label = stringResource(R.string.opt_raise_to_wake),
             isChecked = interaction.isRaiseToWakeEnabled && isPickupSensorAvailable,
             onCheckedChange = { onIntent(MainIntent.ToggleRaiseToWake(it)) },
@@ -91,7 +91,7 @@ private fun GestureActionDialog(
                 AodActionValue.entries
                     .filter { action -> action != AodActionValue.FLASHLIGHT || isFlashlightAvailable }
                     .forEach { action ->
-                        SettingsRadioRow(
+                        AodsRadioRow(
                             label = stringResource(action.labelRes),
                             isSelected = action == selected,
                             onClick = { onSelect(action) },

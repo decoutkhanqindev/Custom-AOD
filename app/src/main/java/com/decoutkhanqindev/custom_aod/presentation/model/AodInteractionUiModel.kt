@@ -5,7 +5,10 @@ import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 
 @Immutable
 data class AodInteractionUiModel(
@@ -47,3 +50,22 @@ fun DataStoreManager.currentAodInteraction(): AodInteractionUiModel = AodInterac
     isAutoDimEnabled = isAodAutoDimEnabled.value ?: DataStoreManager.DEFAULT_IS_AOD_AUTO_DIM_ENABLED,
     isRaiseToWakeEnabled = isAodRaiseToWakeEnabled.value ?: DataStoreManager.DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED,
 )
+
+fun DataStoreManager.observeAodInteraction(): Flow<AodInteractionUiModel> = combine(
+    combine(
+        AodGestureValue.entries.map { gesture -> gestureActionCode(gesture).filterNotNull() },
+    ) { codes ->
+        AodGestureValue.entries
+            .zip(codes) { gesture, code -> gesture to AodActionValue.fromCode(code) }
+            .toMap()
+            .toImmutableMap()
+    },
+    isAodAutoDimEnabled.filterNotNull(),
+    isAodRaiseToWakeEnabled.filterNotNull(),
+) { actions, isAutoDimEnabled, isRaiseToWakeEnabled ->
+    AodInteractionUiModel(
+        actions = actions,
+        isAutoDimEnabled = isAutoDimEnabled,
+        isRaiseToWakeEnabled = isRaiseToWakeEnabled,
+    )
+}

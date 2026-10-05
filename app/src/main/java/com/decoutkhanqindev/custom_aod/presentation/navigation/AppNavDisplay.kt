@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.decoutkhanqindev.custom_aod.data.network.connectivity.NetworkManager
-import com.decoutkhanqindev.custom_aod.presentation.components.dialog.NoInternetDialog
+import com.decoutkhanqindev.custom_aod.presentation.components.dialog.AodsNoInternetDialog
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.LanguageScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.splash.SplashScreen
@@ -47,5 +47,5 @@ fun AppNavDisplay(modifier: Modifier = Modifier) {
         },
     )
 
-    if (!isNetworkAvailable) NoInternetDialog()
+    if (!isNetworkAvailable) AodsNoInternetDialog()
 }

@@ -16,12 +16,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsLabel
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsRadioRow
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSectionHeader
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSlider
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSwitchRow
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsValueRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsRadioRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionLabel
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSliderRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsValueRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
@@ -40,19 +40,19 @@ fun MainRulesSection(
     val timeFormatter = rememberTimeFormatter()
 
     Column(modifier = modifier) {
-        SettingsSectionHeader(title = stringResource(R.string.section_rules))
+        AodsSectionHeader(title = stringResource(R.string.section_rules))
 
-        SettingsLabel(text = stringResource(R.string.opt_charging_rule))
+        AodsSectionLabel(text = stringResource(R.string.opt_charging_rule))
 
         ChargingRuleValue.entries.forEach { rule ->
-            SettingsRadioRow(
+            AodsRadioRow(
                 label = stringResource(rule.labelRes),
                 isSelected = rules.chargingRule == rule,
                 onClick = { onIntent(MainIntent.ChangeChargingRule(rule)) },
             )
         }
 
-        SettingsSwitchRow(
+        AodsSwitchRow(
             label = stringResource(R.string.opt_schedule),
             isChecked = rules.schedule.isEnabled,
             onCheckedChange = { onIntent(MainIntent.ToggleSchedule(it)) },
@@ -61,7 +61,7 @@ fun MainRulesSection(
         AnimatedVisibility(visible = rules.schedule.isEnabled) {
             Column {
                 ScheduleTimeValue.entries.forEach { time ->
-                    SettingsValueRow(
+                    AodsValueRow(
                         label = stringResource(time.labelRes),
                         value = timeFormatter.format(AodScheduleUiModel.timeOf(rules.schedule.minuteOf(time))),
                         onClick = { onIntent(MainIntent.ShowScheduleTimePicker(time)) },
@@ -70,7 +70,7 @@ fun MainRulesSection(
             }
         }
 
-        SettingsSlider(
+        AodsSliderRow(
             label = if (rules.minBattery == 0) {
                 stringResource(R.string.opt_battery_off)
             } else {

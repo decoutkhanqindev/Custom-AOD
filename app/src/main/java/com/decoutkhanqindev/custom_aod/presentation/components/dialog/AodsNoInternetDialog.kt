@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,10 +16,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.theme.AppTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
-fun NoInternetDialog(modifier: Modifier = Modifier) {
+fun AodsNoInternetDialog(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     AlertDialog(
@@ -34,7 +33,7 @@ fun NoInternetDialog(modifier: Modifier = Modifier) {
                 Text(
                     text = stringResource(R.string.open_settings),
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = AodsTheme.typography.titleMedium,
                 )
             }
         },
@@ -50,17 +49,17 @@ fun NoInternetDialog(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.no_internet_connection),
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium,
+                style = AodsTheme.typography.titleMedium,
             )
         },
-        shape = MaterialTheme.shapes.large,
+        shape = AodsTheme.shapes.large,
     )
 }
 
 @Preview
 @Composable
-private fun NoInternetDialogPreview() {
-    AppTheme {
-        NoInternetDialog()
+private fun AodsNoInternetDialogPreview() {
+    AodsTheme {
+        AodsNoInternetDialog()
     }
 }

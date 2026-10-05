@@ -10,7 +10,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
-fun AppLottie(
+fun AodsLottie(
     @RawRes resId: Int,
     modifier: Modifier = Modifier,
 ) {

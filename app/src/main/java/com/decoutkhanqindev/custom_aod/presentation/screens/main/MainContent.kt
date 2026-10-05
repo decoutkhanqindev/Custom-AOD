@@ -12,16 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.SettingsSwitchRow
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AnimationContentKey
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
@@ -33,7 +31,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
-import com.decoutkhanqindev.custom_aod.presentation.theme.AppTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -71,23 +69,23 @@ private fun MainSettings(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(20.dp),
+            .padding(AodsTheme.spacing.screenPadding),
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
+            style = AodsTheme.typography.headlineMedium,
         )
 
         Text(
             text = stringResource(R.string.main_subtitle),
-            modifier = Modifier.padding(top = 4.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = AodsTheme.spacing.inlineGap),
+            color = AodsTheme.colors.onSurfaceVariant,
+            style = AodsTheme.typography.bodyMedium,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AodsTheme.spacing.sectionPadding))
 
-        SettingsSwitchRow(
+        AodsSwitchRow(
             label = stringResource(R.string.opt_enabled),
             isChecked = state.options.isEnabled,
             onCheckedChange = { onIntent(MainIntent.ToggleAod(it)) },
@@ -147,7 +145,7 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AodsTheme.spacing.sectionGap))
 
         Button(
             onClick = { onIntent(MainIntent.OpenPreview) },
@@ -158,9 +156,9 @@ private fun MainSettings(
 
         Text(
             text = stringResource(state.lastWakeMessageRes),
-            modifier = Modifier.padding(top = 12.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = AodsTheme.spacing.componentPadding),
+            color = AodsTheme.colors.onSurfaceVariant,
+            style = AodsTheme.typography.bodySmall,
         )
     }
 }
@@ -168,7 +166,7 @@ private fun MainSettings(
 @Preview(widthDp = 360, heightDp = 3800)
 @Composable
 private fun MainContentPreview() {
-    AppTheme {
+    AodsTheme {
         MainContent(
             state = MainState(
                 isLoading = false,
