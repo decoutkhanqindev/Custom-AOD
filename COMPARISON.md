@@ -22,7 +22,7 @@ Số đo phía Custom AOD là của demo FakeAOD trên cùng máy (ghi **[FakeAO
 | Lượt tải, đánh giá | Hơn 10 triệu, 4,5★ [Play] | – |
 | Kiếm tiền | Quảng cáo và gói Premium [Play] | Quảng cáo AdMob của base: quảng cáo xen kẽ ở Splash, đang là id test. Không có Premium |
 | Ngôn ngữ giao diện | 23 [Play] | English và tiếng Việt, chọn trong app (lần mở đầu tiên và ở màn cài đặt) |
-| Kích thước APK | 17,6 MB, gói cho nhiều kiến trúc CPU [Play] | 83,2 MB bản debug, chưa bật R8. R8 của bản release chạy được, nhưng chưa đóng gói vì chưa có keystore |
+| Kích thước APK | 17,6 MB, gói cho nhiều kiến trúc CPU [Play] | 84,7 MB bản debug, chưa bật R8. R8 của bản release chạy được, nhưng chưa đóng gói vì chưa có keystore |
 
 ## 2. Kỹ thuật
 
@@ -108,7 +108,7 @@ Quyền riêng của Xiaomi:
 | Hiển thị | Giờ (12/24 giờ theo máy) | ✓ | ✓ |
 | | Ngày | ✓ | ✓ |
 | | Pin và trạng thái sạc | ✓ | ✓ |
-| | Thông báo: icon và nội dung | ✓ [Play] | ⚠️ chỉ icon, mỗi app một icon (không hiện nội dung trên màn hình khóa) |
+| | Thông báo: icon và nội dung | ✓ [Play] | ✓ (icon mỗi app; nội dung thông báo mới nhất là tùy chọn, che theo đúng quy tắc của màn hình khóa) |
 | | Viền sáng (edge glow) khi có thông báo mới | ✓ [Play] | ✓ (theo màu của app, khoảng 4 giây) |
 | | Điều khiển nhạc | ✓ [Play] | ✓ (tên bài, nghệ sĩ, Bài trước / Phát–Tạm dừng / Bài tiếp theo) |
 | | Memo luôn hiện | ✓ [Play] | ✓ (tối đa 120 ký tự, 3 dòng dưới ngày) |
@@ -117,7 +117,7 @@ Quyền riêng của Xiaomi:
 | | Lịch | ? (suy ra từ quyền `READ_CALENDAR`) | ✓ (tối đa 2 sự kiện còn lại trong hôm nay) |
 | Tùy biến | Mặt đồng hồ: Digital S7, Classic 24H, Analog S7, Analog Pebble… | ✓ [Play] | ✓ (4 mặt: Số, Số xếp chồng, Kim, Kim tối giản) |
 | | Font, màu, cỡ chữ | ✓ [Play] | ✓ (4 họ font hệ thống, 8 màu, cỡ 60–150%) |
-| | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ⚠️ ảnh tự chọn bằng Photo Picker, hiện mờ 50%; chưa có bộ ảnh AMOLED sẵn |
+| | Ảnh nền, wallpaper AMOLED | ✓ [Play] | ✓ (6 ảnh AMOLED có sẵn dạng vector, hoặc ảnh tự chọn bằng Photo Picker; hiện mờ 50%) |
 | | Độ sáng | ✓ chỉnh mức [2017] | ✓ (1–100%, hoặc theo hệ thống) |
 | | Tự giảm sáng khi trời tối (cảm biến ánh sáng) | ✓ [Play] | ✓ (dưới 5 lux giảm về 1%, chờ 2 giây để không nhấp nháy) |
 | | Ép xoay ngang, dùng làm đồng hồ đêm | ✓ [Play] | ✓ (ngang theo cảm biến, bố cục đồng hồ trái, thông tin phải) |
@@ -160,6 +160,5 @@ Quyền riêng của Xiaomi:
 - **Giai đoạn 3 (2026-10-04) đã thêm**, không cần quyền mới: 4 mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Chưa chạy trên máy.
 - **Giai đoạn 4 (2026-10-04) đã thêm**, không cần quyền mới: hành động cho thao tác và phím, đèn pin, tự giảm sáng, nhấc máy để hiện lại đồng hồ. Chưa chạy trên máy.
 - **Giai đoạn 5 (2026-10-04) đã thêm**, cần 2 quyền hỏi khi bật tùy chọn (`READ_CALENDAR`, `ACCESS_COARSE_LOCATION`) và thư viện Retrofit: thời tiết, sự kiện hôm nay, ghi nhớ, hình vẽ nhanh. Bỏ qua widget và Tasker. Chưa chạy trên máy.
-- **Khoảng trống còn lại chủ yếu là tích hợp và kinh doanh.** Theo mức ảnh hưởng tới người dùng:
-  1. Tùy chọn hiện nội dung thông báo, widget bật/tắt.
-  2. Tasker, Premium, bộ ảnh nền AMOLED có sẵn.
+- **2026-10-05 đã thêm**, không cần quyền mới: nội dung thông báo mới nhất (tùy chọn, theo quy tắc của màn hình khóa), 6 ảnh nền AMOLED có sẵn. Chưa chạy trên máy.
+- **Khoảng trống còn lại là tích hợp và kinh doanh:** widget bật/tắt, Tasker, Premium (chưa làm phần quảng cáo và Premium).

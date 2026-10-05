@@ -99,6 +99,11 @@ class DataStoreManager(
     val isAodMediaControlsEnabled: StateFlow<Boolean?> =
         isAodMediaControlsEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED)
 
+    private val isAodNotificationContentEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_NOTIFICATION_CONTENT_ENABLED_KEY)
+    val isAodNotificationContentEnabled: StateFlow<Boolean?> =
+        isAodNotificationContentEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_NOTIFICATION_CONTENT_ENABLED)
+
     private val aodClockFaceKey: Preferences.Key<Int> = intPreferencesKey(AOD_CLOCK_FACE_KEY)
     val aodClockFace: StateFlow<Int?> =
         aodClockFaceKey.asStateFlow(default = DEFAULT_AOD_CLOCK_FACE)
@@ -118,6 +123,10 @@ class DataStoreManager(
     private val isAodLandscapeKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_LANDSCAPE_KEY)
     val isAodLandscape: StateFlow<Boolean?> =
         isAodLandscapeKey.asStateFlow(default = DEFAULT_IS_AOD_LANDSCAPE)
+
+    private val aodWallpaperKey: Preferences.Key<Int> = intPreferencesKey(AOD_WALLPAPER_KEY)
+    val aodWallpaper: StateFlow<Int?> =
+        aodWallpaperKey.asStateFlow(default = DEFAULT_AOD_WALLPAPER)
 
     private val aodDoubleTapActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_DOUBLE_TAP_ACTION_KEY)
     val aodDoubleTapAction: StateFlow<Int?> =
@@ -256,6 +265,10 @@ class DataStoreManager(
         edit { prefs -> prefs[isAodMediaControlsEnabledKey] = value }
     }
 
+    fun saveIsAodNotificationContentEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodNotificationContentEnabledKey] = value }
+    }
+
     fun saveAodClockFace(value: Int) {
         edit { prefs -> prefs[aodClockFaceKey] = value }
     }
@@ -274,6 +287,10 @@ class DataStoreManager(
 
     fun saveIsAodLandscape(value: Boolean) {
         edit { prefs -> prefs[isAodLandscapeKey] = value }
+    }
+
+    fun saveAodWallpaper(value: Int) {
+        edit { prefs -> prefs[aodWallpaperKey] = value }
     }
 
     fun saveAodDoubleTapAction(value: Int) {
@@ -383,11 +400,13 @@ class DataStoreManager(
         private const val IS_AOD_NOTIFICATION_ICONS_ENABLED_KEY = "is_aod_notification_icons_enabled"
         private const val IS_AOD_EDGE_GLOW_ENABLED_KEY = "is_aod_edge_glow_enabled"
         private const val IS_AOD_MEDIA_CONTROLS_ENABLED_KEY = "is_aod_media_controls_enabled"
+        private const val IS_AOD_NOTIFICATION_CONTENT_ENABLED_KEY = "is_aod_notification_content_enabled"
         private const val AOD_CLOCK_FACE_KEY = "aod_clock_face"
         private const val AOD_CLOCK_FONT_KEY = "aod_clock_font"
         private const val AOD_CLOCK_COLOR_KEY = "aod_clock_color"
         private const val AOD_CLOCK_SIZE_PERCENT_KEY = "aod_clock_size_percent"
         private const val IS_AOD_LANDSCAPE_KEY = "is_aod_landscape"
+        private const val AOD_WALLPAPER_KEY = "aod_wallpaper"
         private const val AOD_DOUBLE_TAP_ACTION_KEY = "aod_double_tap_action"
         private const val AOD_SWIPE_UP_ACTION_KEY = "aod_swipe_up_action"
         private const val AOD_SWIPE_DOWN_ACTION_KEY = "aod_swipe_down_action"
@@ -421,11 +440,13 @@ class DataStoreManager(
         const val DEFAULT_IS_AOD_NOTIFICATION_ICONS_ENABLED = true
         const val DEFAULT_IS_AOD_EDGE_GLOW_ENABLED = true
         const val DEFAULT_IS_AOD_MEDIA_CONTROLS_ENABLED = true
+        const val DEFAULT_IS_AOD_NOTIFICATION_CONTENT_ENABLED = false
         private const val DEFAULT_AOD_CLOCK_FACE = 0
         private const val DEFAULT_AOD_CLOCK_FONT = 0
         private const val DEFAULT_AOD_CLOCK_COLOR = 0
         const val DEFAULT_AOD_CLOCK_SIZE_PERCENT = 100
         const val DEFAULT_IS_AOD_LANDSCAPE = false
+        private const val DEFAULT_AOD_WALLPAPER = 0
         const val DEFAULT_AOD_DOUBLE_TAP_ACTION = 1
         const val DEFAULT_AOD_SWIPE_UP_ACTION = 0
         const val DEFAULT_AOD_SWIPE_DOWN_ACTION = 0

@@ -74,9 +74,9 @@ class CalendarRepositoryImpl(
         private const val ALL_DAY_INDEX = 3
 
         // Chỉ lịch đang hiện trong ứng dụng Lịch, bỏ sự kiện user đã từ chối và sự kiện đã kết thúc.
-        private val SELECTION = "${CalendarContract.Instances.VISIBLE} = 1" +
+        private const val SELECTION = "${CalendarContract.Instances.VISIBLE} = 1" +
             " AND ${CalendarContract.Instances.SELF_ATTENDEE_STATUS} != ${CalendarContract.Attendees.ATTENDEE_STATUS_DECLINED}" +
             " AND ${CalendarContract.Instances.END} > ?"
-        private val SORT_ORDER = "${CalendarContract.Instances.ALL_DAY} DESC, ${CalendarContract.Instances.BEGIN} ASC"
+        private const val SORT_ORDER = "${CalendarContract.Instances.ALL_DAY} DESC, ${CalendarContract.Instances.BEGIN} ASC"
     }
 }

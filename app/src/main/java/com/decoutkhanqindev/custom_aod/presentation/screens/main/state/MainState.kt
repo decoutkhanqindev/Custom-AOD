@@ -14,6 +14,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -25,6 +26,7 @@ data class MainState(
     val appearance: AodAppearanceUiModel = AodAppearanceUiModel(),
     val hasBackground: Boolean = false,
     val isSavingBackground: Boolean = false,
+    val wallpaper: WallpaperValue? = null,
     val extras: AodExtrasUiModel = AodExtrasUiModel(),
     val hasDrawing: Boolean = false,
     val isEditingMemo: Boolean = false,

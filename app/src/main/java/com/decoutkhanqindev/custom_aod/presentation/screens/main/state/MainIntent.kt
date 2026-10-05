@@ -9,6 +9,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFontValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
+import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
 
 sealed interface MainIntent {
     data class ToggleAod(val isEnabled: Boolean) : MainIntent
@@ -21,6 +22,7 @@ sealed interface MainIntent {
     data class ChangeClockColor(val color: ClockColorValue) : MainIntent
     data class ChangeClockSize(val percent: Int) : MainIntent
     data class ToggleLandscape(val isEnabled: Boolean) : MainIntent
+    data class SelectWallpaper(val wallpaper: WallpaperValue) : MainIntent
     data object OpenBackgroundPicker : MainIntent
     data class BackgroundPickerResult(val uri: String?) : MainIntent
     data object RemoveBackground : MainIntent
@@ -42,6 +44,7 @@ sealed interface MainIntent {
     data class ToggleAutoDim(val isEnabled: Boolean) : MainIntent
     data class ToggleRaiseToWake(val isEnabled: Boolean) : MainIntent
     data class ToggleNotificationIcons(val isEnabled: Boolean) : MainIntent
+    data class ToggleNotificationContent(val isEnabled: Boolean) : MainIntent
     data class ToggleEdgeGlow(val isEnabled: Boolean) : MainIntent
     data class ToggleMediaControls(val isEnabled: Boolean) : MainIntent
     data class ChangeChargingRule(val rule: ChargingRuleValue) : MainIntent

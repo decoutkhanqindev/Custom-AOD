@@ -20,6 +20,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodAppearance
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodExtras
 import com.decoutkhanqindev.custom_aod.presentation.model.currentAodInteraction
@@ -88,7 +89,7 @@ class AodViewModel(
         observePlugged()
         observeAudio()
         // StateFlow nóng và viewModelScope chạy ngay trên main thread: icon và nhạc đã vào state trước khung đầu tiên.
-        if (notificationOptions.isIconsEnabled) observeNotifications()
+        if (notificationOptions.isIconsEnabled || notificationOptions.isContentEnabled) observeNotifications()
         if (notificationOptions.isEdgeGlowEnabled) observeAlerts()
         if (notificationOptions.isMediaControlsEnabled) observeMedia()
         loadBackground()
@@ -182,7 +183,7 @@ class AodViewModel(
         viewModelScope.launch {
             notificationStateManager.notifications.collectCatching(
                 action = { notifications ->
-                    updateState { copy(notifications = notifications.toAodNotificationsUiModel()) }
+                    updateState { copy(notifications = notifications.toAodNotificationsUiModel(notificationOptions)) }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
@@ -241,8 +242,9 @@ class AodViewModel(
         }
     }
 
-    // Giải mã ảnh nền tốn vài chục ms: đồng hồ hiện trước, ảnh nền hiện dần sau, không chặn khung đầu tiên.
+    // Giải mã ảnh nền tốn vài chục ms: đồng hồ hiện trước, ảnh nền hiện dần sau, không chặn khung đầu tiên. Đang dùng ảnh có sẵn thì không đọc file.
     private fun loadBackground() {
+        if (state.value.wallpaper != null) return
         viewModelScope.launch {
             val background = aodImageManager.loadBackground() ?: return@launch
             updateState { copy(background = background) }
@@ -436,6 +438,7 @@ class AodViewModel(
             appearance = dataStoreManager.currentAodAppearance(),
             interaction = dataStoreManager.currentAodInteraction(),
             extras = dataStoreManager.currentAodExtras(),
+            wallpaper = WallpaperValue.fromCode(dataStoreManager.aodWallpaper.value),
             battery = batteryStateManager.readLevelPercent()?.let { percent ->
                 BatteryUiModel(percent = percent, isCharging = batteryStateManager.readIsCharging() == true)
             },

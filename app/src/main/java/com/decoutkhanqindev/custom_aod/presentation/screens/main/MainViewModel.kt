@@ -30,6 +30,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
 import com.decoutkhanqindev.custom_aod.presentation.model.gestureActionCode
 import com.decoutkhanqindev.custom_aod.presentation.model.saveGestureAction
 import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
@@ -70,6 +71,7 @@ class MainViewModel(
     init {
         observeSettings()
         observeBackground()
+        observeWallpaper()
         observeExtras()
         observeDrawing()
         observeLanguage()
@@ -90,9 +92,10 @@ class MainViewModel(
             is MainIntent.ChangeClockColor -> dataStoreManager.saveAodClockColor(intent.color.code)
             is MainIntent.ChangeClockSize -> dataStoreManager.saveAodClockSizePercent(intent.percent)
             is MainIntent.ToggleLandscape -> dataStoreManager.saveIsAodLandscape(intent.isEnabled)
+            is MainIntent.SelectWallpaper -> selectWallpaper(intent.wallpaper)
             is MainIntent.OpenBackgroundPicker -> viewModelScope.launch { sendEffect(MainEffect.OpenBackgroundPicker) }
             is MainIntent.BackgroundPickerResult -> onBackgroundPickerResult(intent.uri)
-            is MainIntent.RemoveBackground -> aodImageManager.removeBackground()
+            is MainIntent.RemoveBackground -> removeBackground()
             is MainIntent.ShowMemoEditor -> updateState { copy(isEditingMemo = true) }
             is MainIntent.DismissMemoEditor -> updateState { copy(isEditingMemo = false) }
             is MainIntent.ChangeMemo -> changeMemo(intent.memo)
@@ -111,6 +114,7 @@ class MainViewModel(
             is MainIntent.ToggleAutoDim -> dataStoreManager.saveIsAodAutoDimEnabled(intent.isEnabled)
             is MainIntent.ToggleRaiseToWake -> dataStoreManager.saveIsAodRaiseToWakeEnabled(intent.isEnabled)
             is MainIntent.ToggleNotificationIcons -> dataStoreManager.saveIsAodNotificationIconsEnabled(intent.isEnabled)
+            is MainIntent.ToggleNotificationContent -> dataStoreManager.saveIsAodNotificationContentEnabled(intent.isEnabled)
             is MainIntent.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(intent.isEnabled)
             is MainIntent.ToggleMediaControls -> dataStoreManager.saveIsAodMediaControlsEnabled(intent.isEnabled)
             is MainIntent.ChangeChargingRule -> dataStoreManager.saveAodChargingRule(intent.rule.code)
@@ -180,11 +184,13 @@ class MainViewModel(
 
     private fun notificationOptionsFlow(): Flow<AodNotificationOptionsUiModel> = combine(
         dataStoreManager.isAodNotificationIconsEnabled.filterNotNull(),
+        dataStoreManager.isAodNotificationContentEnabled.filterNotNull(),
         dataStoreManager.isAodEdgeGlowEnabled.filterNotNull(),
         dataStoreManager.isAodMediaControlsEnabled.filterNotNull(),
-    ) { isIconsEnabled, isEdgeGlowEnabled, isMediaControlsEnabled ->
+    ) { isIconsEnabled, isContentEnabled, isEdgeGlowEnabled, isMediaControlsEnabled ->
         AodNotificationOptionsUiModel(
             isIconsEnabled = isIconsEnabled,
+            isContentEnabled = isContentEnabled,
             isEdgeGlowEnabled = isEdgeGlowEnabled,
             isMediaControlsEnabled = isMediaControlsEnabled,
         )
@@ -247,6 +253,15 @@ class MainViewModel(
         viewModelScope.launch {
             aodImageManager.hasBackground.filterNotNull().collectCatching(
                 action = { hasBackground -> updateState { copy(hasBackground = hasBackground) } },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
+            )
+        }
+    }
+
+    private fun observeWallpaper() {
+        viewModelScope.launch {
+            dataStoreManager.aodWallpaper.filterNotNull().collectCatching(
+                action = { code -> updateState { copy(wallpaper = WallpaperValue.fromCode(code)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -358,8 +373,23 @@ class MainViewModel(
             updateState { copy(isSavingBackground = true) }
             val isSaved = aodImageManager.saveBackground(uri)
             updateState { copy(isSavingBackground = false) }
-            if (!isSaved) sendEffect(MainEffect.ShowMessage(R.string.background_save_failed))
+            if (isSaved) {
+                dataStoreManager.saveAodWallpaper(WallpaperValue.NONE_CODE)
+            } else {
+                sendEffect(MainEffect.ShowMessage(R.string.background_save_failed))
+            }
         }
+    }
+
+    // Mỗi lúc chỉ một ảnh nền: chọn ảnh có sẵn thì bỏ ảnh từ máy (và ngược lại), để AOD không phải chọn giữa hai ảnh.
+    private fun selectWallpaper(wallpaper: WallpaperValue) {
+        dataStoreManager.saveAodWallpaper(wallpaper.code)
+        aodImageManager.removeBackground()
+    }
+
+    private fun removeBackground() {
+        dataStoreManager.saveAodWallpaper(WallpaperValue.NONE_CODE)
+        aodImageManager.removeBackground()
     }
 
     private fun changeGestureAction(gesture: AodGestureValue, action: AodActionValue) {

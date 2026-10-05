@@ -66,6 +66,13 @@
   <string name="opt_clock_size_value">Clock size: %1$d%%</string>
   <string name="opt_landscape">Always landscape (night clock)</string>
   <string name="opt_background">Background image</string>
+  <string name="wallpaper_stars">Stars</string>
+  <string name="wallpaper_aurora">Aurora</string>
+  <string name="wallpaper_eclipse">Eclipse</string>
+  <string name="wallpaper_waves">Waves</string>
+  <string name="wallpaper_nebula">Nebula</string>
+  <string name="wallpaper_horizon">Horizon</string>
+  <string name="background_from_device">Your own image</string>
   <string name="background_choose">Choose</string>
   <string name="background_change">Change</string>
   <string name="background_saving">Saving…</string>
@@ -95,6 +102,8 @@
   <string name="section_notifications">Notifications on the clock</string>
   <string name="notification_access_needed">Needs Notification access under Permissions.</string>
   <string name="opt_notification_icons">Show notification icons</string>
+  <string name="opt_notification_content">Show the latest notification\'s content</string>
+  <string name="opt_notification_content_desc">Title and text under the icons. What the lock screen hides stays hidden here too.</string>
   <string name="opt_edge_glow">Glow the screen edges for new notifications</string>
   <string name="opt_media_controls">Music controls</string>
 
@@ -163,6 +172,7 @@
   <string name="aod_media_pause">Pause</string>
   <string name="aod_media_next">Next</string>
   <string name="aod_flashlight_on">Flashlight on</string>
+  <string name="aod_notification_content_hidden">Contents hidden</string>
   <string name="aod_weather_temperature" translatable="false">%1$d°</string>
   <string name="aod_event_all_day">All day</string>
   <string name="aod_drawing">Drawing</string>

@@ -13,6 +13,7 @@ import kotlinx.collections.immutable.toImmutableList
 data class AodNotificationsUiModel(
     val icons: ImmutableList<NotificationIconUiModel> = persistentListOf(),
     val overflowCount: Int = 0,
+    val latest: NotificationContentUiModel? = null,
 ) {
     companion object {
         const val MAX_ICONS = 5
@@ -25,15 +26,40 @@ data class NotificationIconUiModel(
     val icon: Bitmap,
 )
 
+// Thông báo mới nhất có chữ để hiện; isHidden = màn hình khoá của hệ thống đang che nội dung của nó.
+@Immutable
+data class NotificationContentUiModel(
+    val key: String,
+    val icon: Bitmap,
+    val title: String,
+    val text: String,
+    val isHidden: Boolean,
+)
+
 // Một icon cho mỗi app như thanh trạng thái; danh sách đã xếp mới nhất trước nên app có thông báo mới nhất đứng đầu.
-fun List<ActiveNotification>.toAodNotificationsUiModel(): AodNotificationsUiModel {
-    val latestPerApp = distinctBy { notification -> notification.packageName }
+fun List<ActiveNotification>.toAodNotificationsUiModel(options: AodNotificationOptionsUiModel): AodNotificationsUiModel {
+    val latestPerApp = if (options.isIconsEnabled) distinctBy { notification -> notification.packageName } else emptyList()
     return AodNotificationsUiModel(
         icons = latestPerApp
             .take(AodNotificationsUiModel.MAX_ICONS)
             .map { notification -> NotificationIconUiModel(packageName = notification.packageName, icon = notification.icon) }
             .toImmutableList(),
         overflowCount = (latestPerApp.size - AodNotificationsUiModel.MAX_ICONS).coerceAtLeast(0),
+        latest = if (options.isContentEnabled) firstNotNullOfOrNull { it.toContentUiModel() } else null,
+    )
+}
+
+// Không có tiêu đề thì đưa nội dung lên dòng tiêu đề; thông báo không có chữ nào thì bỏ qua để lấy thông báo kế tiếp.
+private fun ActiveNotification.toContentUiModel(): NotificationContentUiModel? {
+    val shownContent = content
+        ?: return NotificationContentUiModel(key = key, icon = icon, title = "", text = "", isHidden = true)
+    if (shownContent.title.isEmpty() && shownContent.text.isEmpty()) return null
+    return NotificationContentUiModel(
+        key = key,
+        icon = icon,
+        title = shownContent.title.ifEmpty { shownContent.text },
+        text = if (shownContent.title.isEmpty()) "" else shownContent.text,
+        isHidden = false,
     )
 }
 

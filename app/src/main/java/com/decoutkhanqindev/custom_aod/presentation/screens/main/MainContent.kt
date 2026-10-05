@@ -105,6 +105,7 @@ private fun MainSettings(
 
         MainAppearanceSection(
             appearance = state.appearance,
+            wallpaper = state.wallpaper,
             hasBackground = state.hasBackground,
             isSavingBackground = state.isSavingBackground,
             onIntent = onIntent,

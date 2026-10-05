@@ -152,10 +152,10 @@ Hai service còn được bảo vệ bằng quyền của hệ thống, để ch
 - **Hết thời gian đã chọn, máy trong túi, pin yếu, hết khung giờ, hoặc cắm/rút sạc trái với quy tắc nguồn điện:** đồng hồ chuyển sang đen. Sau đó màn hình tự tắt theo thời gian chờ của máy.
 - **Ngoài khung giờ, sai quy tắc nguồn điện, hoặc pin dưới ngưỡng lúc màn hình tắt:** đồng hồ không hiện, màn hình tắt như bình thường.
 - **Nút "Xem thử" trong app:** hiện đồng hồ ngay mà không cần khóa máy.
-- **Thông báo** (cần quyền "Truy cập thông báo"): dưới ngày là icon của các app đang có thông báo, mỗi app một icon, tối đa 5, còn lại hiện "+N". Chỉ có icon, không có nội dung. Có thông báo mới khi đồng hồ đang hiện thì 4 cạnh màn hình sáng nhấp nháy khoảng 4 giây, theo màu của app đó.
+- **Thông báo** (cần quyền "Truy cập thông báo"): dưới ngày là icon của các app đang có thông báo, mỗi app một icon, tối đa 5, còn lại hiện "+N". Bật "Hiện nội dung thông báo mới nhất" thì dưới các icon có thêm tiêu đề và nội dung của thông báo mới nhất, theo đúng quy tắc của màn hình khóa: nội dung bị màn hình khóa ẩn thì ở đây ghi "Nội dung đã ẩn". Có thông báo mới khi đồng hồ đang hiện thì 4 cạnh màn hình sáng nhấp nháy khoảng 4 giây, theo màu của app đó.
 - **Nhạc** (cần quyền "Truy cập thông báo"): khi có app nhạc đang phát hoặc tạm dừng, đồng hồ hiện tên bài, nghệ sĩ và 3 nút Bài trước, Phát/Tạm dừng, Bài tiếp theo. Như chạm 2 lần, nút bị bỏ qua khi cảm biến tiệm cận đang bị che.
 - **Thông tin thêm** (mục "Thông tin thêm trên đồng hồ", mặc định tắt hết): thời tiết hiện tại (icon trời và nhiệt độ) cạnh ngày; tối đa 2 sự kiện còn lại trong hôm nay từ lịch của máy (giờ bắt đầu hoặc "Cả ngày", rồi tên sự kiện); một ghi nhớ ngắn; một hình vẽ nhanh bằng ngón tay, hiện theo màu đồng hồ.
-- **Giao diện đồng hồ:** 4 mặt (Số, Số xếp chồng, Kim, Kim tối giản), 4 font, 8 màu, cỡ 60–150%, ảnh nền tự chọn. Bật "Luôn xoay ngang" để dùng làm đồng hồ đêm khi dựng máy: đồng hồ bên trái, ngày, pin và nhạc bên phải.
+- **Giao diện đồng hồ:** 4 mặt (Số, Số xếp chồng, Kim, Kim tối giản), 4 font, 8 màu, cỡ 60–150%, ảnh nền: 6 ảnh AMOLED có sẵn (Sao đêm, Cực quang, Nhật thực, Sóng, Tinh vân, Chân trời) hoặc ảnh từ máy. Bật "Luôn xoay ngang" để dùng làm đồng hồ đêm khi dựng máy: đồng hồ bên trái, ngày, pin và nhạc bên phải.
 
 Đồng hồ hiện giờ (theo định dạng 12 hoặc 24 giờ của máy), ngày, và phần trăm pin kèm trạng thái sạc. Dòng "Chạm 2 lần để thoát" hiện 3 giây rồi mờ đi. Mỗi phút, nội dung dịch sang một vị trí ngẫu nhiên để chống burn-in.
 
@@ -178,6 +178,7 @@ Mục "Thông báo trên đồng hồ", chỉ có tác dụng khi đã cấp quy
 | Tùy chọn | Key | Mặc định | Tác dụng |
 |---|---|---|---|
 | Hiện biểu tượng thông báo | `is_aod_notification_icons_enabled` | Bật | Icon của app có thông báo, như thanh trạng thái. Bỏ thông báo thường trực, im lặng, thông báo nhạc, và thông báo bị ẩn trên màn hình khóa hoặc bị Không làm phiền ẩn khỏi màn hình chờ |
+| Hiện nội dung thông báo mới nhất | `is_aod_notification_content_enabled` | Tắt | Tiêu đề (1 dòng) và nội dung (tối đa 2 dòng) của thông báo mới nhất, dưới các icon. Theo màn hình khóa: tắt "hiện nội dung nhạy cảm" thì thông báo riêng tư chỉ hiện bản công khai của app, không có thì ghi "Nội dung đã ẩn" |
 | Viền sáng khi có thông báo mới | `is_aod_edge_glow_enabled` | Bật | Chỉ khi đồng hồ đang hiện (không tối) và thông báo không bị Không làm phiền chặn |
 | Điều khiển nhạc | `is_aod_media_controls_enabled` | Bật | Lấy từ thông báo nhạc mới nhất, như trình phát trên màn hình khóa của hệ thống |
 
@@ -190,7 +191,8 @@ Mục "Giao diện đồng hồ":
 | Màu | `aod_clock_color` | Xám | 8 màu dịu trên nền đen, áp cho số giờ hoặc kim. Ngày, pin, gợi ý vẫn màu xám |
 | Cỡ đồng hồ | `aod_clock_size_percent` | 100% | Từ 60 đến 150%, mỗi nấc 10% |
 | Luôn xoay ngang (đồng hồ đêm) | `is_aod_landscape` | Tắt | Đồng hồ luôn nằm ngang theo chiều dựng máy |
-| Ảnh nền | (file `aod_background.jpg` trong bộ nhớ riêng của app) | Không có | Chọn bằng Photo Picker, không cần quyền đọc ảnh. App lưu một bản sao đã thu về cỡ màn hình; ảnh hiện mờ 50% sau đồng hồ |
+| Ảnh nền có sẵn | `aod_wallpaper` | Không có | 6 ảnh AMOLED vẽ bằng vector, nền đen: Sao đêm, Cực quang, Nhật thực, Sóng, Tinh vân, Chân trời. Hiện mờ 50% sau đồng hồ |
+| Ảnh từ máy | (file `aod_background.jpg` trong bộ nhớ riêng của app) | Không có | Chọn bằng Photo Picker, không cần quyền đọc ảnh. App lưu một bản sao đã thu về cỡ màn hình; ảnh hiện mờ 50% sau đồng hồ. Mỗi lúc chỉ một ảnh nền: chọn ảnh có sẵn thì bỏ ảnh từ máy, và ngược lại |
 
 Mục "Thông tin thêm trên đồng hồ":
 
@@ -269,7 +271,7 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/aod/AodNotificationListener.kt` | Nhận thông báo từ hệ thống (khi đã cấp "Truy cập thông báo") và chuyển cho `NotificationStateManager` |
 | `presentation/screens/main/` | Màn hình cài đặt (MVI): quyền, tùy chọn, thông tin thêm (ô nhập ghi nhớ, khung vẽ, lịch, thời tiết; hỏi quyền Lịch và Vị trí khi bật), quy tắc hiện, ngôn ngữ, xem thử; hỏi quyền thông báo ở lần mở đầu tiên. Mỗi mục một file `MainXxxSection.kt` |
 | `presentation/screens/language/` | Màn chọn ngôn ngữ (MVI): lần mở đầu tiên và từ màn hình cài đặt |
-| `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`, `AodExtrasUiModel`, `WeatherUiModel` (ẩn bản cũ từ 3 giờ), `WeatherConditionValue`, `CalendarEventUiModel` |
+| `presentation/model/` | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`, `AodExtrasUiModel`, `WeatherUiModel` (ẩn bản cũ từ 3 giờ), `WeatherConditionValue`, `CalendarEventUiModel`, `AodNotificationsUiModel` (icon và nội dung thông báo mới nhất), `WallpaperValue` (ảnh nền có sẵn) |
 | `presentation/components/AppLanguageProvider.kt` | Áp ngôn ngữ đã chọn cho `MainActivity` và `AodActivity` |
 | `presentation/components/SettingsRows.kt` | Các dòng cài đặt dùng chung: tiêu đề mục, công tắc, radio, dòng giá trị, thanh trượt |
 | `presentation/MainActivity.kt` | Activity chính: consent, ngôn ngữ, theme, khởi động service |
@@ -277,7 +279,7 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `data/device/battery/BatteryStateManager.kt` | Phần trăm pin, trạng thái sạc, có đang cắm nguồn |
 | `data/device/audio/AudioStateManager.kt` | Đang có chuông, cuộc gọi hoặc báo thức |
 | `data/device/proximity/ProximityManager.kt` | Cảm biến tiệm cận |
-| `data/device/notification/NotificationStateManager.kt` | Lọc thông báo hiện được trên đồng hồ, nạp sẵn icon, báo thông báo mới, giữ phiên nhạc của thông báo nhạc mới nhất |
+| `data/device/notification/NotificationStateManager.kt` | Lọc thông báo hiện được trên đồng hồ, nạp sẵn icon, che nội dung như màn hình khóa của hệ thống, báo thông báo mới, giữ phiên nhạc của thông báo nhạc mới nhất |
 | `data/device/media/MediaStateManager.kt` | Bài đang phát và các nút điều khiển nhạc |
 | `data/device/permission/PermissionManager.kt` | Đọc quyền overlay, thông báo, truy cập thông báo, lịch, vị trí gần đúng, và quyền riêng của Xiaomi |
 | `data/local/datastore/DataStoreManager.kt` | Lưu tùy chọn AOD cùng các prefs của base |
@@ -294,6 +296,7 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `di/AppModule.kt` | Các module Koin, gồm `networkModule` (`Json`, `Retrofit`, `OpenMeteoApiService`), repository và use case |
 | `utils/ContextExt.kt` | `registerSystemReceiver`; mở trang cài đặt: `openSettingsPage` (ROM không có trang đó thì mở Thông tin ứng dụng), `openOverlaySettings`, `openNotificationSettings`, `openNotificationListenerSettings`, `openMiuiPermissionSettings`; `packageUri` |
 | `res/values-v31/themes.xml` | Splash màu đen cho AOD trên Android 12+, thay vì icon app |
+| `res/drawable/img_wallpaper_*.xml` | 6 ảnh nền AMOLED có sẵn (vector, viewport 1080×2400) |
 | `res/xml/data_extraction_rules.xml` | Không sao lưu và không chuyển dữ liệu app sang máy mới (Android 12+) |
 
 Từ FakeAOD sang Custom AOD:
@@ -328,9 +331,9 @@ Từ FakeAOD sang Custom AOD:
 - **Kiểm tra sau khi mở (`checkLaunch`):** 2 giây sau mỗi lần mở, service xem đồng hồ có đang hiện và màn hình có sáng không. Kết quả hiện ở dòng cuối màn hình app. Nếu không, service đóng Activity, vì trên Xiaomi thiếu "Hiển thị trên màn hình khóa" thì Activity bị giấu sau màn hình khóa và sẽ hiện ra sau lần mở khóa kế tiếp.
 - **Không tự tắt màn hình:** app thường không có cách tắt màn hình, việc đó cần dịch vụ trợ năng hoặc quyền quản trị thiết bị. Khi cần kết thúc (hết giờ, trong túi, sai quy tắc hiện), AOD chuyển sang đen hoàn toàn ở độ sáng thấp nhất và bỏ `FLAG_KEEP_SCREEN_ON`. Sau đó thời gian chờ của máy sẽ tắt màn hình. Lần tắt đó được đánh dấu là chủ ý, nên AOD không mở lại. Trong túi, cảm biến tiệm cận đang bị che thì service cũng không bật lại màn hình khóa.
 - **Độ sáng:** chỉnh bằng `screenBrightness` của cửa sổ AOD (1–100%, hoặc theo hệ thống khi tắt độ sáng riêng), không cần quyền "Sửa đổi cài đặt hệ thống" và không đổi độ sáng của máy. Độ sáng được đặt trong `onCreate`, trước khi cửa sổ hiện, để khung đầu tiên đã đúng mức. Pin cũng được đọc đồng bộ lúc mở để khung đầu tiên có ngay dòng pin.
-- **Thông báo trên đồng hồ:** app chỉ nhận được thông báo qua `NotificationListenerService` do hệ thống bind, nên cần quyền "Truy cập thông báo". Thông báo được lọc giống màn hình chờ của hệ thống, và chỉ hiện icon vì đồng hồ nằm trên màn hình khóa. Icon được nạp sẵn ở luồng nền mỗi khi có thông báo, nên khung đầu tiên của đồng hồ đã có icon. Nhạc lấy từ phiên nhạc trong thông báo nhạc mới nhất, giống trình phát trên màn hình khóa của hệ thống; không hiện ảnh bìa vì sáng và dễ burn-in. Viền sáng vẽ bằng gradient vì làm mờ (`blur`) cần Android 12.
+- **Thông báo trên đồng hồ:** app chỉ nhận được thông báo qua `NotificationListenerService` do hệ thống bind, nên cần quyền "Truy cập thông báo". Thông báo được lọc giống màn hình chờ của hệ thống. Mặc định chỉ hiện icon vì đồng hồ nằm trên màn hình khóa; nội dung là tùy chọn và đi theo đúng quy tắc của màn hình khóa: tắt hiện thông báo thì che hết, máy có khóa bảo mật thì che thông báo riêng tư khi tắt "nội dung nhạy cảm" hoặc khi kênh được đặt ẩn nội dung, và dùng bản công khai app tự soạn nếu có. Phần bị che không bao giờ ra khỏi `NotificationStateManager`. Icon được nạp sẵn ở luồng nền mỗi khi có thông báo, nên khung đầu tiên của đồng hồ đã có icon. Nhạc lấy từ phiên nhạc trong thông báo nhạc mới nhất, giống trình phát trên màn hình khóa của hệ thống; không hiện ảnh bìa vì sáng và dễ burn-in. Viền sáng vẽ bằng gradient vì làm mờ (`blur`) cần Android 12.
 - **Thao tác, đèn pin, cảm biến:** mỗi thao tác lưu một hành động, AOD đọc một lần lúc mở. Phím âm lượng chỉ bị app giữ lại khi đã gán hành động. Đèn pin dùng `setTorchMode`, nên không cần quyền camera. Tự giảm sáng có hai ngưỡng lệch nhau và phải giữ 2 giây để bóng tay hay đèn chớp không làm màn hình nhấp nháy. Nhấc máy chỉ dùng cảm biến nhấc máy chuẩn của Android: nó chạy trên chip cảm biến nên chờ lúc màn hình tắt gần như không tốn pin. App không đoán cảm biến riêng của từng hãng. Không chờ nhấc máy khi đồng hồ tối vì nằm trong túi, để đi bộ không làm sáng màn hình.
-- **Giao diện đồng hồ:** đọc một lần lúc mở AOD, để khung đầu tiên đã đúng mặt, font, màu, cỡ. Hướng ngang được đặt trước khi cửa sổ hiện. Bố cục ngang hay dọc theo kích thước thật của màn hình, nên tự xoay của hệ thống cũng hiển thị đúng. Ảnh nền là bản sao đã thu nhỏ, vì Photo Picker chỉ cho đọc ảnh tạm thời; nó được giải mã ở luồng nền rồi hiện dần, không làm chậm lúc đồng hồ hiện. Font là các họ font có sẵn của hệ thống, không thêm file font.
+- **Giao diện đồng hồ:** đọc một lần lúc mở AOD, để khung đầu tiên đã đúng mặt, font, màu, cỡ. Hướng ngang được đặt trước khi cửa sổ hiện. Bố cục ngang hay dọc theo kích thước thật của màn hình, nên tự xoay của hệ thống cũng hiển thị đúng. Ảnh từ máy là bản sao đã thu nhỏ, vì Photo Picker chỉ cho đọc ảnh tạm thời; nó được giải mã ở luồng nền rồi hiện dần, không làm chậm lúc đồng hồ hiện. Ảnh có sẵn là vector vẽ thẳng: nét ở mọi màn hình, không vỡ gradient như JPEG, không thêm file ảnh vào APK. Ở bố cục ngang, ảnh dọc được cắt giữ phần có chi tiết (cực quang, nhật thực ở trên; sóng, chân trời ở dưới). Font là các họ font có sẵn của hệ thống, không thêm file font.
 - **Thời tiết:** dùng Open-Meteo vì không cần API key hay tài khoản. Vị trí gần đúng (Wi-Fi, mạng di động) đủ cho thời tiết, nhanh và ít tốn pin hơn GPS; toạ độ được làm tròn 2 chữ số thập phân (khoảng 1 km) trước khi gửi. Bản đã tải lưu trong DataStore, nên đồng hồ có thời tiết ngay từ khung đầu, không chờ mạng. App chỉ gọi mạng khi bản đã lưu cũ từ 30 phút, và chỉ lúc app ở tiền cảnh (đồng hồ đang hiện, hoặc lúc bật tùy chọn), nên không cần quyền vị trí nền hay job chạy nền. Đồng hồ hiện lâu (đồng hồ đêm lúc sạc) thì cứ 10 phút thử tải lại; bản cũ từ 3 giờ không hiện nữa để khỏi hiện sai.
 - **Sự kiện lịch:** đọc thẳng `CalendarContract.Instances` của máy (đã gồm sự kiện lặp lại), không cần tài khoản hay mạng. Chỉ hiện giờ và tên sự kiện vì đồng hồ nằm trên màn hình khóa. Sự kiện cả ngày được lưu theo nửa đêm UTC, nên app so theo ngày ghi trên lịch chứ không theo mốc giờ, để không lệch ngày ở múi giờ khác UTC.
 - **Ghi nhớ và hình vẽ:** ghi nhớ là một tùy chọn trong DataStore. Hình vẽ lưu PNG nền trong suốt, nét trắng; lúc hiện mới tô theo màu đồng hồ, nên đổi màu đồng hồ không phải vẽ lại.
@@ -380,6 +383,8 @@ Từ FakeAOD sang Custom AOD:
 37. Sự kiện hôm nay: trong ứng dụng Lịch, tạo một sự kiện bắt đầu sau 30 phút, một sự kiện cả ngày hôm nay và một sự kiện ngày mai. Bật "Sự kiện hôm nay": hộp thoại xin quyền Lịch hiện; cho phép thì công tắc bật. Khóa máy: hiện "Cả ngày" kèm tên, rồi giờ kèm tên của sự kiện sau 30 phút; không có sự kiện ngày mai. Để đồng hồ hiện tới khi sự kiện kết thúc: dòng đó tự mất. Từ chối quyền: công tắc vẫn tắt và có dòng nhắc.
 38. Thời tiết: bật "Thời tiết": hộp thoại xin vị trí (chọn "Gần đúng" cũng được); cho phép thì công tắc bật và hiện thêm "Hiện nhiệt độ theo °F". Khóa máy khi có mạng và đang bật định vị: icon trời và nhiệt độ hiện cạnh ngày (ban đêm là icon trăng). Bật °F: lần AOD sau đổi sang °F. Tắt mạng rồi khóa máy: vẫn hiện bản đã tải. Thu hồi quyền vị trí: công tắc về tắt.
 39. Thời tiết khi đồng hồ hiện lâu: cắm sạc, để đồng hồ hiện hơn 30 phút khi có mạng: log có lần tải mới, nhiệt độ cập nhật mà không cần khóa lại máy.
+40. Nội dung thông báo: bật "Hiện nội dung thông báo mới nhất", gửi tin nhắn tới máy rồi khóa máy: dưới các icon có tên người gửi và tin nhắn. Có PIN/hình vẽ: tắt "hiện nội dung nhạy cảm" trong cài đặt màn hình khóa của máy thì tin nhắn đổi thành bản công khai của app (vd "1 tin nhắn mới") hoặc "Nội dung đã ẩn"; chọn không hiện thông báo trên màn hình khóa thì luôn "Nội dung đã ẩn". Tin mới đến khi đồng hồ đang hiện thì dòng nội dung đổi theo.
+41. Ảnh nền có sẵn: chọn lần lượt 6 ảnh rồi bấm "Xem thử": ảnh mờ sau đồng hồ, không vỡ, đồng hồ và chữ vẫn đọc rõ. Bật "Luôn xoay ngang": cực quang, nhật thực giữ phần trên; sóng, chân trời giữ phần dưới. Chọn ảnh từ máy thì ảnh có sẵn bỏ chọn, và ngược lại; "Bỏ ảnh nền" bỏ cả hai.
 
 Lưu ý khi test trên máy ảo hoặc ngay sau khi vừa dùng app: trong 10 giây sau khi app vừa mở hoặc đóng một Activity, Android cho phép mở Activity từ nền mà không cần quyền gì (log ghi `BAL_ALLOW_GRACE_PERIOD`). Vì vậy đồng hồ có thể hiện dù chưa bật "Hiển thị trên ứng dụng khác". Muốn test đúng thì về màn hình chính, đợi hơn 10 giây rồi mới khóa máy.
 
@@ -413,7 +418,8 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
 - **Ô Cài đặt nhanh trên Android 15 trở lên** phải mở app mỗi lần bật AOD (xem "Các quyết định thiết kế"), đang khóa máy thì phải mở khóa trước.
 - **Thông báo bật lên (heads-up)** của hệ thống vẫn có thể hiện đè lên đồng hồ khi có thông báo mới; app không chặn được.
 - **Icon thông báo vẫn hiện khi đã tắt "Hiện thông báo trên màn hình khóa" của hệ thống** (chỉ icon, không nội dung). Thông báo hoặc kênh đặt ẩn hẳn trên màn hình khóa thì không hiện; riêng tùy chỉnh theo kênh chỉ đọc được từ Android 12. Muốn ẩn hết thì tắt "Hiện biểu tượng thông báo".
-- **Ảnh nền đứng yên** (chỉ đồng hồ dịch vị trí), nên để lâu dễ burn-in và tốn pin hơn nền đen; nên chọn ảnh tối.
+- **Nội dung thông báo** chỉ hiện thông báo mới nhất. Quy tắc che nội dung đọc từ hai cài đặt màn hình khóa không có API công khai; ROM chặn đọc thì app coi như phải che, khi đó thông báo riêng tư chỉ ghi "Nội dung đã ẩn". Đổi cài đặt màn hình khóa thì có tác dụng từ lần danh sách thông báo đổi tiếp theo.
+- **Ảnh nền đứng yên** (chỉ đồng hồ dịch vị trí), nên để lâu dễ burn-in và tốn pin hơn nền đen; nên chọn ảnh tối. Ảnh có sẵn đã nền đen và mờ, nhưng mặt trời của "Chân trời" và vầng sáng của "Nhật thực" vẫn là vùng sáng đứng yên.
 - **Xoay ngang** có thể thấy màn hình xoay lúc đồng hồ hiện và lúc mở khóa. Từ Android 16, màn hình lớn (sw ≥ 600dp) bỏ qua yêu cầu xoay này.
 - **Nhấc máy để hiện lại đồng hồ** chỉ chạy trên máy cho app dùng cảm biến nhấc máy chuẩn của Android. Nhiều máy (có thể cả Xiaomi) chỉ có cảm biến riêng của hãng, khi đó tùy chọn bị tắt. Lúc đồng hồ đã tối nhưng màn hình chưa tắt thì nhấc máy chưa có tác dụng.
 - **Đèn pin bật từ đồng hồ không tự tắt** khi đồng hồ đóng, giống ô Đèn pin của hệ thống.
@@ -449,7 +455,7 @@ Nếu đưa lên Google Play:
 - `targetSdk` 37 đã đạt yêu cầu tối thiểu 36 mà Play áp dụng từ 31/08/2026.
 - Có quảng cáo: khai báo "Chứa quảng cáo" và mục Data safety cho mã quảng cáo (`AD_ID`) mà Google Mobile Ads dùng.
 - Thời tiết gửi toạ độ gần đúng (đã làm tròn khoảng 1 km) tới Open-Meteo: mục Data safety khai báo "Vị trí gần đúng", chia sẻ với bên thứ ba để lấy thời tiết; chính sách quyền riêng tư nêu tên Open-Meteo. API miễn phí của Open-Meteo dành cho dùng phi thương mại và dữ liệu theo giấy phép CC BY 4.0 (cần ghi nguồn): app có quảng cáo thì kiểm lại điều khoản và gói trả phí trước khi phát hành. Lịch chỉ đọc trên máy, không gửi đi đâu.
-- `NotificationListenerService` đọc được mọi thông báo: mô tả trên Play nên nói rõ chức năng dùng nó (icon, viền sáng, nhạc trên đồng hồ), và chính sách quyền riêng tư nên ghi rằng dữ liệu thông báo chỉ được xử lý trên máy, không gửi đi đâu.
+- `NotificationListenerService` đọc được mọi thông báo: mô tả trên Play nên nói rõ chức năng dùng nó (icon, nội dung thông báo mới nhất khi bật, viền sáng, nhạc trên đồng hồ), và chính sách quyền riêng tư nên ghi rằng dữ liệu thông báo chỉ được xử lý trên máy, không gửi đi đâu.
 
 ## Dựng từ Android-Base
 

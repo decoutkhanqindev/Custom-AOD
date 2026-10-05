@@ -64,6 +64,13 @@
   <string name="opt_clock_size_value">Cỡ đồng hồ: %1$d%%</string>
   <string name="opt_landscape">Luôn xoay ngang (đồng hồ đêm)</string>
   <string name="opt_background">Ảnh nền</string>
+  <string name="wallpaper_stars">Sao đêm</string>
+  <string name="wallpaper_aurora">Cực quang</string>
+  <string name="wallpaper_eclipse">Nhật thực</string>
+  <string name="wallpaper_waves">Sóng</string>
+  <string name="wallpaper_nebula">Tinh vân</string>
+  <string name="wallpaper_horizon">Chân trời</string>
+  <string name="background_from_device">Ảnh từ máy</string>
   <string name="background_choose">Chọn ảnh</string>
   <string name="background_change">Đổi ảnh</string>
   <string name="background_saving">Đang lưu…</string>
@@ -92,6 +99,8 @@
   <string name="section_notifications">Thông báo trên đồng hồ</string>
   <string name="notification_access_needed">Cần quyền Truy cập thông báo ở mục Quyền.</string>
   <string name="opt_notification_icons">Hiện biểu tượng thông báo</string>
+  <string name="opt_notification_content">Hiện nội dung thông báo mới nhất</string>
+  <string name="opt_notification_content_desc">Tiêu đề và nội dung dưới các icon. Nội dung bị màn hình khóa ẩn thì ở đây cũng ẩn.</string>
   <string name="opt_edge_glow">Viền sáng khi có thông báo mới</string>
   <string name="opt_media_controls">Điều khiển nhạc</string>
 
@@ -150,6 +159,7 @@
   <string name="aod_media_pause">Tạm dừng</string>
   <string name="aod_media_next">Bài tiếp theo</string>
   <string name="aod_flashlight_on">Đèn pin đang bật</string>
+  <string name="aod_notification_content_hidden">Nội dung đã ẩn</string>
   <string name="aod_event_all_day">Cả ngày</string>
   <string name="aod_drawing">Hình vẽ</string>
   <string name="weather_clear">Trời quang</string>

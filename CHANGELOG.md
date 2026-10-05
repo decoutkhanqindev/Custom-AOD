@@ -4,6 +4,21 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-05 – Nội dung thông báo, ảnh nền AMOLED có sẵn
+
+Hai khoảng trống còn lại so với Always On AMOLED. Không thêm quyền và thư viện. Bản này build được (`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 40–41).
+
+### Thêm
+
+- "Hiện nội dung thông báo mới nhất" (`is_aod_notification_content_enabled`, mặc định tắt): tiêu đề và nội dung của thông báo mới nhất dưới các icon. `NotificationStateManager` che nội dung đúng như màn hình khóa của hệ thống: đọc "hiện thông báo trên màn hình khóa", "hiện nội dung nhạy cảm", khóa bảo mật, chính sách quản lý thiết bị, `visibility` của thông báo và tùy chỉnh theo kênh; bị che thì dùng `publicVersion`, không có thì AOD ghi "Nội dung đã ẩn". `ActiveNotification` có thêm `content` (`NotificationContent`).
+- 6 ảnh nền AMOLED có sẵn (`WallpaperValue`, key `aod_wallpaper`): Sao đêm, Cực quang, Nhật thực, Sóng, Tinh vân, Chân trời. Vector `res/drawable/img_wallpaper_*.xml`, AOD vẽ thẳng (không lưu file), mờ 50%, bố cục ngang giữ phần có chi tiết. Màn cài đặt có hàng ảnh xem trước để chọn.
+- `CLAUDE.md`: bất biến 38 (nội dung thông báo), 39 (ảnh nền có sẵn), resource ảnh nền (mục 16), cách thêm ảnh nền (mục 20.6).
+
+### Thay đổi
+
+- Mục ảnh nền của màn cài đặt: nhãn "Ảnh nền", hàng ảnh có sẵn, dòng "Ảnh từ máy", "Bỏ ảnh nền" bỏ cả hai. Mỗi lúc chỉ một ảnh nền: chọn ảnh có sẵn thì xóa ảnh từ máy, và ngược lại.
+- `AodViewModel` theo dõi thông báo khi bật icon hoặc nội dung; `toAodNotificationsUiModel(options)` nhận tùy chọn thông báo.
+
 ## [Chưa phát hành] – 2026-10-04 – Giai đoạn 5: thông tin thêm trên đồng hồ
 
 Thời tiết, sự kiện hôm nay, ghi nhớ, hình vẽ nhanh. Thêm 2 quyền hỏi lúc chạy, chỉ hỏi khi bật tùy chọn tương ứng (`READ_CALENDAR`, `ACCESS_COARSE_LOCATION`), và thư viện Retrofit 3.0.0 + converter kotlinx-serialization, kotlinx-serialization-json 1.11.0 cho API thời tiết Open-Meteo. Lần đầu dùng tầng domain (UseCase, Repository). Bỏ qua widget và Tasker. Bản này build được (`assembleDebug`, R8 của bản release), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 35–39).

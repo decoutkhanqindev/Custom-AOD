@@ -41,6 +41,13 @@ fun MainNotificationsSection(
         )
 
         SettingsSwitchRow(
+            label = stringResource(R.string.opt_notification_content),
+            isChecked = options.isContentEnabled,
+            onCheckedChange = { onIntent(MainIntent.ToggleNotificationContent(it)) },
+            description = stringResource(R.string.opt_notification_content_desc),
+        )
+
+        SettingsSwitchRow(
             label = stringResource(R.string.opt_edge_glow),
             isChecked = options.isEdgeGlowEnabled,
             onCheckedChange = { onIntent(MainIntent.ToggleEdgeGlow(it)) },

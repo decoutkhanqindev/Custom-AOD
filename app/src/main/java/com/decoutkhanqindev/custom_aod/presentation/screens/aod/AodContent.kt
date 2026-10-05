@@ -73,6 +73,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -84,6 +85,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.createBitmap
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
@@ -96,6 +98,8 @@ import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.NotificationContentUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WeatherConditionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
@@ -186,6 +190,8 @@ fun AodContent(
     ) {
         val isLandscape = maxWidth > maxHeight
 
+        AodWallpaper(wallpaper = state.wallpaper.takeIf { !state.isDark })
+
         AodBackground(background = state.background.takeIf { !state.isDark })
 
         AodEdgeGlow(
@@ -254,6 +260,8 @@ private fun AodDetails(
         AodDrawing(drawing = state.drawing, color = state.appearance.color.color)
 
         AodNotificationIcons(notifications = state.notifications)
+
+        AodNotificationContent(content = state.notifications.latest)
 
         state.battery?.let { battery ->
             Spacer(modifier = Modifier.height(20.dp))
@@ -592,6 +600,58 @@ private fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
 }
 
 @Composable
+private fun AodNotificationContent(content: NotificationContentUiModel?) {
+    AnimatedContent(
+        targetState = content,
+        contentKey = { it?.key },
+        label = "AodNotificationContent",
+    ) { target ->
+        if (target != null) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .widthIn(max = 280.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        bitmap = remember(target.icon) { target.icon.asImageBitmap() },
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        colorFilter = ColorFilter.tint(Grey8A),
+                    )
+
+                    Text(
+                        text = if (target.isHidden) {
+                            stringResource(R.string.aod_notification_content_hidden)
+                        } else {
+                            target.title
+                        },
+                        modifier = Modifier.padding(start = 6.dp),
+                        color = Grey8A,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+
+                if (target.text.isNotEmpty()) {
+                    Text(
+                        text = target.text,
+                        modifier = Modifier.padding(top = 2.dp),
+                        color = Grey6E,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun AodMediaControls(
     media: MediaUiModel?,
     onIntent: (AodIntent) -> Unit,
@@ -675,6 +735,26 @@ private fun AodMediaButton(
             .padding(8.dp),
         tint = if (isEnabled) GreyB4 else Grey5A,
     )
+}
+
+@Composable
+private fun AodWallpaper(wallpaper: WallpaperValue?) {
+    Crossfade(
+        targetState = wallpaper,
+        modifier = Modifier.fillMaxSize(),
+        label = "AodWallpaper",
+    ) { target ->
+        if (target != null) {
+            Image(
+                painter = painterResource(target.drawableRes),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                alignment = target.alignment,
+                contentScale = ContentScale.Crop,
+                alpha = 0.5f,
+            )
+        }
+    }
 }
 
 @Composable
@@ -802,6 +882,16 @@ private fun AodContentPreview() {
         state = AodState(
             nowMillis = System.currentTimeMillis(),
             extras = AodExtrasUiModel(memo = "Buy milk"),
+            wallpaper = WallpaperValue.AURORA,
+            notifications = AodNotificationsUiModel(
+                latest = NotificationContentUiModel(
+                    key = "preview",
+                    icon = createBitmap(48, 48),
+                    title = "Alice",
+                    text = "See you at 7 at the usual place?",
+                    isHidden = false,
+                ),
+            ),
             weather = WeatherUiModel(
                 temperature = 24,
                 condition = WeatherConditionValue.CLOUDY,

@@ -12,6 +12,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiMode
 import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -22,6 +23,7 @@ data class AodState(
     val appearance: AodAppearanceUiModel = AodAppearanceUiModel(),
     val interaction: AodInteractionUiModel = AodInteractionUiModel(),
     val extras: AodExtrasUiModel = AodExtrasUiModel(),
+    val wallpaper: WallpaperValue? = null,
     val background: Bitmap? = null,
     val drawing: Bitmap? = null,
     val weather: WeatherUiModel? = null,
