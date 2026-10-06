@@ -4,6 +4,35 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-06 – Onboarding mới, font Inter, icon app
+
+Làm lại giao diện Splash và Language theo hướng skill ui-ux-pro-max gợi ý (style Dark Mode OLED, giữ màu mint), thêm màn Permission sau Language ở lần đầu mở app. Không thêm quyền, không thêm thư viện. Bản này build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.
+
+### Thêm
+
+- Màn Permission (`screens/permission/`, bước 2/2 của onboarding): chỉ các quyền bắt buộc để AOD mặc định chạy — "Hiển thị trên ứng dụng khác", thêm "Hiển thị trên màn hình khóa" trên máy Xiaomi. Nút Bắt đầu chỉ bật khi đủ quyền; quyền mà máy không cho kiểm tra (op của Xiaomi) thì không chặn, chỉ nhắc mở Cài đặt. Quay lại từ Cài đặt thì tự đọc lại quyền.
+- Các lần mở app sau: AOD đang bật mà thiếu quyền bắt buộc thì màn chính hiện bottom sheet để cấp quyền. Đóng sheet thì còn dòng cảnh báo ở đầu màn chính để mở lại; bật lại công tắc AOD cũng mở lại sheet; đủ quyền thì cả hai tự ẩn.
+- Component dùng chung `AodsOnboardingHeader` / `AodsOnboardingFooter` (chỉ báo bước, một nút chính, dòng nhắc khi nút bị khoá) và `AodsPermissionCard`; token `AodsOnboardingTokens`; thứ tự bước `OnboardingStepValue`.
+- Font Inter (bản variable của Google Fonts, giấy phép OFL, khoảng 856 KB) cho toàn bộ giao diện app, kể cả component Material 3. Màn AOD giữ font đồng hồ user chọn.
+- Icon app mới: điện thoại tắt màn hình có viền sáng gradient mint → xanh → tím, đồng hồ 7 đoạn xếp chồng và ba chấm thông báo; thêm lớp đơn sắc cho icon theo chủ đề (Android 13+). Small icon của thông báo vẫn là `ic_aod`.
+- Animation Lottie `res/raw/lottie_device_edge_light.json` (37 KB, lặp 2,4 giây): ánh sáng kiểu LED lướt theo viền máy — nằm sát trên viền, độ rộng đều, cùng dải màu, độ sáng mịn với đuôi dài và mép trước tắt dần (44 lớp mỏng chồng nhau, đầu nét phẳng) nên trông như chính viền đang sáng lên; aura chuyển màu thở phía sau; cùng khung 108 với icon nên khung đầu trùng icon tĩnh. `AodsLottie` thêm tham số `placeholder` để vẽ thứ khác trong lúc file đang nạp.
+
+### Thay đổi
+
+- Splash: icon động (Lottie viền sáng) 288dp đúng tâm cửa sổ, khung đầu trùng splash hệ thống; tên app và câu giới thiệu hiện dần bên dưới; giữ thanh tải và dòng "có thể có quảng cáo".
+- Language: mỗi ngôn ngữ là một thẻ chọn lớn (cờ, viền, radio, đổi màu có animation); lần đầu mở app có chỉ báo "Bước 1/2" và nút Tiếp tục.
+- Cờ "lần đầu mở app" chỉ xoá khi đã đủ quyền bắt buộc (ở Language nếu máy đã có sẵn quyền, không thì ở màn Permission), nên thoát giữa chừng thì lần sau đi lại onboarding.
+- `PermissionValue` thêm tên ngắn và icon; danh sách quyền dùng chung `PermissionManager.aodPermissions()` / `requiredAodPermissions()`.
+- CLAUDE.md: luồng onboarding (mục 5), font Inter và splash (mục 14), component mới (mục 15), icon app, quy tắc tự làm thay vì tạo agent (mục 21).
+
+## [Chưa phát hành] – 2026-10-06 – Skill ui-ux-pro-max
+
+Chuẩn bị cho đợt làm lại UI (style, theme). Không đổi code app.
+
+### Thêm
+
+- `.claude/skills/ui-ux-pro-max/` từ nextlevelbuilder/ui-ux-pro-max-skill (MIT, bản 2.13.0): tra style, bảng màu, cặp font, luật UX / accessibility và hướng dẫn riêng cho Jetpack Compose bằng script Python (chỉ thư viện chuẩn). Đường dẫn script sửa cho bản cài trong project, bỏ test của skill, thêm mục "Project notes (Custom-AOD)". `CLAUDE.md` mục 21.
+
 ## [Chưa phát hành] – 2026-10-05 – Bộ skill Claude, design system Aods
 
 Đưa bộ skill của kotlin-accelerator-ai vào project và refactor UI theo chuẩn token của skill. Giá trị hình ảnh giữ nguyên nên giao diện không đổi. Không thêm quyền và thư viện. Bản này build được (`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.

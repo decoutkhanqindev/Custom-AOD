@@ -56,6 +56,12 @@ fun MainContent(
             }
         }
     }
+
+    MainPermissionSheet(
+        isVisible = state.isPermissionSheetVisible,
+        permissions = state.requiredPermissions,
+        onIntent = onIntent,
+    )
 }
 
 @Composable
@@ -81,6 +87,11 @@ private fun MainSettings(
             modifier = Modifier.padding(top = AodsTheme.spacing.inlineGap),
             color = AodsTheme.colors.onSurfaceVariant,
             style = AodsTheme.typography.bodyMedium,
+        )
+
+        MainPermissionWarning(
+            isVisible = state.isPermissionWarningVisible,
+            onIntent = onIntent,
         )
 
         Spacer(modifier = Modifier.height(AodsTheme.spacing.sectionPadding))

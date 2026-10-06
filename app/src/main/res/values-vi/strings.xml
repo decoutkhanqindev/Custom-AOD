@@ -4,6 +4,19 @@
   <string name="open_settings">Mở Cài đặt</string>
   <string name="no_internet_connection">Không có kết nối Internet. Vui lòng kiểm tra kết nối rồi thử lại.</string>
 
+  <!-- Onboarding: Splash, Language, Permission -->
+  <string name="splash_tagline">Màn hình tắt, đồng hồ vẫn sáng</string>
+  <string name="onboarding_step">Bước %1$d/%2$d</string>
+  <string name="language_title">Chọn ngôn ngữ</string>
+  <string name="language_subtitle">Bạn có thể đổi lại sau ở màn hình chính.</string>
+  <string name="action_continue">Tiếp tục</string>
+  <string name="permission_title">Cho phép hiện đồng hồ</string>
+  <string name="permission_subtitle">Custom AOD cần các quyền dưới đây để hiện đồng hồ khi màn hình tắt.</string>
+  <string name="permission_missing_hint">Cho phép đủ các quyền trên để tiếp tục.</string>
+  <string name="permission_unknown_hint">Máy không cho app kiểm tra quyền này. Hãy mở Cài đặt để chắc chắn quyền đã bật.</string>
+  <string name="action_allow">Cho phép</string>
+  <string name="action_get_started">Bắt đầu</string>
+
   <!-- Ads -->
   <string name="ad_loading">Đang tải quảng cáo…</string>
   <string name="ad_label">Quảng cáo</string>
@@ -30,10 +43,17 @@
   <string name="perm_notif_desc">Chỉ để hiện thông báo ứng dụng đang chạy.</string>
   <string name="perm_notif_access_title">Truy cập thông báo</string>
   <string name="perm_notif_access_desc">Để hiện biểu tượng thông báo, viền sáng và điều khiển nhạc trên đồng hồ. Đồng hồ vẫn chạy khi không có quyền này.</string>
+  <string name="perm_overlay_name">Hiển thị trên ứng dụng khác</string>
+  <string name="perm_lock_name">Hiển thị trên màn hình khóa</string>
+  <string name="perm_popup_name">Cửa sổ bật lên khi chạy nền</string>
 
   <string name="permission_state_granted">Đã cấp</string>
   <string name="permission_state_missing">Chưa cấp</string>
   <string name="permission_state_unknown">Không rõ</string>
+
+  <string name="permission_sheet_title">Đồng hồ chưa thể hiện</string>
+  <string name="permission_sheet_desc">Hãy cho phép các quyền sau để đồng hồ hiện khi màn hình tắt.</string>
+  <string name="action_later">Để sau</string>
 
   <string name="opt_custom_brightness">Dùng độ sáng riêng cho đồng hồ</string>
   <string name="opt_brightness_value">Độ sáng: %1$d%%</string>

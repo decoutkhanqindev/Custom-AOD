@@ -15,8 +15,10 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.hasRequiredPermissions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class MainState(
@@ -44,7 +46,23 @@ data class MainState(
     val editingScheduleTime: ScheduleTimeValue? = null,
     @param:StringRes val lastWakeMessageRes: Int = WakeResultValue.UNKNOWN.messageRes,
     val isNotificationPermissionPending: Boolean = false,
+    val isPermissionSheetDismissed: Boolean = false,
 ) {
     val isNotificationAccessGranted: Boolean
         get() = permissions.any { it.permission == PermissionValue.NOTIFICATION_ACCESS && it.isGranted == true }
+
+    val requiredPermissions: ImmutableList<PermissionUiModel>
+        get() = permissions.filter { it.permission.isRequired }.toImmutableList()
+
+    // Lần đầu mở app đã có màn quyền riêng; về sau AOD đang bật mà thiếu quyền bắt buộc thì nhắc ở màn chính.
+    private val isMissingRequiredPermissions: Boolean
+        get() = !isLoading && options.isEnabled && permissions.isNotEmpty() && !permissions.hasRequiredPermissions
+
+    // Đóng sheet thì nó không tự hiện lại tới lần mở app sau (ViewModel tạo mới) hay lần bật lại AOD;
+    // trong lúc đó dòng cảnh báo ở đầu màn chính mở lại được sheet.
+    val isPermissionSheetVisible: Boolean
+        get() = isMissingRequiredPermissions && !isPermissionSheetDismissed
+
+    val isPermissionWarningVisible: Boolean
+        get() = isMissingRequiredPermissions && isPermissionSheetDismissed
 }

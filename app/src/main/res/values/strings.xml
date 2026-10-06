@@ -6,6 +6,19 @@
   <string name="open_settings">Open Settings</string>
   <string name="no_internet_connection">No internet connection. Please check your connection and try again.</string>
 
+  <!-- Onboarding: Splash, Language, Permission -->
+  <string name="splash_tagline">The clock stays on while the screen is off</string>
+  <string name="onboarding_step">Step %1$d of %2$d</string>
+  <string name="language_title">Choose your language</string>
+  <string name="language_subtitle">You can change it later on the home screen.</string>
+  <string name="action_continue">Continue</string>
+  <string name="permission_title">Allow the clock to appear</string>
+  <string name="permission_subtitle">Custom AOD needs these permissions to show the clock when the screen turns off.</string>
+  <string name="permission_missing_hint">Allow every permission above to continue.</string>
+  <string name="permission_unknown_hint">Your phone does not let the app check this one. Open Settings to make sure it is on.</string>
+  <string name="action_allow">Allow</string>
+  <string name="action_get_started">Get started</string>
+
   <!-- Ads -->
   <string name="ad_loading">Loading ad…</string>
   <string name="ad_label">Ad</string>
@@ -32,10 +45,17 @@
   <string name="perm_notif_desc">Only shows the notification that the app is running.</string>
   <string name="perm_notif_access_title">Notification access</string>
   <string name="perm_notif_access_desc">Shows notification icons, the edge glow and music controls on the clock. The clock works without it.</string>
+  <string name="perm_overlay_name">Display over other apps</string>
+  <string name="perm_lock_name">Show on Lock screen</string>
+  <string name="perm_popup_name">Pop-up windows in the background</string>
 
   <string name="permission_state_granted">Granted</string>
   <string name="permission_state_missing">Not granted</string>
   <string name="permission_state_unknown">Unknown</string>
+
+  <string name="permission_sheet_title">The clock cannot appear yet</string>
+  <string name="permission_sheet_desc">Allow these permissions so the clock shows when the screen turns off.</string>
+  <string name="action_later">Later</string>
 
   <string name="opt_custom_brightness">Use a custom brightness for the clock</string>
   <string name="opt_brightness_value">Brightness: %1$d%%</string>

@@ -17,5 +17,7 @@ object AodsPrimitiveSpacing {
     val Xxl = 40.dp
     val Xxxl = 48.dp
     val XxxlPlus = 56.dp
+    val Huge = 64.dp
     val Giant = 80.dp
+    val Colossal = 128.dp
 }

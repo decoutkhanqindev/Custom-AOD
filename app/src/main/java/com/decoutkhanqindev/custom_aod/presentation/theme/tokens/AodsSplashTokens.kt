@@ -7,12 +7,15 @@ import androidx.compose.ui.unit.Dp
 @Immutable
 data class AodsSplashTokens(
     val iconSize: Dp,
+    val textOffset: Dp,
     val contentPadding: Dp,
 )
 
-// Icon 144dp đúng giữa cửa sổ: trùng icon của splash hệ thống từ Android 12 nên lúc chuyển màn icon không nhảy.
+// Splash hệ thống từ Android 12 vẽ lớp foreground của icon (khung 108) cỡ 288dp giữa cửa sổ; splash của app vẽ đúng drawable đó
+// cùng cỡ, cùng chỗ nên lúc chuyển màn icon không nhảy. Tên app nằm dưới tâm một đoạn textOffset, ngay dưới hình điện thoại.
 val defaultAodsSplash = AodsSplashTokens(
-    iconSize = AodsPrimitiveIconSize.Massive,
+    iconSize = AodsPrimitiveIconSize.Gigantic,
+    textOffset = AodsPrimitiveSpacing.Colossal,
     contentPadding = AodsPrimitiveSpacing.Xl,
 )
 

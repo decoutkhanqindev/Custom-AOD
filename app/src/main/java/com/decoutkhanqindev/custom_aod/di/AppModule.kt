@@ -28,6 +28,7 @@ import com.decoutkhanqindev.custom_aod.presentation.aod.AodSession
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.AodViewModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.LanguageViewModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainViewModel
+import com.decoutkhanqindev.custom_aod.presentation.screens.permission.PermissionViewModel
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidApplication
@@ -87,7 +88,8 @@ val useCaseModule = module {
 
 val viewModelModule = module {
     viewModel { MainViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get()) }
+    viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get(), get()) }
+    viewModel { PermissionViewModel(get(), get()) }
     viewModel { (isPreview: Boolean) ->
         AodViewModel(isPreview, get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
     }

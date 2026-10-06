@@ -7,6 +7,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 @Immutable
 data class AodsMotionTokens(
     val durationShort: Int,
+    val durationEnter: Int,
     val durationShimmer: Int,
     val durationShimmerHighlight: Int,
     val easeLinear: Easing,
@@ -15,6 +16,7 @@ data class AodsMotionTokens(
 
 val defaultAodsMotion = AodsMotionTokens(
     durationShort = AodsPrimitiveMotion.Duration100,
+    durationEnter = AodsPrimitiveMotion.Duration600,
     durationShimmer = AodsPrimitiveMotion.Duration1000,
     durationShimmerHighlight = AodsPrimitiveMotion.Duration1400,
     easeLinear = AodsPrimitiveMotion.EaseLinear,

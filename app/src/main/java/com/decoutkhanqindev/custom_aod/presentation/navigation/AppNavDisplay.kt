@@ -14,6 +14,7 @@ import com.decoutkhanqindev.custom_aod.data.network.connectivity.NetworkManager
 import com.decoutkhanqindev.custom_aod.presentation.components.dialog.AodsNoInternetDialog
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.LanguageScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainScreen
+import com.decoutkhanqindev.custom_aod.presentation.screens.permission.PermissionScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.splash.SplashScreen
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -34,6 +35,7 @@ fun AppNavDisplay(modifier: Modifier = Modifier) {
             entryProvider = entryProvider {
                 entry<SplashDestination> { SplashScreen(backStack) }
                 entry<LanguageDestination> { dest -> LanguageScreen(backStack = backStack, isFirstOpen = dest.isFirstOpen) }
+                entry<PermissionDestination> { PermissionScreen(backStack) }
                 entry<MainDestination> { MainScreen(backStack) }
                 // TODO: Đăng ký entry<XxxDestination> { dest -> XxxScreen(...) } cho màn mới
             },

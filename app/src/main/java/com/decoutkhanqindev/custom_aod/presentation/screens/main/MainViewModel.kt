@@ -21,11 +21,11 @@ import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptions
 import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aodPermissions
 import com.decoutkhanqindev.custom_aod.presentation.model.observeAodAppearance
 import com.decoutkhanqindev.custom_aod.presentation.model.observeAodExtras
 import com.decoutkhanqindev.custom_aod.presentation.model.observeAodInteraction
@@ -39,7 +39,6 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainInten
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -123,6 +122,8 @@ class MainViewModel(
             is MainIntent.ChangeMinBattery -> dataStoreManager.saveAodMinBattery(intent.percent)
             is MainIntent.OpenPermissionSettings -> openPermissionSettings(intent.permission)
             is MainIntent.RefreshPermissions -> refreshPermissions()
+            is MainIntent.ShowPermissionSheet -> showPermissionSheet()
+            is MainIntent.DismissPermissionSheet -> dismissPermissionSheet()
             is MainIntent.NotificationPermissionDialogShown -> onNotificationPermissionDialogShown()
             is MainIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
             is MainIntent.NavigateToLanguage -> viewModelScope.launch { sendEffect(MainEffect.NavigateToLanguage) }
@@ -224,32 +225,21 @@ class MainViewModel(
 
     // Trạng thái quyền đổi ở app Cài đặt chứ không phải ở đây, nên đọc lại mỗi lần màn hình resume.
     private fun refreshPermissions() {
-        val permissions = buildList {
-            add(PermissionUiModel(PermissionValue.OVERLAY, permissionManager.canDrawOverlays()))
-            if (permissionManager.isXiaomi) {
-                add(PermissionUiModel(PermissionValue.MIUI_LOCK_SCREEN, permissionManager.isMiuiShowWhenLockedAllowed()))
-                add(
-                    PermissionUiModel(
-                        PermissionValue.MIUI_BACKGROUND_POPUP,
-                        permissionManager.isMiuiBackgroundStartAllowed(),
-                    ),
-                )
-            }
-            add(PermissionUiModel(PermissionValue.NOTIFICATIONS, permissionManager.areNotificationsEnabled()))
-            add(
-                PermissionUiModel(
-                    PermissionValue.NOTIFICATION_ACCESS,
-                    permissionManager.isNotificationListenerEnabled(),
-                ),
-            )
-        }
         updateState {
             copy(
-                permissions = permissions.toImmutableList(),
+                permissions = permissionManager.aodPermissions(),
                 hasCalendarPermission = permissionManager.hasCalendarPermission(),
                 hasLocationPermission = permissionManager.hasCoarseLocationPermission(),
             )
         }
+    }
+
+    private fun showPermissionSheet() {
+        updateState { copy(isPermissionSheetDismissed = false) }
+    }
+
+    private fun dismissPermissionSheet() {
+        updateState { copy(isPermissionSheetDismissed = true) }
     }
 
     // Chỉ hỏi một lần ở lần mở app đầu tiên, để thông báo của foreground service hiện ngay từ đầu (Google Play muốn service đó dễ nhận biết).
@@ -262,8 +252,10 @@ class MainViewModel(
         }
     }
 
+    // Bật lại AOD là lúc cần quyền: còn thiếu quyền bắt buộc thì sheet nhắc quyền hiện lại dù trước đó đã bị đóng.
     private fun toggleAod(isEnabled: Boolean) {
         dataStoreManager.saveIsAodEnabled(isEnabled)
+        if (isEnabled) showPermissionSheet()
         viewModelScope.launch {
             sendEffect(if (isEnabled) MainEffect.StartAodService else MainEffect.StopAodService)
         }

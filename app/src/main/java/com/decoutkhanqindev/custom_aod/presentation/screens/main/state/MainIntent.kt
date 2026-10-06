@@ -55,6 +55,8 @@ sealed interface MainIntent {
     data class ChangeMinBattery(val percent: Int) : MainIntent
     data class OpenPermissionSettings(val permission: PermissionValue) : MainIntent
     data object RefreshPermissions : MainIntent
+    data object ShowPermissionSheet : MainIntent
+    data object DismissPermissionSheet : MainIntent
     data object NotificationPermissionDialogShown : MainIntent
     data class NotificationPermissionResult(val isGranted: Boolean) : MainIntent
     data object NavigateToLanguage : MainIntent

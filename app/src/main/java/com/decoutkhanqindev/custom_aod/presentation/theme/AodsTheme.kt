@@ -14,6 +14,7 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsColorTokens
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsDrawingPadTokens
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsElevationTokens
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsMotionTokens
+import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsOnboardingTokens
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsOpacityTokens
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsPickerTokens
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.AodsSettingsRowTokens
@@ -27,6 +28,7 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsColors
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsDrawingPad
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsElevation
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsMotion
+import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsOnboarding
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsOpacity
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsPicker
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.LocalAodsSettingsRow
@@ -40,6 +42,7 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsCloc
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsDrawingPad
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsElevation
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsMotion
+import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsOnboarding
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsOpacity
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsPicker
 import com.decoutkhanqindev.custom_aod.presentation.theme.tokens.defaultAodsSettingsRow
@@ -85,6 +88,9 @@ object AodsTheme {
     val splash: AodsSplashTokens
         @Composable @ReadOnlyComposable get() = LocalAodsSplash.current
 
+    val onboarding: AodsOnboardingTokens
+        @Composable @ReadOnlyComposable get() = LocalAodsOnboarding.current
+
     val ad: AodsAdTokens
         @Composable @ReadOnlyComposable get() = LocalAodsAd.current
 }
@@ -105,6 +111,7 @@ fun AodsTheme(content: @Composable () -> Unit) {
         LocalAodsDrawingPad provides defaultAodsDrawingPad,
         LocalAodsClock provides defaultAodsClock,
         LocalAodsSplash provides defaultAodsSplash,
+        LocalAodsOnboarding provides defaultAodsOnboarding,
         LocalAodsAd provides defaultAodsAd,
     ) {
         MaterialTheme(
@@ -131,15 +138,27 @@ private fun AodsColorTokens.toMaterial3ColorScheme(): ColorScheme = darkColorSch
     error = error,
 )
 
-private fun AodsTypographyTokens.toMaterial3Typography(): Typography = Typography(
-    headlineLarge = headlineLarge,
-    headlineMedium = headlineMedium,
-    titleMedium = titleMedium,
-    bodyLarge = bodyLarge,
-    bodyMedium = bodyMedium,
-    bodySmall = bodySmall,
-    labelMedium = labelMedium,
-)
+// Style không có token vẫn theo type scale của Material 3 nhưng đổi sang font của app, để mọi component Material cùng font.
+private fun AodsTypographyTokens.toMaterial3Typography(): Typography {
+    val materialTypeScale = Typography()
+    return Typography(
+        displayLarge = materialTypeScale.displayLarge.copy(fontFamily = fontFamily),
+        displayMedium = materialTypeScale.displayMedium.copy(fontFamily = fontFamily),
+        displaySmall = displaySmall,
+        headlineLarge = headlineLarge,
+        headlineMedium = headlineMedium,
+        headlineSmall = headlineSmall,
+        titleLarge = titleLarge,
+        titleMedium = titleMedium,
+        titleSmall = materialTypeScale.titleSmall.copy(fontFamily = fontFamily),
+        bodyLarge = bodyLarge,
+        bodyMedium = bodyMedium,
+        bodySmall = bodySmall,
+        labelLarge = labelLarge,
+        labelMedium = labelMedium,
+        labelSmall = materialTypeScale.labelSmall.copy(fontFamily = fontFamily),
+    )
+}
 
 private fun AodsShapeTokens.toMaterial3Shapes(): Shapes = Shapes(
     small = small,
