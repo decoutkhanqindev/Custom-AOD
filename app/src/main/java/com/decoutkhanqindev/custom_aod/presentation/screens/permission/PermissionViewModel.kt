@@ -26,7 +26,9 @@ class PermissionViewModel(
         when (intent) {
             is PermissionIntent.RefreshPermissions -> refreshPermissions()
             is PermissionIntent.OpenPermissionSettings -> openPermissionSettings(intent.permission)
+            is PermissionIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
             is PermissionIntent.ConfirmPermissions -> confirmPermissions()
+            is PermissionIntent.NavigateBack -> viewModelScope.launch { sendEffect(PermissionEffect.NavigateBack) }
         }
     }
 
@@ -35,21 +37,41 @@ class PermissionViewModel(
         updateState { copy(permissions = permissionManager.requiredAodPermissions()) }
     }
 
-    // Màn này chỉ có quyền bắt buộc: "Hiển thị trên ứng dụng khác" và quyền màn hình khoá của Xiaomi.
+    // Màn này chỉ có quyền bắt buộc: "Hiển thị trên ứng dụng khác", thông báo và hai quyền riêng của Xiaomi.
     private fun openPermissionSettings(permission: PermissionValue) {
         val effect = when (permission) {
             PermissionValue.OVERLAY -> PermissionEffect.OpenOverlaySettings
-            else -> PermissionEffect.OpenMiuiPermissionSettings
+            PermissionValue.MIUI_LOCK_SCREEN,
+            PermissionValue.MIUI_BACKGROUND_POPUP -> PermissionEffect.OpenMiuiPermissionSettings
+
+            PermissionValue.NOTIFICATIONS ->
+                if (permissionManager.needsNotificationPermission()) {
+                    PermissionEffect.RequestNotificationPermission
+                } else {
+                    PermissionEffect.OpenNotificationSettings
+                }
+
+            else -> return
         }
         viewModelScope.launch { sendEffect(effect) }
     }
 
-    // Đọc lại quyền ngay lúc bấm (quyền có thể vừa bị tắt mà màn chưa kịp đọc lại); đủ quyền mới xoá cờ lần đầu mở app.
+    // Đã cho phép thì start lại service để nó đăng lại thông báo; bị từ chối thì mở trang cài đặt thông báo (sau 2 lần từ chối hệ thống không hiện hộp thoại nữa).
+    private fun onNotificationPermissionResult(isGranted: Boolean) {
+        refreshPermissions()
+        viewModelScope.launch {
+            when {
+                isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(PermissionEffect.StartAodService)
+                else -> sendEffect(PermissionEffect.OpenNotificationSettings)
+            }
+        }
+    }
+
+    // Đọc lại quyền ngay lúc bấm (quyền có thể vừa bị tắt mà màn chưa kịp đọc lại); onboarding đã xong từ lúc vào màn này.
     private fun confirmPermissions() {
         val permissions = permissionManager.requiredAodPermissions()
         updateState { copy(permissions = permissions) }
         if (!permissions.hasRequiredPermissions) return
-        dataStoreManager.saveIsFirstOpen(false)
         viewModelScope.launch { sendEffect(PermissionEffect.NavigateToMain) }
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,7 +54,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.WeatherConditionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsAodTheme
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -62,17 +63,16 @@ fun AodContent(
     onIntent: (AodIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val clock = AodsTheme.clock
     val currentOnIntent by rememberUpdatedState(onIntent)
     val focusRequester = remember { FocusRequester() }
     val shiftX = animateDpAsState(
         targetValue = state.shiftXDp.dp,
-        animationSpec = tween(durationMillis = clock.shiftDurationMillis),
+        animationSpec = tween(durationMillis = 1500),
         label = "AodShiftX",
     )
     val shiftY = animateDpAsState(
         targetValue = state.shiftYDp.dp,
-        animationSpec = tween(durationMillis = clock.shiftDurationMillis),
+        animationSpec = tween(durationMillis = 1500),
         label = "AodShiftY",
     )
 
@@ -83,7 +83,7 @@ fun AodContent(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .background(clock.background)
+            .background(MaterialTheme.colorScheme.background)
             .onPreviewKeyEvent { event ->
                 val gesture = when (event.key) {
                     Key.VolumeUp -> AodGestureValue.VOLUME_UP
@@ -111,7 +111,7 @@ fun AodContent(
                 detectVerticalDragGestures(
                     onDragStart = { dragTotal = 0f },
                     onDragEnd = {
-                        val threshold = clock.swipeThreshold.toPx()
+                        val threshold = 80.dp.toPx()
                         when {
                             dragTotal <= -threshold ->
                                 currentOnIntent(AodIntent.PerformGesture(AodGestureValue.SWIPE_UP))
@@ -136,7 +136,7 @@ fun AodContent(
 
         AodEdgeGlow(
             isGlowing = state.isGlowing,
-            color = state.glowColorArgb?.let { Color(it) } ?: clock.accent,
+            color = state.glowColorArgb?.let { Color(it) } ?: MaterialTheme.colorScheme.primary,
         )
 
         AnimatedVisibility(
@@ -156,7 +156,7 @@ fun AodContent(
                 ) {
                     AodClockFace(nowMillis = state.nowMillis, appearance = state.appearance)
 
-                    Spacer(modifier = Modifier.width(clock.landscapeGap))
+                    Spacer(modifier = Modifier.width(40.dp))
 
                     AodDetails(state = state, onIntent = currentOnIntent)
                 }
@@ -182,57 +182,61 @@ fun AodContent(
 @Preview(widthDp = 360, heightDp = 720)
 @Composable
 private fun AodContentPreview() {
-    AodContent(
-        state = AodState(
-            nowMillis = System.currentTimeMillis(),
-            extras = AodExtrasUiModel(memo = "Buy milk"),
-            wallpaper = WallpaperValue.AURORA,
-            notifications = AodNotificationsUiModel(
-                latest = NotificationContentUiModel(
-                    key = "preview",
-                    icon = createBitmap(48, 48),
-                    title = "Alice",
-                    text = "See you at 7 at the usual place?",
-                    isHidden = false,
+    AodsAodTheme {
+        AodContent(
+            state = AodState(
+                nowMillis = System.currentTimeMillis(),
+                extras = AodExtrasUiModel(memo = "Buy milk"),
+                wallpaper = WallpaperValue.AURORA,
+                notifications = AodNotificationsUiModel(
+                    latest = NotificationContentUiModel(
+                        key = "preview",
+                        icon = createBitmap(48, 48),
+                        title = "Alice",
+                        text = "See you at 7 at the usual place?",
+                        isHidden = false,
+                    ),
                 ),
-            ),
-            weather = WeatherUiModel(
-                temperature = 24,
-                condition = WeatherConditionValue.CLOUDY,
-                isDay = true,
-                updatedAtMillis = System.currentTimeMillis(),
-            ),
-            events = persistentListOf(
-                CalendarEventUiModel(
-                    title = "Team meeting",
-                    beginMillis = System.currentTimeMillis(),
-                    endMillis = System.currentTimeMillis(),
-                    isAllDay = false,
+                weather = WeatherUiModel(
+                    temperature = 24,
+                    condition = WeatherConditionValue.CLOUDY,
+                    isDay = true,
+                    updatedAtMillis = System.currentTimeMillis(),
                 ),
+                events = persistentListOf(
+                    CalendarEventUiModel(
+                        title = "Team meeting",
+                        beginMillis = System.currentTimeMillis(),
+                        endMillis = System.currentTimeMillis(),
+                        isAllDay = false,
+                    ),
+                ),
+                battery = BatteryUiModel(percent = 72, isCharging = false),
+                media = MediaUiModel(
+                    title = "Song title",
+                    artist = "Artist",
+                    isPlaying = true,
+                    canSkipToPrevious = true,
+                    canSkipToNext = true,
+                ),
+                isGlowing = true,
             ),
-            battery = BatteryUiModel(percent = 72, isCharging = false),
-            media = MediaUiModel(
-                title = "Song title",
-                artist = "Artist",
-                isPlaying = true,
-                canSkipToPrevious = true,
-                canSkipToNext = true,
-            ),
-            isGlowing = true,
-        ),
-        onIntent = {},
-    )
+            onIntent = {},
+        )
+    }
 }
 
 @Preview(widthDp = 720, heightDp = 360)
 @Composable
 private fun AodContentLandscapePreview() {
-    AodContent(
-        state = AodState(
-            nowMillis = System.currentTimeMillis(),
-            appearance = AodAppearanceUiModel(face = ClockFaceValue.ANALOG, color = ClockColorValue.MINT),
-            battery = BatteryUiModel(percent = 72, isCharging = true),
-        ),
-        onIntent = {},
-    )
+    AodsAodTheme {
+        AodContent(
+            state = AodState(
+                nowMillis = System.currentTimeMillis(),
+                appearance = AodAppearanceUiModel(face = ClockFaceValue.ANALOG, color = ClockColorValue.MINT),
+                battery = BatteryUiModel(percent = 72, isCharging = true),
+            ),
+            onIntent = {},
+        )
+    }
 }

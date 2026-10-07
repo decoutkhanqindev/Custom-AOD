@@ -29,12 +29,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
 internal fun AodWallpaper(wallpaper: WallpaperValue?) {
-    val alpha = AodsTheme.clock.imageAlpha
+    val alpha = 0.5f
 
     Crossfade(
         targetState = wallpaper,
@@ -56,7 +56,7 @@ internal fun AodWallpaper(wallpaper: WallpaperValue?) {
 
 @Composable
 internal fun AodBackground(background: Bitmap?) {
-    val alpha = AodsTheme.clock.imageAlpha
+    val alpha = 0.5f
 
     Crossfade(
         targetState = background,
@@ -80,27 +80,25 @@ internal fun AodEdgeGlow(
     isGlowing: Boolean,
     color: Color,
 ) {
-    val clock = AodsTheme.clock
-
     AnimatedVisibility(
         visible = isGlowing,
         modifier = Modifier.fillMaxSize(),
-        enter = fadeIn(animationSpec = tween(durationMillis = clock.glowInDurationMillis)),
-        exit = fadeOut(animationSpec = tween(durationMillis = clock.glowOutDurationMillis)),
+        enter = fadeIn(animationSpec = tween(durationMillis = 400)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 800)),
     ) {
         val transition = rememberInfiniteTransition(label = "AodEdgeGlow")
         val pulse = transition.animateFloat(
-            initialValue = clock.glowPulseMinAlpha,
+            initialValue = 0.3f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = clock.glowPulseDurationMillis),
+                animation = tween(durationMillis = 900),
                 repeatMode = RepeatMode.Reverse,
             ),
             label = "AodEdgeGlowPulse",
         )
 
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val glowWidth = clock.edgeGlowWidth.toPx()
+            val glowWidth = 24.dp.toPx()
             val edgeColor = color.copy(alpha = pulse.value)
             drawRect(
                 brush = Brush.verticalGradient(

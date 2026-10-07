@@ -1,6 +1,6 @@
 ---
 name: design-tokens
-description: Create Kotlin Compose design tokens from one of three supported sources — Google Stitch (MCP), Figma (MCP or JSON), or Claude Design (design-spec output, Claude HTML/markdown artifacts). Three-layer architecture (Primitive/Semantic/Component) with code generation. Use when user asks to "generate design tokens", "create theme from Figma/Stitch/Claude design", "build Compose tokens from design spec", or "convert design source to tokens". Refuses any other input source and asks user for correct seed data.
+description: Create Kotlin Compose design tokens from one of three supported sources — Google Stitch (MCP), Figma (MCP or JSON), or Claude Design (design-spec output, Claude HTML/markdown artifacts). Three-layer architecture (Primitive/Semantic/Component) with code generation; Custom-AOD does not use the layered architecture (flat `AodsColors` / `AodsTypography` / `AodsShapes` objects read via `AodsTheme.colors / .typography / .shapes`, literal dp/sp in UI). Use when user asks to "generate design tokens", "create theme from Figma/Stitch/Claude design", "build Compose tokens from design spec", or "convert design source to tokens". Refuses any other input source and asks user for correct seed data.
 ---
 
 ## Platform Tooling
@@ -11,6 +11,8 @@ description: Create Kotlin Compose design tokens from one of three supported sou
 - Use Skill tool when chaining to another installed skill.
 
 # Compose Design Tokens
+
+> **Custom-AOD override (đọc trước):** project này **không dùng kiến trúc token 3 tầng** của skill mà theo pattern theme của Lich-Viet-Loc-Phat. Chỉ lấy giá trị từ nguồn thiết kế rồi ghi vào `presentation/theme/AodsColors.kt` (màu, biến thể alpha `<Màu>Alpha<NN>`), `AodsTypography.kt` (`TextStyle`), `AodsShapes.kt` (`RoundedCornerShape<N>dp`) — mỗi file một `internal object` cùng tên; UI đọc qua `AodsTheme.colors / .typography / .shapes`, không gọi thẳng các object ngoài package `theme`. **Không** sinh Primitive / Semantic / Component, `CompositionLocal`, accessor `AodsTheme.xxx`, object khoảng cách / cỡ icon / thời lượng (UI viết số dp / sp / thời lượng thẳng). Phần còn lại của skill chỉ áp dụng cho project khác. Chi tiết: CLAUDE.md mục 14 và 18.
 
 Generate Kotlin Compose design tokens from **exactly one** of three supported sources: **Stitch**, **Figma**, or **Claude Design**. Any other input is rejected with a request for correct seed data.
 

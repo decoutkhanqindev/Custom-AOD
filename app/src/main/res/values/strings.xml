@@ -39,15 +39,20 @@
   <string name="perm_overlay_desc">Lets the app open the clock by itself when the screen turns off.</string>
   <string name="perm_lock_title">Xiaomi: show on Lock screen (required)</string>
   <string name="perm_lock_desc">Under Other permissions, allow Show on Lock screen. Without it the clock stays hidden behind the lock screen.</string>
-  <string name="perm_popup_title">Xiaomi: pop-up windows in the background</string>
-  <string name="perm_popup_desc">Under Other permissions, allow Open new windows while running in the background, only if the clock still does not appear.</string>
-  <string name="perm_notif_title">Notifications</string>
-  <string name="perm_notif_desc">Only shows the notification that the app is running.</string>
+  <string name="perm_popup_title">Xiaomi: pop-up windows in the background (required)</string>
+  <string name="perm_popup_desc">Under Other permissions, allow Open new windows while running in the background. Without it the clock cannot open by itself when the screen turns off.</string>
+  <string name="perm_notif_title">Notifications (required)</string>
+  <string name="perm_notif_desc">Shows the notification that keeps the clock running in the background.</string>
   <string name="perm_notif_access_title">Notification access</string>
   <string name="perm_notif_access_desc">Shows notification icons, the edge glow and music controls on the clock. The clock works without it.</string>
   <string name="perm_overlay_name">Display over other apps</string>
   <string name="perm_lock_name">Show on Lock screen</string>
   <string name="perm_popup_name">Pop-up windows in the background</string>
+  <string name="perm_notif_name">Notifications</string>
+  <string name="perm_calendar_title">Calendar</string>
+  <string name="perm_calendar_desc">Shows today\'s events on the clock. Only needed for Today\'s events.</string>
+  <string name="perm_location_title">Approximate location</string>
+  <string name="perm_location_desc">Gets the weather where you are. Only needed for Weather.</string>
 
   <string name="permission_state_granted">Granted</string>
   <string name="permission_state_missing">Not granted</string>

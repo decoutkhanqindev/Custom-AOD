@@ -45,7 +45,6 @@ data class MainState(
     val language: LanguageUiModel? = null,
     val editingScheduleTime: ScheduleTimeValue? = null,
     @param:StringRes val lastWakeMessageRes: Int = WakeResultValue.UNKNOWN.messageRes,
-    val isNotificationPermissionPending: Boolean = false,
     val isPermissionSheetDismissed: Boolean = false,
 ) {
     val isNotificationAccessGranted: Boolean
@@ -54,11 +53,11 @@ data class MainState(
     val requiredPermissions: ImmutableList<PermissionUiModel>
         get() = permissions.filter { it.permission.isRequired }.toImmutableList()
 
-    // Lần đầu mở app đã có màn quyền riêng; về sau AOD đang bật mà thiếu quyền bắt buộc thì nhắc ở màn chính.
+    // Lần đầu mở app đã có màn quyền riêng (vào màn đó là xong onboarding); về sau thiếu quyền bắt buộc thì nhắc ở màn chính.
     private val isMissingRequiredPermissions: Boolean
-        get() = !isLoading && options.isEnabled && permissions.isNotEmpty() && !permissions.hasRequiredPermissions
+        get() = !isLoading && permissions.isNotEmpty() && !permissions.hasRequiredPermissions
 
-    // Đóng sheet thì nó không tự hiện lại tới lần mở app sau (ViewModel tạo mới) hay lần bật lại AOD;
+    // Đóng sheet thì nó không tự hiện lại tới lần mở app sau (ViewModel tạo mới) hay lần bật AOD / áp giao diện cho đồng hồ;
     // trong lúc đó dòng cảnh báo ở đầu màn chính mở lại được sheet.
     val isPermissionSheetVisible: Boolean
         get() = isMissingRequiredPermissions && !isPermissionSheetDismissed

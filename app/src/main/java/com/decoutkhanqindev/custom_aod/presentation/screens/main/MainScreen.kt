@@ -20,6 +20,7 @@ import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycl
 import com.decoutkhanqindev.custom_aod.presentation.navigation.LanguageDestination
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.utils.openAppSettings
 import com.decoutkhanqindev.custom_aod.utils.openMiuiPermissionSettings
 import com.decoutkhanqindev.custom_aod.utils.openNotificationSettings
 import com.decoutkhanqindev.custom_aod.utils.openOverlaySettings
@@ -65,6 +66,8 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                 is MainEffect.OpenNotificationAccessSettings ->
                     AodNotificationListener.openAccessSettings(context)
 
+                is MainEffect.OpenAppSettings -> context.openAppSettings()
+
                 is MainEffect.RequestNotificationPermission ->
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -83,15 +86,6 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                 is MainEffect.ShowMessage -> context.showToast(resources.getString(effect.messageRes))
             }
         }
-    }
-
-    LifecycleResumeEffect(state.isNotificationPermissionPending) {
-        if (!state.isNotificationPermissionPending) return@LifecycleResumeEffect onPauseOrDispose { }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-        viewModel.onIntent(MainIntent.NotificationPermissionDialogShown)
-        onPauseOrDispose { }
     }
 
     LifecycleResumeEffect(Unit) {

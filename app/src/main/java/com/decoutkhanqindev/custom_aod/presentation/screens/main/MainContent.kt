@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AnimationContentKey
@@ -75,18 +77,18 @@ private fun MainSettings(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(AodsTheme.spacing.screenPadding),
+            .padding(20.dp),
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = AodsTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineMedium,
         )
 
         Text(
             text = stringResource(R.string.main_subtitle),
-            modifier = Modifier.padding(top = AodsTheme.spacing.inlineGap),
-            color = AodsTheme.colors.onSurfaceVariant,
-            style = AodsTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 4.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
         )
 
         MainPermissionWarning(
@@ -94,7 +96,7 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
-        Spacer(modifier = Modifier.height(AodsTheme.spacing.sectionPadding))
+        Spacer(modifier = Modifier.height(16.dp))
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_enabled),
@@ -156,7 +158,7 @@ private fun MainSettings(
             onIntent = onIntent,
         )
 
-        Spacer(modifier = Modifier.height(AodsTheme.spacing.sectionGap))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = { onIntent(MainIntent.OpenPreview) },
@@ -167,9 +169,9 @@ private fun MainSettings(
 
         Text(
             text = stringResource(state.lastWakeMessageRes),
-            modifier = Modifier.padding(top = AodsTheme.spacing.componentPadding),
-            color = AodsTheme.colors.onSurfaceVariant,
-            style = AodsTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 12.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

@@ -32,6 +32,11 @@ fun Context.openOverlaySettings() {
     openSettingsPage(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, packageUri()))
 }
 
+// Quyền runtime bị từ chối hai lần thì hệ thống không hiện hộp thoại nữa: chỉ cấp được ở trang Thông tin ứng dụng.
+fun Context.openAppSettings() {
+    openSettingsPage(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri()))
+}
+
 fun Context.openNotificationSettings() {
     openSettingsPage(
         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, packageName),

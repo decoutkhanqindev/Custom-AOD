@@ -37,15 +37,20 @@
   <string name="perm_overlay_desc">Cho phép app tự mở đồng hồ khi màn hình tắt.</string>
   <string name="perm_lock_title">Xiaomi: hiển thị trên màn hình khóa (bắt buộc)</string>
   <string name="perm_lock_desc">Trong Quyền khác, cho phép Hiển thị trên màn hình khóa. Thiếu quyền này đồng hồ bị giấu sau màn hình khóa.</string>
-  <string name="perm_popup_title">Xiaomi: cửa sổ pop-up khi chạy nền</string>
-  <string name="perm_popup_desc">Trong Quyền khác, cho phép Mở cửa sổ mới khi đang chạy nền, chỉ khi đồng hồ vẫn không hiện.</string>
-  <string name="perm_notif_title">Thông báo</string>
-  <string name="perm_notif_desc">Chỉ để hiện thông báo ứng dụng đang chạy.</string>
+  <string name="perm_popup_title">Xiaomi: cửa sổ pop-up khi chạy nền (bắt buộc)</string>
+  <string name="perm_popup_desc">Trong Quyền khác, cho phép Mở cửa sổ mới khi đang chạy nền. Thiếu quyền này đồng hồ không tự mở được khi màn hình tắt.</string>
+  <string name="perm_notif_title">Thông báo (bắt buộc)</string>
+  <string name="perm_notif_desc">Hiện thông báo giữ cho đồng hồ chạy nền.</string>
   <string name="perm_notif_access_title">Truy cập thông báo</string>
   <string name="perm_notif_access_desc">Để hiện biểu tượng thông báo, viền sáng và điều khiển nhạc trên đồng hồ. Đồng hồ vẫn chạy khi không có quyền này.</string>
   <string name="perm_overlay_name">Hiển thị trên ứng dụng khác</string>
   <string name="perm_lock_name">Hiển thị trên màn hình khóa</string>
   <string name="perm_popup_name">Cửa sổ bật lên khi chạy nền</string>
+  <string name="perm_notif_name">Thông báo</string>
+  <string name="perm_calendar_title">Lịch</string>
+  <string name="perm_calendar_desc">Hiện sự kiện hôm nay trên đồng hồ. Chỉ cần khi bật Sự kiện hôm nay.</string>
+  <string name="perm_location_title">Vị trí gần đúng</string>
+  <string name="perm_location_desc">Lấy thời tiết nơi bạn đang ở. Chỉ cần khi bật Thời tiết.</string>
 
   <string name="permission_state_granted">Đã cấp</string>
   <string name="permission_state_missing">Chưa cấp</string>

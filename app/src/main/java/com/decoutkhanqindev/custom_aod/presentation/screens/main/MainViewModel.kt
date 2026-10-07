@@ -41,7 +41,6 @@ import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -62,8 +61,8 @@ class MainViewModel(
     ),
 ), Tag {
 
-    // Hộp thoại quyền thông báo đang mở là lần hỏi tự động lúc mở app lần đầu (bị từ chối thì để yên) hay do user bấm dòng "Thông báo".
-    private var isFirstLaunchNotificationRequest = false
+    // Quyền lịch / vị trí đang được hỏi từ danh sách quyền (chỉ để cấp) hay từ công tắc "Sự kiện hôm nay" / "Thời tiết" (cấp xong thì bật luôn mục đó).
+    private var permissionRequestedFromList: PermissionValue? = null
 
     init {
         observeSettings()
@@ -73,11 +72,11 @@ class MainViewModel(
         observeDrawing()
         observeLanguage()
         observeLastWake()
-        checkFirstLaunchNotificationPermission()
     }
 
     override fun onIntent(intent: MainIntent) {
         Timber.tag(tag).d("onIntent: $intent")
+        if (intent.isAodRelated) showPermissionSheet()
         when (intent) {
             is MainIntent.ToggleAod -> toggleAod(intent.isEnabled)
             is MainIntent.ToggleCustomBrightness -> dataStoreManager.saveIsAodCustomBrightness(intent.isEnabled)
@@ -124,7 +123,6 @@ class MainViewModel(
             is MainIntent.RefreshPermissions -> refreshPermissions()
             is MainIntent.ShowPermissionSheet -> showPermissionSheet()
             is MainIntent.DismissPermissionSheet -> dismissPermissionSheet()
-            is MainIntent.NotificationPermissionDialogShown -> onNotificationPermissionDialogShown()
             is MainIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
             is MainIntent.NavigateToLanguage -> viewModelScope.launch { sendEffect(MainEffect.NavigateToLanguage) }
             is MainIntent.OpenPreview -> viewModelScope.launch { sendEffect(MainEffect.OpenPreview) }
@@ -242,20 +240,8 @@ class MainViewModel(
         updateState { copy(isPermissionSheetDismissed = true) }
     }
 
-    // Chỉ hỏi một lần ở lần mở app đầu tiên, để thông báo của foreground service hiện ngay từ đầu (Google Play muốn service đó dễ nhận biết).
-    private fun checkFirstLaunchNotificationPermission() {
-        viewModelScope.launch {
-            val isAsked = dataStoreManager.isNotificationsAsked.filterNotNull().first()
-            if (isAsked || !permissionManager.needsNotificationPermission()) return@launch
-            dataStoreManager.saveIsNotificationsAsked(true)
-            updateState { copy(isNotificationPermissionPending = true) }
-        }
-    }
-
-    // Bật lại AOD là lúc cần quyền: còn thiếu quyền bắt buộc thì sheet nhắc quyền hiện lại dù trước đó đã bị đóng.
     private fun toggleAod(isEnabled: Boolean) {
         dataStoreManager.saveIsAodEnabled(isEnabled)
-        if (isEnabled) showPermissionSheet()
         viewModelScope.launch {
             sendEffect(if (isEnabled) MainEffect.StartAodService else MainEffect.StopAodService)
         }
@@ -307,37 +293,47 @@ class MainViewModel(
     // Bật lịch hay thời tiết khi chưa có quyền thì hỏi quyền trước; chỉ lưu "bật" khi đã được cấp, để AOD không chờ dữ liệu không bao giờ có.
     private fun toggleCalendar(isEnabled: Boolean) {
         if (isEnabled && !permissionManager.hasCalendarPermission()) {
+            permissionRequestedFromList = null
             viewModelScope.launch { sendEffect(MainEffect.RequestCalendarPermission) }
         } else {
             dataStoreManager.saveIsAodCalendarEnabled(isEnabled)
         }
     }
 
+    // Hỏi từ danh sách quyền: chỉ cấp, không bật "Sự kiện hôm nay"; bị từ chối thì mở Thông tin ứng dụng (từ chối hai lần thì hệ thống không hỏi nữa).
     private fun onCalendarPermissionResult(isGranted: Boolean) {
-        updateState { copy(hasCalendarPermission = isGranted) }
-        if (isGranted) {
-            dataStoreManager.saveIsAodCalendarEnabled(true)
-        } else {
-            viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.calendar_permission_denied)) }
+        val isFromList = permissionRequestedFromList == PermissionValue.CALENDAR
+        permissionRequestedFromList = null
+        refreshPermissions()
+        viewModelScope.launch {
+            when {
+                isFromList -> if (!isGranted) sendEffect(MainEffect.OpenAppSettings)
+                isGranted -> dataStoreManager.saveIsAodCalendarEnabled(true)
+                else -> sendEffect(MainEffect.ShowMessage(R.string.calendar_permission_denied))
+            }
         }
     }
 
     private fun toggleWeather(isEnabled: Boolean) {
         when {
             !isEnabled -> dataStoreManager.saveIsAodWeatherEnabled(false)
-            !permissionManager.hasCoarseLocationPermission() ->
+            !permissionManager.hasCoarseLocationPermission() -> {
+                permissionRequestedFromList = null
                 viewModelScope.launch { sendEffect(MainEffect.RequestLocationPermission) }
+            }
 
             else -> enableWeather()
         }
     }
 
     private fun onLocationPermissionResult(isGranted: Boolean) {
-        updateState { copy(hasLocationPermission = isGranted) }
-        if (isGranted) {
-            enableWeather()
-        } else {
-            viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.location_permission_denied)) }
+        val isFromList = permissionRequestedFromList == PermissionValue.LOCATION
+        permissionRequestedFromList = null
+        refreshPermissions()
+        when {
+            isFromList -> if (!isGranted) viewModelScope.launch { sendEffect(MainEffect.OpenAppSettings) }
+            isGranted -> enableWeather()
+            else -> viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.location_permission_denied)) }
         }
     }
 
@@ -366,33 +362,57 @@ class MainViewModel(
 
             PermissionValue.NOTIFICATIONS ->
                 if (permissionManager.needsNotificationPermission()) {
-                    isFirstLaunchNotificationRequest = false
                     MainEffect.RequestNotificationPermission
                 } else {
                     MainEffect.OpenNotificationSettings
                 }
 
             PermissionValue.NOTIFICATION_ACCESS -> MainEffect.OpenNotificationAccessSettings
+            PermissionValue.CALENDAR ->
+                if (permissionManager.hasCalendarPermission()) {
+                    MainEffect.OpenAppSettings
+                } else {
+                    permissionRequestedFromList = PermissionValue.CALENDAR
+                    MainEffect.RequestCalendarPermission
+                }
+
+            PermissionValue.LOCATION ->
+                if (permissionManager.hasCoarseLocationPermission()) {
+                    MainEffect.OpenAppSettings
+                } else {
+                    permissionRequestedFromList = PermissionValue.LOCATION
+                    MainEffect.RequestLocationPermission
+                }
         }
         viewModelScope.launch { sendEffect(effect) }
     }
 
-    private fun onNotificationPermissionDialogShown() {
-        isFirstLaunchNotificationRequest = true
-        updateState { copy(isNotificationPermissionPending = false) }
-    }
-
-    // Đã cho phép thì start lại service để nó đăng lại thông báo; bị từ chối từ dòng "Thông báo" thì mở trang cài đặt (sau 2 lần từ chối hệ thống không hiện hộp thoại nữa).
+    // Đã cho phép thì start lại service để nó đăng lại thông báo; bị từ chối thì mở trang cài đặt thông báo (sau 2 lần từ chối hệ thống không hiện hộp thoại nữa).
     private fun onNotificationPermissionResult(isGranted: Boolean) {
-        val isFirstLaunch = isFirstLaunchNotificationRequest
-        isFirstLaunchNotificationRequest = false
+        refreshPermissions()
         viewModelScope.launch {
             when {
                 isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(MainEffect.StartAodService)
-                !isFirstLaunch -> sendEffect(MainEffect.OpenNotificationSettings)
+                else -> sendEffect(MainEffect.OpenNotificationSettings)
             }
         }
     }
+
+    // Bật AOD hay áp giao diện cho đồng hồ (mặt, font, màu, cỡ, xoay ngang, ảnh nền) là lúc cần quyền: còn thiếu quyền bắt buộc
+    // thì sheet nhắc quyền hiện lại dù trước đó đã bị đóng. Theme / style mới cho AOD thì thêm Intent của nó vào đây.
+    private val MainIntent.isAodRelated: Boolean
+        get() = when (this) {
+            is MainIntent.ToggleAod -> isEnabled
+            is MainIntent.BackgroundPickerResult -> uri != null
+            is MainIntent.ChangeClockFace,
+            is MainIntent.ChangeClockFont,
+            is MainIntent.ChangeClockColor,
+            is MainIntent.ChangeClockSize,
+            is MainIntent.ToggleLandscape,
+            is MainIntent.SelectWallpaper -> true
+
+            else -> false
+        }
 
     // Gom mọi nhóm cài đặt vào một lần cập nhật: màn hình chỉ hết loading khi tất cả đã đọc xong.
     private data class Settings(

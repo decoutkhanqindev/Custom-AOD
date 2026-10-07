@@ -16,6 +16,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.components.AppLanguageProvider
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.AodScreen
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsAodTheme
 import org.koin.android.ext.android.inject
 
 class AodActivity : ComponentActivity() {
@@ -57,12 +58,14 @@ class AodActivity : ComponentActivity() {
         if (dataStoreManager.isAodLandscape.value == true) lockLandscape()
         setContent {
             AppLanguageProvider {
-                AodScreen(
-                    isPreview = isPreview,
-                    onDarkChange = ::renderDark,
-                    onDimChange = ::renderDim,
-                    onClose = ::close,
-                )
+                AodsAodTheme {
+                    AodScreen(
+                        isPreview = isPreview,
+                        onDarkChange = ::renderDark,
+                        onDimChange = ::renderDim,
+                        onClose = ::close,
+                    )
+                }
             }
         }
         hideSystemBars()

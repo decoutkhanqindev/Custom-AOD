@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Icon app: điện thoại tắt màn hình có viền sáng (edge lighting) chuyển màu mint → xanh → tím, trên màn là đồng hồ
+<!-- Sinh bằng tools/brand/generate_launcher_icon.py: sửa script rồi chạy lại, đừng sửa tay.
+     Icon app: điện thoại tắt màn hình có viền sáng (edge lighting) chuyển màu mint → xanh → tím, trên màn là đồng hồ
      xếp chồng kiểu AOD và ba chấm thông báo. Ba lớp viền cùng gradient, độ đậm khác nhau tạo quầng sáng.
-     Mọi hình nằm trong vùng an toàn 66dp ở giữa khung 108. Splash của app vẽ nguyên drawable này 288dp để trùng splash hệ thống. -->
+     Mọi hình nằm trong vùng an toàn 66dp ở giữa khung 108. Cùng toạ độ với lottie_device_edge_light: splash của app phát
+     Lottie đó và dùng drawable này làm placeholder lúc đang nạp, nên khớp splash hệ thống. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"

@@ -7,7 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,54 +26,74 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.OnboardingStepValue
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AodsOnboardingTopBar(
+    step: OnboardingStepValue,
+    modifier: Modifier = Modifier,
+    onNavigateBack: (() -> Unit)? = null,
+) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.onboarding_step, step.number, OnboardingStepValue.entries.size),
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        shape = CircleShape,
+                    )
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 4.dp,
+                    ),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge,
+            )
+        },
+        modifier = modifier,
+        navigationIcon = {
+            if (onNavigateBack != null) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.action_back),
+                    )
+                }
+            }
+        },
+    )
+}
+
 @Composable
 fun AodsOnboardingHeader(
-    step: OnboardingStepValue,
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
 ) {
-    val onboarding = AodsTheme.onboarding
-
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = onboarding.headerTopPadding),
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = stringResource(R.string.onboarding_step, step.number, OnboardingStepValue.entries.size),
-            modifier = Modifier
-                .background(
-                    color = AodsTheme.colors.primary.copy(alpha = AodsTheme.opacity.tint),
-                    shape = AodsTheme.shapes.full,
-                )
-                .padding(
-                    horizontal = onboarding.stepPillHorizontalPadding,
-                    vertical = onboarding.stepPillVerticalPadding,
-                ),
-            color = AodsTheme.colors.primary,
-            style = AodsTheme.typography.labelLarge,
-        )
-
-        Text(
             text = title,
-            modifier = Modifier
-                .padding(top = onboarding.titleTopPadding)
-                .semantics { heading() },
-            color = AodsTheme.colors.onBackground,
+            modifier = Modifier.semantics { heading() },
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.SemiBold,
-            style = AodsTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.headlineMedium,
         )
 
         Text(
             text = subtitle,
-            modifier = Modifier.padding(top = onboarding.subtitleTopPadding),
-            color = AodsTheme.colors.onSurfaceVariant,
-            style = AodsTheme.typography.bodyLarge,
+            modifier = Modifier.padding(top = 8.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
@@ -82,16 +110,16 @@ fun AodsOnboardingFooter(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(AodsTheme.spacing.screenPadding),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AnimatedVisibility(visible = disabledHint != null && !isActionEnabled) {
             Text(
                 text = disabledHint.orEmpty(),
-                modifier = Modifier.padding(bottom = AodsTheme.onboarding.hintBottomPadding),
-                color = AodsTheme.colors.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                style = AodsTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
 
@@ -99,7 +127,7 @@ fun AodsOnboardingFooter(
             onClick = onAction,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = AodsTheme.onboarding.buttonMinHeight),
+                .heightIn(min = 56.dp),
             enabled = isActionEnabled,
         ) {
             Text(text = actionLabel)
@@ -109,10 +137,20 @@ fun AodsOnboardingFooter(
 
 @Preview(widthDp = 360)
 @Composable
+private fun AodsOnboardingTopBarPreview() {
+    AodsTheme {
+        AodsOnboardingTopBar(
+            step = OnboardingStepValue.PERMISSION,
+            onNavigateBack = {},
+        )
+    }
+}
+
+@Preview(widthDp = 360)
+@Composable
 private fun AodsOnboardingHeaderPreview() {
     AodsTheme {
         AodsOnboardingHeader(
-            step = OnboardingStepValue.LANGUAGE,
             title = "Choose your language",
             subtitle = "You can change it later on the home screen.",
         )

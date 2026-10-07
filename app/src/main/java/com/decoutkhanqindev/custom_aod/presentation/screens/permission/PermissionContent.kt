@@ -11,9 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingFooter
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingTopBar
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsPermissionCard
 import com.decoutkhanqindev.custom_aod.presentation.model.OnboardingStepValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
@@ -30,6 +32,12 @@ fun PermissionContent(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            AodsOnboardingTopBar(
+                step = OnboardingStepValue.PERMISSION,
+                onNavigateBack = { onIntent(PermissionIntent.NavigateBack) },
+            )
+        },
         bottomBar = {
             AodsOnboardingFooter(
                 actionLabel = stringResource(R.string.action_get_started),
@@ -44,14 +52,16 @@ fun PermissionContent(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(horizontal = AodsTheme.spacing.screenPadding),
-            verticalArrangement = Arrangement.spacedBy(AodsTheme.onboarding.itemGap),
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AodsOnboardingHeader(
-                step = OnboardingStepValue.PERMISSION,
                 title = stringResource(R.string.permission_title),
                 subtitle = stringResource(R.string.permission_subtitle),
-                modifier = Modifier.padding(bottom = AodsTheme.onboarding.listTopPadding),
+                modifier = Modifier.padding(
+                    top = 8.dp,
+                    bottom = 12.dp,
+                ),
             )
 
             state.permissions.forEach { permission ->

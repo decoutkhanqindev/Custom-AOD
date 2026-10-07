@@ -1,6 +1,7 @@
 package com.decoutkhanqindev.custom_aod.presentation.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -12,6 +13,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +34,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.PI
@@ -45,7 +46,6 @@ fun Modifier.onClick(
     ripple: Boolean = true,
     action: () -> Unit,
 ): Modifier {
-    val motion = AodsTheme.motion
     val isPressed = remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val scale = remember { Animatable(1f) }
@@ -53,8 +53,8 @@ fun Modifier.onClick(
     LaunchedEffect(Unit) {
         snapshotFlow { isPressed.value }.collectLatest { pressed ->
             scale.animateTo(
-                targetValue = if (pressed) motion.pressScale else 1f,
-                animationSpec = tween(durationMillis = motion.durationShort),
+                targetValue = if (pressed) 0.95f else 1f,
+                animationSpec = tween(durationMillis = 100),
             )
         }
     }
@@ -123,14 +123,14 @@ private fun DrawScope.drawShimmerGradient(progress: Float, highlightColor: Color
 @Composable
 fun Modifier.shimmerLoading(
     backgroundColor: Color? = null,
-    shimmerColor: Color = AodsTheme.colors.shimmer,
+    shimmerColor: Color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.3f),
     shape: Shape? = null,
     isEnable: Boolean = true,
-    durationMillis: Int = AodsTheme.motion.durationShimmer,
+    durationMillis: Int = 1000,
 ): Modifier {
     if (!isEnable) return this
 
-    val easing = AodsTheme.motion.easeLinear
+    val easing = LinearEasing
     val transition = rememberInfiniteTransition(label = "ShimmerLoading")
     val progress = transition.animateFloat(
         initialValue = 0f,
@@ -159,9 +159,9 @@ fun Modifier.shimmerHighlight(
     backgroundColor: Color,
     shimmerColor: Color,
     shape: Shape? = null,
-    durationMillis: Int = AodsTheme.motion.durationShimmerHighlight,
+    durationMillis: Int = 1400,
 ): Modifier {
-    val easing = AodsTheme.motion.easeLinear
+    val easing = LinearEasing
     val transition = rememberInfiniteTransition(label = "ShimmerHighlight")
     val progress = transition.animateFloat(
         initialValue = 0f,
@@ -184,7 +184,7 @@ fun Modifier.shimmerHighlight(
 @Composable
 fun Modifier.blurBackground(
     alphas: ImmutableList<Float>,
-    color: Color = AodsTheme.colors.surfaceContainer,
+    color: Color = MaterialTheme.colorScheme.surfaceContainer,
     startY: Float = 0f,
     endY: Float = Float.POSITIVE_INFINITY,
 ): Modifier = this.background(

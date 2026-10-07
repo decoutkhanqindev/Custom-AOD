@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,9 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingFooter
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingTopBar
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.model.OnboardingStepValue
@@ -51,7 +54,9 @@ fun LanguageContent(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            if (!state.isFirstOpen) {
+            if (state.isFirstOpen) {
+                AodsOnboardingTopBar(step = OnboardingStepValue.LANGUAGE)
+            } else {
                 TopAppBar(
                     title = { Text(text = stringResource(R.string.language)) },
                     navigationIcon = {
@@ -78,17 +83,19 @@ fun LanguageContent(
                 .fillMaxSize()
                 .selectableGroup(),
             contentPadding = innerPadding,
-            verticalArrangement = Arrangement.spacedBy(AodsTheme.onboarding.itemGap),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (state.isFirstOpen) {
                 item(key = OnboardingStepValue.LANGUAGE.name) {
                     AodsOnboardingHeader(
-                        step = OnboardingStepValue.LANGUAGE,
                         title = stringResource(R.string.language_title),
                         subtitle = stringResource(R.string.language_subtitle),
                         modifier = Modifier
-                            .padding(horizontal = AodsTheme.spacing.screenPadding)
-                            .padding(bottom = AodsTheme.onboarding.listTopPadding),
+                            .padding(horizontal = 20.dp)
+                            .padding(
+                                top = 8.dp,
+                                bottom = 12.dp,
+                            ),
                     )
                 }
             }
@@ -98,7 +105,7 @@ fun LanguageContent(
                     language = language,
                     isSelected = language.language == state.selectedLanguage,
                     onClick = { onIntent(LanguageIntent.SelectLanguage(language.language)) },
-                    modifier = Modifier.padding(horizontal = AodsTheme.spacing.screenPadding),
+                    modifier = Modifier.padding(horizontal = 20.dp),
                 )
             }
         }
@@ -112,47 +119,46 @@ private fun LanguageOption(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val onboarding = AodsTheme.onboarding
     val containerColor by animateColorAsState(
         targetValue = if (isSelected) {
-            AodsTheme.colors.primary.copy(alpha = AodsTheme.opacity.tint)
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
         } else {
-            AodsTheme.colors.surfaceContainer
+            MaterialTheme.colorScheme.surfaceContainer
         },
         label = "LanguageOptionContainer",
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) AodsTheme.colors.primary else AodsTheme.colors.outlineVariant,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
         label = "LanguageOptionBorder",
     )
     val borderWidth by animateDpAsState(
-        targetValue = if (isSelected) onboarding.selectedBorderWidth else onboarding.cardBorderWidth,
+        targetValue = if (isSelected) 2.dp else 1.dp,
         label = "LanguageOptionBorderWidth",
     )
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = onboarding.optionMinHeight)
-            .clip(onboarding.cardShape)
+            .heightIn(min = 64.dp)
+            .clip(MaterialTheme.shapes.large)
             .background(containerColor)
-            .border(width = borderWidth, color = borderColor, shape = onboarding.cardShape)
+            .border(width = borderWidth, color = borderColor, shape = MaterialTheme.shapes.large)
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
-            .padding(horizontal = onboarding.cardPadding),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = language.language.flag,
-            style = AodsTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.headlineSmall,
         )
 
         Text(
             text = language.displayName,
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = onboarding.contentGap),
-            color = AodsTheme.colors.onSurface,
-            style = AodsTheme.typography.titleMedium,
+                .padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
         )
 
         RadioButton(selected = isSelected, onClick = null)

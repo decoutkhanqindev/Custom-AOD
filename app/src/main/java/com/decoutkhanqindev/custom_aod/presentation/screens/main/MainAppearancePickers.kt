@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,9 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
 internal fun WallpaperPicker(
@@ -41,31 +43,31 @@ internal fun WallpaperPicker(
         modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
-            .padding(vertical = AodsTheme.picker.verticalPadding),
-        horizontalArrangement = Arrangement.spacedBy(AodsTheme.picker.thumbnailGap),
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         WallpaperValue.entries.forEach { wallpaper ->
             val isSelected = wallpaper == selected
 
             Column(
                 modifier = Modifier
-                    .clip(AodsTheme.shapes.small)
+                    .clip(MaterialTheme.shapes.small)
                     .selectable(selected = isSelected, role = Role.RadioButton, onClick = { onSelect(wallpaper) })
-                    .padding(AodsTheme.picker.thumbnailItemPadding),
+                    .padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
                     modifier = Modifier
-                        .size(width = AodsTheme.picker.thumbnailWidth, height = AodsTheme.picker.thumbnailHeight)
-                        .clip(AodsTheme.shapes.medium)
+                        .size(width = 60.dp, height = 132.dp)
+                        .clip(MaterialTheme.shapes.medium)
                         .border(
-                            width = if (isSelected) AodsTheme.picker.thumbnailSelectedBorderWidth else AodsTheme.picker.thumbnailBorderWidth,
+                            width = if (isSelected) 2.dp else 1.dp,
                             color = if (isSelected) {
-                                AodsTheme.colors.primary
+                                MaterialTheme.colorScheme.primary
                             } else {
-                                AodsTheme.colors.outlineVariant
+                                MaterialTheme.colorScheme.outlineVariant
                             },
-                            shape = AodsTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.medium,
                         ),
                 ) {
                     Image(
@@ -81,22 +83,22 @@ internal fun WallpaperPicker(
                             contentDescription = null,
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
-                                .padding(AodsTheme.picker.thumbnailCheckPadding)
-                                .size(AodsTheme.picker.thumbnailCheckSize),
-                            tint = AodsTheme.colors.primary,
+                                .padding(6.dp)
+                                .size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
 
                 Text(
                     text = stringResource(wallpaper.labelRes),
-                    modifier = Modifier.padding(top = AodsTheme.picker.thumbnailLabelTopPadding),
+                    modifier = Modifier.padding(top = 6.dp),
                     color = if (isSelected) {
-                        AodsTheme.colors.primary
+                        MaterialTheme.colorScheme.primary
                     } else {
-                        AodsTheme.colors.onSurfaceVariant
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     },
-                    style = AodsTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
@@ -111,7 +113,7 @@ internal fun ClockColorPicker(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = AodsTheme.picker.verticalPadding),
+            .padding(vertical = 8.dp),
     ) {
         ClockColorValue.entries.forEach { color ->
             val label = stringResource(color.labelRes)
@@ -123,13 +125,13 @@ internal fun ClockColorPicker(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(AodsTheme.picker.swatchSize)
-                        .clip(AodsTheme.shapes.full)
+                        .size(32.dp)
+                        .clip(CircleShape)
                         .background(color.color)
                         .border(
-                            width = AodsTheme.picker.swatchBorderWidth,
-                            color = if (isSelected) AodsTheme.colors.onBackground else color.color,
-                            shape = AodsTheme.shapes.full,
+                            width = 2.dp,
+                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else color.color,
+                            shape = CircleShape,
                         )
                         .selectable(selected = isSelected, role = Role.RadioButton, onClick = { onSelect(color) })
                         .semantics { contentDescription = label },
@@ -139,8 +141,8 @@ internal fun ClockColorPicker(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
-                            modifier = Modifier.size(AodsTheme.picker.swatchCheckSize),
-                            tint = AodsTheme.colors.background,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }

@@ -10,6 +10,7 @@ sealed interface MainEffect {
     data object OpenMiuiPermissionSettings : MainEffect
     data object OpenNotificationSettings : MainEffect
     data object OpenNotificationAccessSettings : MainEffect
+    data object OpenAppSettings : MainEffect
     data object RequestNotificationPermission : MainEffect
     data object RequestCalendarPermission : MainEffect
     data object RequestLocationPermission : MainEffect

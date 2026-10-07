@@ -16,8 +16,8 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.language.LanguageScr
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.permission.PermissionScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.splash.SplashScreen
+import com.decoutkhanqindev.custom_aod.utils.navigateBack
 import org.koin.compose.koinInject
-import timber.log.Timber
 
 @Composable
 fun AppNavDisplay(modifier: Modifier = Modifier) {
@@ -41,12 +41,7 @@ fun AppNavDisplay(modifier: Modifier = Modifier) {
             },
         ),
         modifier = modifier,
-        onBack = {
-            if (backStack.size > 1) {
-                Timber.tag("Navigation").d("onBack, removing ${backStack.lastOrNull()?.let { it::class.simpleName }}")
-                backStack.removeLastOrNull()
-            }
-        },
+        onBack = { backStack.navigateBack() },
     )
 
     if (!isNetworkAvailable) AodsNoInternetDialog()

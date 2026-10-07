@@ -9,6 +9,7 @@ import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycl
 import com.decoutkhanqindev.custom_aod.presentation.navigation.MainDestination
 import com.decoutkhanqindev.custom_aod.presentation.navigation.PermissionDestination
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageEffect
+import com.decoutkhanqindev.custom_aod.utils.navigateBack
 import com.decoutkhanqindev.custom_aod.utils.navigateTo
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -26,7 +27,7 @@ fun LanguageScreen(
             when (effect) {
                 is LanguageEffect.NavigateToPermission -> backStack.navigateTo(PermissionDestination)
                 is LanguageEffect.NavigateToMain -> backStack.navigateTo(MainDestination, preserveState = false)
-                is LanguageEffect.NavigateBack -> backStack.removeLastOrNull()
+                is LanguageEffect.NavigateBack -> backStack.navigateBack()
             }
         }
     }

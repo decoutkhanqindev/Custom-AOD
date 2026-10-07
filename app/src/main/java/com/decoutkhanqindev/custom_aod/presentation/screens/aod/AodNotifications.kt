@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -22,15 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.NotificationContentUiModel
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
 internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
-    val clock = AodsTheme.clock
-
     AnimatedContent(
         targetState = notifications,
         contentKey = { it.icons.isEmpty() },
@@ -39,9 +39,9 @@ internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
         if (target.icons.isNotEmpty()) {
             Row(
                 modifier = Modifier
-                    .padding(top = clock.notificationIconsTopPadding)
+                    .padding(top = 16.dp)
                     .animateContentSize(),
-                horizontalArrangement = Arrangement.spacedBy(clock.notificationIconGap),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 target.icons.forEach { icon ->
@@ -49,8 +49,8 @@ internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
                         Image(
                             bitmap = remember(icon.icon) { icon.icon.asImageBitmap() },
                             contentDescription = null,
-                            modifier = Modifier.size(clock.iconSize),
-                            colorFilter = ColorFilter.tint(clock.text),
+                            modifier = Modifier.size(18.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
                         )
                     }
                 }
@@ -58,8 +58,8 @@ internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
                 if (target.overflowCount > 0) {
                     Text(
                         text = stringResource(R.string.aod_notifications_overflow, target.overflowCount),
-                        color = clock.textMuted,
-                        fontSize = clock.captionSize,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp,
                     )
                 }
             }
@@ -69,8 +69,6 @@ internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
 
 @Composable
 internal fun AodNotificationContent(content: NotificationContentUiModel?) {
-    val clock = AodsTheme.clock
-
     AnimatedContent(
         targetState = content,
         contentKey = { it?.key },
@@ -79,16 +77,16 @@ internal fun AodNotificationContent(content: NotificationContentUiModel?) {
         if (target != null) {
             Column(
                 modifier = Modifier
-                    .padding(top = clock.itemGap)
-                    .widthIn(max = clock.textMaxWidth),
+                    .padding(top = 12.dp)
+                    .widthIn(max = 280.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         bitmap = remember(target.icon) { target.icon.asImageBitmap() },
                         contentDescription = null,
-                        modifier = Modifier.size(clock.smallIconSize),
-                        colorFilter = ColorFilter.tint(clock.text),
+                        modifier = Modifier.size(14.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
                     )
 
                     Text(
@@ -97,9 +95,9 @@ internal fun AodNotificationContent(content: NotificationContentUiModel?) {
                         } else {
                             target.title
                         },
-                        modifier = Modifier.padding(start = clock.iconTextGap),
-                        color = clock.text,
-                        fontSize = clock.bodySize,
+                        modifier = Modifier.padding(start = 6.dp),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -108,9 +106,9 @@ internal fun AodNotificationContent(content: NotificationContentUiModel?) {
                 if (target.text.isNotEmpty()) {
                     Text(
                         text = target.text,
-                        modifier = Modifier.padding(top = clock.lineGap),
-                        color = clock.textMuted,
-                        fontSize = clock.detailSize,
+                        modifier = Modifier.padding(top = 2.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,

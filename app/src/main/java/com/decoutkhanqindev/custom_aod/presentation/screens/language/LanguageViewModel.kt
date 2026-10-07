@@ -78,18 +78,15 @@ class LanguageViewModel(
         }
     }
 
-    // Lần đầu mở app còn bước cấp quyền: cờ lần đầu chỉ xoá khi đã đủ quyền bắt buộc (ở đây hoặc ở màn quyền),
-    // nên thoát app giữa chừng thì lần sau đi lại từ đầu thay vì vào màn chính thiếu quyền.
+    // Lần đầu mở app: chọn xong ngôn ngữ là xong onboarding (đi tiếp sang màn quyền cũng tính là xong), nên thoát giữa chừng
+    // thì lần sau vào thẳng màn chính, thiếu quyền thì màn chính nhắc bằng bottom sheet. Máy đã đủ quyền thì bỏ qua màn quyền.
     private fun confirmLanguage() {
         val language = state.value.selectedLanguage ?: return
         dataStoreManager.saveSelectedLangCode(language.code)
+        if (isFirstOpen) dataStoreManager.saveIsFirstOpen(false)
         val effect = when {
             !isFirstOpen -> LanguageEffect.NavigateBack
-            permissionManager.requiredAodPermissions().hasRequiredPermissions -> {
-                dataStoreManager.saveIsFirstOpen(false)
-                LanguageEffect.NavigateToMain
-            }
-
+            permissionManager.requiredAodPermissions().hasRequiredPermissions -> LanguageEffect.NavigateToMain
             else -> LanguageEffect.NavigateToPermission
         }
         viewModelScope.launch { sendEffect(effect) }

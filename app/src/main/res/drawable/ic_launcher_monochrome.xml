@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Lớp đơn sắc cho icon theo chủ đề (Android 13+): cùng hình với foreground, viền là nét đơn, không gradient, không quầng sáng. -->
+<!-- Sinh bằng tools/brand/generate_launcher_icon.py: sửa script rồi chạy lại, đừng sửa tay.
+     Lớp đơn sắc cho icon theo chủ đề (Android 13+): cùng hình với foreground, viền là nét đơn, không gradient, không quầng sáng. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"

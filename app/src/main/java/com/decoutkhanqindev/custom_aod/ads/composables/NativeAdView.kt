@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.R
@@ -35,7 +38,6 @@ import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.NativeAdUnit
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
 import com.decoutkhanqindev.custom_aod.presentation.components.shimmerLoading
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -53,12 +55,12 @@ fun NativeAdView(
     val adState by adUnit().state.collectAsStateWithLifecycle()
     val nativeAd = adUnit().nativeAd
     val colors = NativeAdColors(
-        cardBackground = AodsTheme.colors.surfaceContainer,
-        cardBorder = AodsTheme.colors.outlineVariant,
-        accent = AodsTheme.colors.primary,
-        headline = AodsTheme.colors.onSurface,
-        body = AodsTheme.colors.onSurfaceVariant,
-        ctaText = AodsTheme.colors.onPrimary,
+        cardBackground = MaterialTheme.colorScheme.surfaceContainer,
+        cardBorder = MaterialTheme.colorScheme.outlineVariant,
+        accent = MaterialTheme.colorScheme.primary,
+        headline = MaterialTheme.colorScheme.onSurface,
+        body = MaterialTheme.colorScheme.onSurfaceVariant,
+        ctaText = MaterialTheme.colorScheme.onPrimary,
     )
 
     DisposableEffect(adUnit()) {
@@ -88,7 +90,7 @@ fun NativeAdView(
                 onClick = onCloseClick,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(AodsTheme.ad.closeButtonMargin),
+                    .padding(12.dp),
             )
         }
     }
@@ -117,7 +119,7 @@ private fun NativeAdContent(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .shimmerLoading(backgroundColor = AodsTheme.colors.surfaceVariant),
+                    .shimmerLoading(backgroundColor = MaterialTheme.colorScheme.surfaceVariant),
             )
         }
     }
@@ -130,16 +132,16 @@ private fun CloseButton(
 ) {
     Box(
         modifier = modifier
-            .size(AodsTheme.ad.closeButtonSize)
-            .onClick(shape = AodsTheme.shapes.full, action = onClick)
-            .background(color = AodsTheme.colors.overlay, shape = AodsTheme.shapes.full),
+            .size(36.dp)
+            .onClick(shape = CircleShape, action = onClick)
+            .background(color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f), shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = Icons.Filled.Close,
             contentDescription = null,
-            tint = AodsTheme.colors.onOverlay,
-            modifier = Modifier.size(AodsTheme.ad.closeIconSize),
+            tint = MaterialTheme.colorScheme.inverseSurface,
+            modifier = Modifier.size(20.dp),
         )
     }
 }

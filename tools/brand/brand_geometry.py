@@ -8,7 +8,7 @@ from pathlib import Path
 
 RES = Path(__file__).resolve().parents[2] / "app" / "src" / "main" / "res"
 
-# Màu hex (trùng AodsPrimitiveColors). Viền sáng chuyển màu từ góc trên trái xuống góc dưới phải của điện thoại.
+# Màu hex (trùng AodsColors). Viền sáng chuyển màu từ góc trên trái xuống góc dưới phải của điện thoại.
 MINT, BLUE, PURPLE = "7FD1AE", "8AB4F8", "C3A6FF"
 EDGE_COLORS = (MINT, BLUE, PURPLE)
 CLOCK_COLOR = MINT
@@ -16,11 +16,11 @@ DOT_COLOR, CAMERA_COLOR, SCREEN_COLOR, MONOCHROME_COLOR = "9A9A9A", "5A5A5A", "0
 
 # Điện thoại trong khung 108; mọi hình phải nằm trong vùng an toàn 66 ở giữa (bán kính 33 quanh tâm 54, 54).
 PHONE_X, PHONE_Y, PHONE_W, PHONE_H, PHONE_RADIUS = 38.0, 26.0, 32.0, 56.0, 7.5
-CAMERA_X, CAMERA_Y, CAMERA_RADIUS = 54.0, 30.5, 1.0
-DOTS_Y, DOT_RADIUS, DOTS_X = 75.5, 1.1, (50.5, 54.0, 57.5)
+CAMERA_X, CAMERA_Y, CAMERA_RADIUS = 54, 30.5, 1.0
+DOTS_Y, DOT_RADIUS, DOTS_X = 75.5, 1.1, (50.5, 54, 57.5)
 
 # Viền tĩnh: ba lớp cùng dải màu (độ rộng, độ đậm 0..1) — lõi và quầng sáng.
-BORDER_STROKES = [(1.6, 1.0), (3.2, 0.4), (6.0, 0.18)]
+BORDER_STROKES = [(1.6, 1.0), (3.2, 0.4), (6, 0.18)]
 
 # Đồng hồ 7 đoạn xếp chồng: mỗi dòng hai chữ số; đoạn là thanh bo tròn hai đầu.
 CLOCK_ROWS = ("08", "30")

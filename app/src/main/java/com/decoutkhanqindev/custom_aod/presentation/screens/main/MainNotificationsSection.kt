@@ -3,16 +3,17 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
 fun MainNotificationsSection(
@@ -27,9 +28,9 @@ fun MainNotificationsSection(
         AnimatedVisibility(visible = !isAccessGranted) {
             Text(
                 text = stringResource(R.string.notification_access_needed),
-                modifier = Modifier.padding(vertical = AodsTheme.spacing.inlineGap),
-                color = AodsTheme.colors.onSurfaceVariant,
-                style = AodsTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 4.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
 

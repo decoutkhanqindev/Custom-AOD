@@ -19,7 +19,7 @@ data class PermissionUiModel(
         }
 }
 
-// Quyền bắt buộc đứng trước; hai quyền riêng của Xiaomi chỉ có trên máy Xiaomi. Trạng thái đổi ở app Cài đặt nên mỗi lần cần thì đọc lại.
+// Mọi quyền app dùng, quyền bắt buộc đứng trước; hai quyền riêng của Xiaomi chỉ có trên máy Xiaomi. Trạng thái đổi ở app Cài đặt nên mỗi lần cần thì đọc lại.
 fun PermissionManager.aodPermissions(): ImmutableList<PermissionUiModel> = buildList {
     add(PermissionUiModel(PermissionValue.OVERLAY, canDrawOverlays()))
     if (isXiaomi) {
@@ -28,6 +28,8 @@ fun PermissionManager.aodPermissions(): ImmutableList<PermissionUiModel> = build
     }
     add(PermissionUiModel(PermissionValue.NOTIFICATIONS, areNotificationsEnabled()))
     add(PermissionUiModel(PermissionValue.NOTIFICATION_ACCESS, isNotificationListenerEnabled()))
+    add(PermissionUiModel(PermissionValue.CALENDAR, hasCalendarPermission()))
+    add(PermissionUiModel(PermissionValue.LOCATION, hasCoarseLocationPermission()))
 }.toImmutableList()
 
 fun PermissionManager.requiredAodPermissions(): ImmutableList<PermissionUiModel> =

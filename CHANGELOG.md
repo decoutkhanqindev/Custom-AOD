@@ -4,6 +4,35 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-07 – Quyền bắt buộc, chỉnh UI onboarding, theme theo pattern Lich-Viet-Loc-Phat, script icon
+
+Siết lại bộ quyền bắt buộc theo thử nghiệm trên máy Xiaomi, chỉnh giao diện splash / màn ngôn ngữ / màn quyền, theme đổi sang pattern phẳng của Lich-Viet-Loc-Phat (bỏ tầng token), đưa script sinh icon / Lottie vào repo. Không thêm quyền Manifest, không thêm thư viện. Bản này build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.
+
+### Thêm
+
+- `tools/brand/`: script Python sinh icon app (`generate_launcher_icon.py`) và Lottie của icon (`generate_edge_light_lottie.py`) từ cùng một bộ hình học (`brand_geometry.py`); đổi màu viền, tốc độ, độ dài vệt sáng… chỉ cần sửa thông số rồi chạy lại. File sinh ra giống hệt bản đang dùng (icon chỉ thêm dòng ghi chú "sinh bằng script").
+- `PermissionValue` có đủ mọi quyền app dùng: thêm lịch và vị trí (không bắt buộc). Danh sách quyền ở màn chính hiện cả hai; bấm thì xin quyền (chỉ cấp, không tự bật "Sự kiện hôm nay" / "Thời tiết"), bị từ chối thì mở Thông tin ứng dụng.
+- Màn quyền có nút back trên top bar để quay về màn ngôn ngữ.
+- `AodsOnboardingTopBar`: top bar của onboarding, chỉ báo bước nằm giữa top bar (không cuộn theo nội dung nữa), kèm nút back khi cần.
+- `NavBackStack.navigateBack()` (`utils/NavExt.kt`): quay lại nhưng không bao giờ pop màn cuối cùng (back stack rỗng thì NavDisplay crash), bấm back liên tiếp cũng an toàn. Dùng cho `onBack` của `AppNavDisplay` và nút back của Language / Permission; CLAUDE.md cấm gọi `backStack.removeLastOrNull()` thẳng (thêm lệnh grep thứ 25).
+
+### Thay đổi
+
+- Quyền bắt buộc: thêm Thông báo (thông báo của service giữ đồng hồ chạy nền) và, trên Xiaomi, "Cửa sổ bật lên khi chạy nền" (HyperOS chặn mở AOD từ nền khi thiếu). Màn quyền xin thông báo bằng hộp thoại hệ thống, bị từ chối thì mở trang cài đặt thông báo.
+- Bỏ việc tự hỏi quyền thông báo khi vào màn chính (và cờ `is_notifications_asked`).
+- Onboarding: bấm Tiếp tục ở Language lần đầu là xong onboarding; thoát ở màn quyền thì lần sau vào thẳng màn chính, thiếu quyền thì màn chính nhắc bằng bottom sheet.
+- Bottom sheet quyền ở màn chính hiện mỗi khi thiếu quyền bắt buộc (không còn phụ thuộc công tắc AOD) và hiện lại khi bật AOD hay áp giao diện cho đồng hồ (mặt, font, màu, cỡ, xoay ngang, ảnh nền), kể cả khi đã đóng trước đó.
+- Splash: Lottie và chữ chung một cột ở giữa màn hình, chữ mở dần ra làm cả cụm dồn lên giữa. Lottie thu nhỏ từ 288dp còn 200dp, bỏ placeholder.
+- Tiêu đề màn ngôn ngữ và màn quyền căn giữa; chỉ báo bước chuyển từ nội dung lên top bar.
+- Thẻ quyền gọn hơn (padding 12dp, icon 40dp, mô tả chữ nhỏ), nội dung căn giữa theo chiều dọc. Bên phải trong thẻ là nút tròn filled màu primary, cùng cỡ với icon quyền: mũi tên khi chưa cấp, dấu tích khi đã cấp. Quyền không kiểm tra được vẫn có dòng nhắc trong thẻ, bấm thẻ để mở Cài đặt (bỏ nút "Mở cài đặt" riêng).
+- Thẻ quyền bấm được cả thẻ khi quyền chưa cấp (trước chỉ bấm được nút); nút tròn bên phải giờ chỉ để báo trạng thái.
+- Bottom sheet quyền: tiêu đề và mô tả căn giữa; nút "Để sau" rộng hết chiều ngang, chữ căn giữa, cao bằng nút chính của onboarding (chữ vốn cùng cỡ `labelLarge` với nút đó).
+- Theme theo pattern của Lich-Viet-Loc-Phat cho đơn giản: `presentation/theme/` phẳng, mỗi file một `internal object` cùng tên — `AodsColors` (màu, biến thể alpha `MintAlpha12`, `RedAlpha12`, `WhiteAlpha30`, `BlackAlpha50`), `AodsTypography` (font Inter, các `TextStyle`, `Material` cho cầu nối), `AodsShapes` (`RoundedCornerShape8dp` / `12dp` / `16dp`). UI đọc qua `AodsTheme.colors / .typography / .shapes` (object trỏ thẳng tới các object trên, không đổi tên, không `CompositionLocal`), không gọi thẳng các object ngoài package `theme`; hàm `AodsTheme { }` chỉ bọc `MaterialTheme`. Khoảng cách, cỡ icon, viền, kích thước, `sp`, thời lượng, alpha viết số thẳng (`16.dp`, `14.sp`, `tween(durationMillis = 600)`), hình tròn dùng `CircleShape`. Bỏ thư mục `tokens/` cùng mọi tầng token: semantic (`AodsColorTokens`, `AodsSpacingTokens`…), token riêng của component / màn (`AodsOnboardingTokens`, `AodsClockTokens`…), `LocalAods…`, và các object `AodsPrimitive*`. Giao diện giữ nguyên. CLAUDE.md, agent `compose-implementer`, skill `design-tokens` / `compose-optimizer`, README cập nhật theo; lệnh grep: thư mục `theme/` chỉ có `AodsTheme` / `AodsColors` / `AodsTypography` / `AodsShapes` / `AodsBrush`, không gọi thẳng `AodsColors` / `AodsTypography` / `AodsShapes` ngoài `theme/`, không `AodsPrimitive` / tầng token, không `.copy(` trên màu theme trong UI; bỏ 2 lệnh cấm số `dp` / `sp` và `durationMillis` viết thẳng.
+
+### Ghi chú
+
+- "Tắt màn hình không thấy AOD" lúc thử là do đang ngoài khung giờ hiện (mặc định 07:00–23:00, mục Quy tắc hiện), không phải lỗi code.
+
 ## [Chưa phát hành] – 2026-10-06 – Onboarding mới, font Inter, icon app
 
 Làm lại giao diện Splash và Language theo hướng skill ui-ux-pro-max gợi ý (style Dark Mode OLED, giữ màu mint), thêm màn Permission sau Language ở lần đầu mở app. Không thêm quyền, không thêm thư viện. Bản này build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.

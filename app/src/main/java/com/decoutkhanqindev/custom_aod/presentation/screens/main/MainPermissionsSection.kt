@@ -8,18 +8,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionStatusValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -47,23 +48,23 @@ private fun PermissionRow(
 ) {
     val status = permission.status
     val statusColor = when (status) {
-        PermissionStatusValue.GRANTED -> AodsTheme.colors.primary
-        PermissionStatusValue.MISSING_REQUIRED -> AodsTheme.colors.error
+        PermissionStatusValue.GRANTED -> MaterialTheme.colorScheme.primary
+        PermissionStatusValue.MISSING_REQUIRED -> MaterialTheme.colorScheme.error
         PermissionStatusValue.UNKNOWN,
-        PermissionStatusValue.MISSING_OPTIONAL -> AodsTheme.colors.onSurfaceVariant
+        PermissionStatusValue.MISSING_OPTIONAL -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = AodsTheme.settingsRow.statusVerticalPadding),
+            .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(modifier = Modifier.width(AodsTheme.settingsRow.statusIconSlotWidth)) {
+        Box(modifier = Modifier.width(28.dp)) {
             Icon(
                 imageVector = status.icon,
                 contentDescription = stringResource(status.descriptionRes),
-                modifier = Modifier.size(AodsTheme.settingsRow.statusIconSize),
+                modifier = Modifier.size(20.dp),
                 tint = statusColor,
             )
         }
@@ -71,18 +72,18 @@ private fun PermissionRow(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = AodsTheme.settingsRow.statusTextEndPadding),
+                .padding(end = 12.dp),
         ) {
             Text(
                 text = stringResource(permission.permission.titleRes),
-                style = AodsTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge,
             )
 
             Text(
                 text = stringResource(permission.permission.descriptionRes),
-                modifier = Modifier.padding(top = AodsTheme.spacing.textGap),
-                color = AodsTheme.colors.onSurfaceVariant,
-                style = AodsTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 2.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
 

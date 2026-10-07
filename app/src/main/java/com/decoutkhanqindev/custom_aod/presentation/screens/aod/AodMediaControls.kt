@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,19 +23,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 
 @Composable
 internal fun AodMediaControls(
     media: MediaUiModel?,
     onIntent: (AodIntent) -> Unit,
 ) {
-    val clock = AodsTheme.clock
-
     AnimatedContent(
         targetState = media,
         contentKey = { it != null },
@@ -41,14 +42,14 @@ internal fun AodMediaControls(
     ) { target ->
         if (target != null) {
             Column(
-                modifier = Modifier.padding(top = clock.mediaTopPadding),
+                modifier = Modifier.padding(top = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = target.title,
-                    modifier = Modifier.widthIn(max = clock.mediaTextMaxWidth),
-                    color = clock.text,
-                    fontSize = clock.bodySize,
+                    modifier = Modifier.widthIn(max = 260.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 14.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -56,17 +57,17 @@ internal fun AodMediaControls(
                 target.artist?.let { artist ->
                     Text(
                         text = artist,
-                        modifier = Modifier.widthIn(max = clock.mediaTextMaxWidth),
-                        color = clock.textMuted,
-                        fontSize = clock.captionSize,
+                        modifier = Modifier.widthIn(max = 260.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
 
                 Row(
-                    modifier = Modifier.padding(top = clock.mediaRowTopPadding),
-                    horizontalArrangement = Arrangement.spacedBy(clock.mediaButtonGap),
+                    modifier = Modifier.padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AodMediaButton(
@@ -104,21 +105,19 @@ private fun AodMediaButton(
     isEnabled: Boolean,
     onClick: () -> Unit,
 ) {
-    val clock = AodsTheme.clock
-
     Icon(
         imageVector = imageVector,
         contentDescription = contentDescription,
         modifier = Modifier
-            .size(clock.mediaButtonSize)
+            .size(40.dp)
             .then(
                 if (isEnabled) {
-                    Modifier.onClick(shape = AodsTheme.shapes.full, ripple = false, action = onClick)
+                    Modifier.onClick(shape = CircleShape, ripple = false, action = onClick)
                 } else {
                     Modifier
                 },
             )
-            .padding(clock.mediaButtonPadding),
-        tint = if (isEnabled) clock.control else clock.controlDisabled,
+            .padding(8.dp),
+        tint = if (isEnabled) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline,
     )
 }

@@ -1,8 +1,9 @@
-package com.decoutkhanqindev.custom_aod.presentation.theme.tokens
+package com.decoutkhanqindev.custom_aod.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-object AodsPrimitiveColors {
+// Bảng màu thô: chỉ AodsTheme.kt (dựng color scheme) và bảng màu đồng hồ cho user chọn (ClockColorValue) đọc thẳng; UI đọc qua MaterialTheme.colorScheme.
+internal object AodsColors {
     val Black = Color(0xFF000000)
     val White = Color(0xFFFFFFFF)
     val Mint = Color(0xFF7FD1AE)
@@ -22,4 +23,5 @@ object AodsPrimitiveColors {
     val Neutral12 = Color(0xFF211F26)
     val NeutralVariant30 = Color(0xFF49454F)
     val NeutralVariant60 = Color(0xFF938F99)
+
 }

@@ -57,7 +57,6 @@ sealed interface MainIntent {
     data object RefreshPermissions : MainIntent
     data object ShowPermissionSheet : MainIntent
     data object DismissPermissionSheet : MainIntent
-    data object NotificationPermissionDialogShown : MainIntent
     data class NotificationPermissionResult(val isGranted: Boolean) : MainIntent
     data object NavigateToLanguage : MainIntent
     data object OpenPreview : MainIntent

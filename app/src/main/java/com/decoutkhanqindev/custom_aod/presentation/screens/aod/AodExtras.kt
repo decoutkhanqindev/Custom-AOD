@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -28,10 +29,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -39,8 +41,6 @@ internal fun AodWeather(
     weather: WeatherUiModel?,
     fontFamily: FontFamily,
 ) {
-    val clock = AodsTheme.clock
-
     AnimatedContent(
         targetState = weather,
         contentKey = { it != null },
@@ -48,21 +48,21 @@ internal fun AodWeather(
     ) { target ->
         if (target != null) {
             Row(
-                modifier = Modifier.padding(start = clock.itemGap),
+                modifier = Modifier.padding(start = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = target.icon,
                     contentDescription = stringResource(target.condition.labelRes),
-                    modifier = Modifier.size(clock.iconSize),
-                    tint = clock.text,
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onBackground,
                 )
 
                 Text(
                     text = stringResource(R.string.aod_weather_temperature, target.temperature),
-                    modifier = Modifier.padding(start = clock.inlineGap),
-                    color = clock.text,
-                    fontSize = clock.dateSize,
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
                     fontFamily = fontFamily,
                 )
             }
@@ -72,7 +72,6 @@ internal fun AodWeather(
 
 @Composable
 internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
-    val clock = AodsTheme.clock
     val timeFormatter = rememberTimeFormatter()
 
     AnimatedContent(
@@ -83,10 +82,10 @@ internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
         if (target.isNotEmpty()) {
             Column(
                 modifier = Modifier
-                    .padding(top = clock.itemGap)
+                    .padding(top = 12.dp)
                     .animateContentSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(clock.inlineGap),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 target.forEach { event ->
                     key(event.beginMillis, event.title) {
@@ -94,8 +93,8 @@ internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
                             Icon(
                                 imageVector = Icons.Default.Event,
                                 contentDescription = null,
-                                modifier = Modifier.size(clock.smallIconSize),
-                                tint = clock.textMuted,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
 
                             Text(
@@ -104,18 +103,18 @@ internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
                                 } else {
                                     rememberZonedDateTime(event.beginMillis).format(timeFormatter)
                                 },
-                                modifier = Modifier.padding(start = clock.iconTextGap),
-                                color = clock.textMuted,
-                                fontSize = clock.detailSize,
+                                modifier = Modifier.padding(start = 6.dp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 13.sp,
                             )
 
                             Text(
                                 text = event.title,
                                 modifier = Modifier
-                                    .padding(start = clock.textGap)
-                                    .widthIn(max = clock.eventTitleMaxWidth),
-                                color = clock.text,
-                                fontSize = clock.detailSize,
+                                    .padding(start = 8.dp)
+                                    .widthIn(max = 220.dp),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 13.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
@@ -136,10 +135,10 @@ internal fun AodMemo(
         Text(
             text = memo,
             modifier = Modifier
-                .padding(top = AodsTheme.clock.itemGap)
-                .widthIn(max = AodsTheme.clock.textMaxWidth),
-            color = AodsTheme.clock.text,
-            fontSize = AodsTheme.clock.bodySize,
+                .padding(top = 12.dp)
+                .widthIn(max = 280.dp),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 14.sp,
             fontFamily = fontFamily,
             textAlign = TextAlign.Center,
             maxLines = 3,
@@ -153,8 +152,6 @@ internal fun AodDrawing(
     drawing: Bitmap?,
     color: Color,
 ) {
-    val clock = AodsTheme.clock
-
     AnimatedContent(
         targetState = drawing,
         contentKey = { it != null },
@@ -165,8 +162,8 @@ internal fun AodDrawing(
                 bitmap = remember(bitmap) { bitmap.asImageBitmap() },
                 contentDescription = stringResource(R.string.aod_drawing),
                 modifier = Modifier
-                    .padding(top = clock.itemGap)
-                    .size(clock.drawingSize),
+                    .padding(top = 12.dp)
+                    .size(120.dp),
                 colorFilter = ColorFilter.tint(color),
             )
         }

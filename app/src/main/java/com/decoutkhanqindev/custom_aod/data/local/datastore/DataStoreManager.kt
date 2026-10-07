@@ -200,11 +200,6 @@ class DataStoreManager(
     val aodLastWake: StateFlow<Int?> =
         aodLastWakeKey.asStateFlow(default = DEFAULT_AOD_LAST_WAKE)
 
-    private val isNotificationsAskedKey: Preferences.Key<Boolean> =
-        booleanPreferencesKey(IS_NOTIFICATIONS_ASKED_KEY)
-    val isNotificationsAsked: StateFlow<Boolean?> =
-        isNotificationsAskedKey.asStateFlow(default = DEFAULT_IS_NOTIFICATIONS_ASKED)
-
     fun saveSelectedLangCode(value: String) {
         edit { prefs -> prefs[selectedLangCodeKey] = value }
     }
@@ -355,10 +350,6 @@ class DataStoreManager(
         edit { prefs -> prefs[aodLastWakeKey] = value }
     }
 
-    fun saveIsNotificationsAsked(value: Boolean) {
-        edit { prefs -> prefs[isNotificationsAskedKey] = value }
-    }
-
     private fun <T : Any> Preferences.Key<T>.asStateFlow(default: T): StateFlow<T?> =
         app.prefs.data
             .map { prefs -> prefs[this] ?: default }
@@ -424,7 +415,6 @@ class DataStoreManager(
         private const val IS_WEATHER_DAY_KEY = "is_weather_day"
         private const val WEATHER_UPDATED_AT_MILLIS_KEY = "weather_updated_at_millis"
         private const val AOD_LAST_WAKE_KEY = "aod_last_wake"
-        private const val IS_NOTIFICATIONS_ASKED_KEY = "is_notifications_asked"
         private const val DEFAULT_SELECTED_LANG_CODE = "en"
         private const val DEFAULT_IS_FIRST_OPEN = true
         const val DEFAULT_IS_AOD_ENABLED = true
@@ -464,6 +454,5 @@ class DataStoreManager(
         private const val DEFAULT_IS_WEATHER_DAY = true
         const val DEFAULT_WEATHER_UPDATED_AT_MILLIS = 0L
         private const val DEFAULT_AOD_LAST_WAKE = 0
-        private const val DEFAULT_IS_NOTIFICATIONS_ASKED = false
     }
 }
