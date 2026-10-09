@@ -13,6 +13,9 @@ data object MainDestination : NavKey
 data class LanguageDestination(val isFirstOpen: Boolean) : NavKey
 
 @Serializable
+data object CustomizeDestination : NavKey
+
+@Serializable
 data object PermissionDestination : NavKey
 
 // TODO: Thêm destination của project — data object khi không có args, data class (field primitive/@Serializable) khi có args

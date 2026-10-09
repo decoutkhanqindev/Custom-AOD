@@ -31,6 +31,8 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainPermissionState
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainRulesState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
@@ -62,7 +64,7 @@ fun MainContent(
 
     MainPermissionSheet(
         isVisible = state.isPermissionSheetVisible,
-        permissions = state.requiredPermissions,
+        permissions = state.permission.requiredPermissions,
         onIntent = onIntent,
     )
 }
@@ -106,7 +108,7 @@ private fun MainSettings(
         )
 
         MainPermissionsSection(
-            permissions = state.permissions,
+            permissions = state.permission.permissions,
             onIntent = onIntent,
         )
 
@@ -117,40 +119,27 @@ private fun MainSettings(
 
         MainAppearanceSection(
             appearance = state.appearance,
-            wallpaper = state.wallpaper,
-            hasBackground = state.hasBackground,
-            isSavingBackground = state.isSavingBackground,
             onIntent = onIntent,
         )
 
         MainExtrasSection(
             extras = state.extras,
-            hasDrawing = state.hasDrawing,
-            isEditingMemo = state.isEditingMemo,
-            isDrawingPadVisible = state.isDrawingPadVisible,
-            hasCalendarPermission = state.hasCalendarPermission,
-            hasLocationPermission = state.hasLocationPermission,
             onIntent = onIntent,
         )
 
         MainNotificationsSection(
             options = state.notificationOptions,
-            isAccessGranted = state.isNotificationAccessGranted,
+            isAccessGranted = state.permission.isNotificationAccessGranted,
             onIntent = onIntent,
         )
 
         MainInteractionSection(
             interaction = state.interaction,
-            editingGesture = state.editingGesture,
-            isFlashlightAvailable = state.isFlashlightAvailable,
-            isLightSensorAvailable = state.isLightSensorAvailable,
-            isPickupSensorAvailable = state.isPickupSensorAvailable,
             onIntent = onIntent,
         )
 
         MainRulesSection(
             rules = state.rules,
-            editingScheduleTime = state.editingScheduleTime,
             onIntent = onIntent,
         )
 
@@ -185,13 +174,15 @@ private fun MainContentPreview() {
             state = MainState(
                 isLoading = false,
                 options = AodOptionsUiModel(brightnessPercent = 20, timeoutMinutes = 30),
-                rules = AodRulesUiModel(chargingRule = ChargingRuleValue.PLUGGED),
-                permissions = persistentListOf(
-                    PermissionUiModel(permission = PermissionValue.OVERLAY, isGranted = true),
-                    PermissionUiModel(permission = PermissionValue.MIUI_LOCK_SCREEN, isGranted = false),
-                    PermissionUiModel(permission = PermissionValue.MIUI_BACKGROUND_POPUP, isGranted = null),
-                    PermissionUiModel(permission = PermissionValue.NOTIFICATIONS, isGranted = false),
-                    PermissionUiModel(permission = PermissionValue.NOTIFICATION_ACCESS, isGranted = false),
+                rules = MainRulesState(settings = AodRulesUiModel(chargingRule = ChargingRuleValue.PLUGGED)),
+                permission = MainPermissionState(
+                    permissions = persistentListOf(
+                        PermissionUiModel(permission = PermissionValue.OVERLAY, isGranted = true),
+                        PermissionUiModel(permission = PermissionValue.MIUI_LOCK_SCREEN, isGranted = false),
+                        PermissionUiModel(permission = PermissionValue.MIUI_BACKGROUND_POPUP, isGranted = null),
+                        PermissionUiModel(permission = PermissionValue.NOTIFICATIONS, isGranted = false),
+                        PermissionUiModel(permission = PermissionValue.NOTIFICATION_ACCESS, isGranted = false),
+                    ),
                 ),
                 language = LanguageUiModel(language = LanguageValue.ENGLISH, displayName = "English"),
                 lastWakeMessageRes = WakeResultValue.OK.messageRes,

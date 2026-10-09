@@ -28,5 +28,6 @@ internal object AodsColors {
     val RedAlpha12 = Red.copy(alpha = 0.12f)
     val WhiteAlpha30 = White.copy(alpha = 0.3f)
     val BlackAlpha50 = Black.copy(alpha = 0.5f)
+    val BlackAlpha70 = Black.copy(alpha = 0.7f)
 
 }

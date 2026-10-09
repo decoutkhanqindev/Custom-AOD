@@ -69,5 +69,5 @@ This skill is standalone. If a dedicated test agent is added later, put it in `.
 - Already in the project: JUnit 4, `kotlinx-coroutines-test`. MockK and Turbine are NOT dependencies yet — adding them needs the user's approval (CLAUDE.md hard rules); without them, write fakes by hand.
 - Fake at the Repository interface boundary (`domain/repository`); do not mock UseCases or final classes. Managers are concrete Android classes — test ViewModels that depend on them with instrumented tests, or extract the pure logic into the UiModel / mapper and unit-test that.
 - UseCases return `Result<T>` built with `suspendRunCatching`; assert `isSuccess` / `exceptionOrNull()`.
-- ViewModels extend `BaseViewModel` and launch in `viewModelScope`: set `Dispatchers.setMain(StandardTestDispatcher(testScheduler))`, send intents with `onIntent(...)`, then read `state.value` / collect `effect`.
+- ViewModels extend `BaseViewModel` and launch in `viewModelScope`: set `Dispatchers.setMain(StandardTestDispatcher(testScheduler))`, send intents with `onIntent(...)` (clustered screens use the full path, e.g. `CustomizeIntent.History.UndoChange`), then read `state.value` / collect `effect`.
 - Repository implementations switch to `Dispatchers.IO` inside `withContextCatching`; that work runs outside virtual time, so keep Repository tests small or test through a fake.

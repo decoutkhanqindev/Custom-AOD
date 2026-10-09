@@ -27,13 +27,13 @@ import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainRulesState
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun MainRulesSection(
-    rules: AodRulesUiModel,
-    editingScheduleTime: ScheduleTimeValue?,
+    rules: MainRulesState,
     onIntent: (MainIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -47,48 +47,48 @@ fun MainRulesSection(
         ChargingRuleValue.entries.forEach { rule ->
             AodsRadioRow(
                 label = stringResource(rule.labelRes),
-                isSelected = rules.chargingRule == rule,
-                onClick = { onIntent(MainIntent.ChangeChargingRule(rule)) },
+                isSelected = rules.settings.chargingRule == rule,
+                onClick = { onIntent(MainIntent.Rules.ChangeChargingRule(rule)) },
             )
         }
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_schedule),
-            isChecked = rules.schedule.isEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleSchedule(it)) },
+            isChecked = rules.settings.schedule.isEnabled,
+            onCheckedChange = { onIntent(MainIntent.Rules.ToggleSchedule(it)) },
         )
 
-        AnimatedVisibility(visible = rules.schedule.isEnabled) {
+        AnimatedVisibility(visible = rules.settings.schedule.isEnabled) {
             Column {
                 ScheduleTimeValue.entries.forEach { time ->
                     AodsValueRow(
                         label = stringResource(time.labelRes),
-                        value = timeFormatter.format(AodScheduleUiModel.timeOf(rules.schedule.minuteOf(time))),
-                        onClick = { onIntent(MainIntent.ShowScheduleTimePicker(time)) },
+                        value = timeFormatter.format(AodScheduleUiModel.timeOf(rules.settings.schedule.minuteOf(time))),
+                        onClick = { onIntent(MainIntent.Rules.ShowScheduleTimePicker(time)) },
                     )
                 }
             }
         }
 
         AodsSliderRow(
-            label = if (rules.minBattery == 0) {
+            label = if (rules.settings.minBattery == 0) {
                 stringResource(R.string.opt_battery_off)
             } else {
-                stringResource(R.string.opt_battery_value, rules.minBattery)
+                stringResource(R.string.opt_battery_value, rules.settings.minBattery)
             },
-            value = rules.minBattery,
+            value = rules.settings.minBattery,
             valueRange = 0..AodRulesUiModel.BATTERY_MAX_PERCENT,
             step = AodRulesUiModel.BATTERY_STEP_PERCENT,
-            onValueChange = { onIntent(MainIntent.ChangeMinBattery(it)) },
+            onValueChange = { onIntent(MainIntent.Rules.ChangeMinBattery(it)) },
         )
     }
 
-    editingScheduleTime?.let { time ->
+    rules.editingScheduleTime?.let { time ->
         ScheduleTimeDialog(
             time = time,
-            initialTime = AodScheduleUiModel.timeOf(rules.schedule.minuteOf(time)),
-            onConfirm = { picked -> onIntent(MainIntent.ChangeScheduleTime(time, AodScheduleUiModel.minuteOfDay(picked))) },
-            onDismiss = { onIntent(MainIntent.DismissScheduleTimePicker) },
+            initialTime = AodScheduleUiModel.timeOf(rules.settings.schedule.minuteOf(time)),
+            onConfirm = { picked -> onIntent(MainIntent.Rules.ChangeScheduleTime(time, AodScheduleUiModel.minuteOfDay(picked))) },
+            onDismiss = { onIntent(MainIntent.Rules.DismissScheduleTimePicker) },
         )
     }
 }

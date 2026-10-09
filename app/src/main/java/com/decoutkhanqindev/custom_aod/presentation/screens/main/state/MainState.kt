@@ -25,43 +25,68 @@ data class MainState(
     val isLoading: Boolean = true,
     val options: AodOptionsUiModel = AodOptionsUiModel(),
     val notificationOptions: AodNotificationOptionsUiModel = AodNotificationOptionsUiModel(),
-    val appearance: AodAppearanceUiModel = AodAppearanceUiModel(),
+    val appearance: MainAppearanceState = MainAppearanceState(),
+    val extras: MainExtrasState = MainExtrasState(),
+    val interaction: MainInteractionState = MainInteractionState(),
+    val rules: MainRulesState = MainRulesState(),
+    val permission: MainPermissionState = MainPermissionState(),
+    val language: LanguageUiModel? = null,
+    @param:StringRes val lastWakeMessageRes: Int = WakeResultValue.UNKNOWN.messageRes,
+) {
+    // Lần đầu mở app đã có màn quyền riêng (vào màn đó là xong onboarding); về sau thiếu quyền bắt buộc thì nhắc ở màn chính.
+    private val isMissingRequiredPermissions: Boolean
+        get() = !isLoading && permission.permissions.isNotEmpty() && !permission.permissions.hasRequiredPermissions
+
+    // Đóng sheet thì nó không tự hiện lại tới lần mở app sau (ViewModel tạo mới) hay lần bật AOD / áp giao diện cho đồng hồ;
+    // trong lúc đó dòng cảnh báo ở đầu màn chính mở lại được sheet.
+    val isPermissionSheetVisible: Boolean
+        get() = isMissingRequiredPermissions && !permission.isSheetDismissed
+
+    val isPermissionWarningVisible: Boolean
+        get() = isMissingRequiredPermissions && permission.isSheetDismissed
+}
+
+@Immutable
+data class MainAppearanceState(
+    val settings: AodAppearanceUiModel = AodAppearanceUiModel(),
+    val wallpaper: WallpaperValue? = null,
     val hasBackground: Boolean = false,
     val isSavingBackground: Boolean = false,
-    val wallpaper: WallpaperValue? = null,
-    val extras: AodExtrasUiModel = AodExtrasUiModel(),
+)
+
+@Immutable
+data class MainExtrasState(
+    val settings: AodExtrasUiModel = AodExtrasUiModel(),
     val hasDrawing: Boolean = false,
-    val isEditingMemo: Boolean = false,
+    val isMemoEditorVisible: Boolean = false,
     val isDrawingPadVisible: Boolean = false,
     val hasCalendarPermission: Boolean = false,
     val hasLocationPermission: Boolean = false,
-    val interaction: AodInteractionUiModel = AodInteractionUiModel(),
+)
+
+@Immutable
+data class MainInteractionState(
+    val settings: AodInteractionUiModel = AodInteractionUiModel(),
     val editingGesture: AodGestureValue? = null,
     val isFlashlightAvailable: Boolean = false,
     val isLightSensorAvailable: Boolean = false,
     val isPickupSensorAvailable: Boolean = false,
-    val rules: AodRulesUiModel = AodRulesUiModel(),
-    val permissions: ImmutableList<PermissionUiModel> = persistentListOf(),
-    val language: LanguageUiModel? = null,
+)
+
+@Immutable
+data class MainRulesState(
+    val settings: AodRulesUiModel = AodRulesUiModel(),
     val editingScheduleTime: ScheduleTimeValue? = null,
-    @param:StringRes val lastWakeMessageRes: Int = WakeResultValue.UNKNOWN.messageRes,
-    val isPermissionSheetDismissed: Boolean = false,
+)
+
+@Immutable
+data class MainPermissionState(
+    val permissions: ImmutableList<PermissionUiModel> = persistentListOf(),
+    val isSheetDismissed: Boolean = false,
 ) {
     val isNotificationAccessGranted: Boolean
         get() = permissions.any { it.permission == PermissionValue.NOTIFICATION_ACCESS && it.isGranted == true }
 
     val requiredPermissions: ImmutableList<PermissionUiModel>
         get() = permissions.filter { it.permission.isRequired }.toImmutableList()
-
-    // Lần đầu mở app đã có màn quyền riêng (vào màn đó là xong onboarding); về sau thiếu quyền bắt buộc thì nhắc ở màn chính.
-    private val isMissingRequiredPermissions: Boolean
-        get() = !isLoading && permissions.isNotEmpty() && !permissions.hasRequiredPermissions
-
-    // Đóng sheet thì nó không tự hiện lại tới lần mở app sau (ViewModel tạo mới) hay lần bật AOD / áp giao diện cho đồng hồ;
-    // trong lúc đó dòng cảnh báo ở đầu màn chính mở lại được sheet.
-    val isPermissionSheetVisible: Boolean
-        get() = isMissingRequiredPermissions && !isPermissionSheetDismissed
-
-    val isPermissionWarningVisible: Boolean
-        get() = isMissingRequiredPermissions && isPermissionSheetDismissed
 }

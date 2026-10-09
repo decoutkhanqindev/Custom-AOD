@@ -164,6 +164,19 @@ class DataStoreManager(
     val aodMemo: StateFlow<String?> =
         aodMemoKey.asStateFlow(default = DEFAULT_AOD_MEMO)
 
+    private val isAodDateEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_DATE_ENABLED_KEY)
+    val isAodDateEnabled: StateFlow<Boolean?> =
+        isAodDateEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_DATE_ENABLED)
+
+    private val isAodBatteryEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_BATTERY_ENABLED_KEY)
+    val isAodBatteryEnabled: StateFlow<Boolean?> =
+        isAodBatteryEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_BATTERY_ENABLED)
+
+    private val isCustomizeGuideShownKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_CUSTOMIZE_GUIDE_SHOWN_KEY)
+    val isCustomizeGuideShown: StateFlow<Boolean?> =
+        isCustomizeGuideShownKey.asStateFlow(default = DEFAULT_IS_CUSTOMIZE_GUIDE_SHOWN)
+
     private val isAodCalendarEnabledKey: Preferences.Key<Boolean> =
         booleanPreferencesKey(IS_AOD_CALENDAR_ENABLED_KEY)
     val isAodCalendarEnabled: StateFlow<Boolean?> =
@@ -324,6 +337,18 @@ class DataStoreManager(
         edit { prefs -> prefs[aodMemoKey] = value }
     }
 
+    fun saveIsAodDateEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodDateEnabledKey] = value }
+    }
+
+    fun saveIsAodBatteryEnabled(value: Boolean) {
+        edit { prefs -> prefs[isAodBatteryEnabledKey] = value }
+    }
+
+    fun saveIsCustomizeGuideShown(value: Boolean) {
+        edit { prefs -> prefs[isCustomizeGuideShownKey] = value }
+    }
+
     fun saveIsAodCalendarEnabled(value: Boolean) {
         edit { prefs -> prefs[isAodCalendarEnabledKey] = value }
     }
@@ -407,6 +432,9 @@ class DataStoreManager(
         private const val IS_AOD_AUTO_DIM_ENABLED_KEY = "is_aod_auto_dim_enabled"
         private const val IS_AOD_RAISE_TO_WAKE_ENABLED_KEY = "is_aod_raise_to_wake_enabled"
         private const val AOD_MEMO_KEY = "aod_memo"
+        private const val IS_AOD_DATE_ENABLED_KEY = "is_aod_date_enabled"
+        private const val IS_AOD_BATTERY_ENABLED_KEY = "is_aod_battery_enabled"
+        private const val IS_CUSTOMIZE_GUIDE_SHOWN_KEY = "is_customize_guide_shown"
         private const val IS_AOD_CALENDAR_ENABLED_KEY = "is_aod_calendar_enabled"
         private const val IS_AOD_WEATHER_ENABLED_KEY = "is_aod_weather_enabled"
         private const val IS_AOD_WEATHER_FAHRENHEIT_KEY = "is_aod_weather_fahrenheit"
@@ -446,6 +474,9 @@ class DataStoreManager(
         const val DEFAULT_IS_AOD_AUTO_DIM_ENABLED = true
         const val DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED = true
         const val DEFAULT_AOD_MEMO = ""
+        const val DEFAULT_IS_AOD_DATE_ENABLED = true
+        const val DEFAULT_IS_AOD_BATTERY_ENABLED = true
+        private const val DEFAULT_IS_CUSTOMIZE_GUIDE_SHOWN = false
         const val DEFAULT_IS_AOD_CALENDAR_ENABLED = false
         const val DEFAULT_IS_AOD_WEATHER_ENABLED = false
         const val DEFAULT_IS_AOD_WEATHER_FAHRENHEIT = false

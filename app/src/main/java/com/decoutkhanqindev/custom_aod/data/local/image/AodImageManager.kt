@@ -65,6 +65,29 @@ class AodImageManager(
         },
     )
 
+    // Màn thử tùy chỉnh giữ ảnh trong bộ nhớ làm bản nháp, chỉ ghi file khi user bấm Áp dụng.
+    suspend fun decodeBackground(uri: String): Bitmap? = withContextCatching(
+        context = Dispatchers.IO,
+        action = { decodeScaled(uri) },
+        catch = { e ->
+            Timber.tag(tag).e("Could not decode the background image: ${e.stackTraceToString()}")
+            null
+        },
+    )
+
+    suspend fun saveBackground(bitmap: Bitmap): Boolean = withContextCatching(
+        context = Dispatchers.IO,
+        action = {
+            writeAtomically(file = backgroundFile, bitmap = bitmap, format = Bitmap.CompressFormat.JPEG)
+            _hasBackground.value = true
+            true
+        },
+        catch = { e ->
+            Timber.tag(tag).e("Could not save the background image: ${e.stackTraceToString()}")
+            false
+        },
+    )
+
     suspend fun loadBackground(): Bitmap? = load(backgroundFile)
 
     fun removeBackground() {

@@ -46,12 +46,13 @@ fun SplashContent() {
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 32.dp)
+                .padding(bottom = 128.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             AodsLottie(
                 resId = R.raw.lottie_device_edge_light,
-                modifier = Modifier.size(200.dp),
+                modifier = Modifier.size(300.dp),
             )
 
             AnimatedVisibility(

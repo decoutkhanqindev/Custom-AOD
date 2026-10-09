@@ -1,7 +1,5 @@
 package com.decoutkhanqindev.custom_aod.presentation.components.dialog
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WifiOff
@@ -11,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,17 +18,11 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @Composable
-fun AodsNoInternetDialog(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-
+fun AodsNoInternetDialog(modifier: Modifier = Modifier, onOpenSettings: () -> Unit) {
     AlertDialog(
         onDismissRequest = {},
         confirmButton = {
-            TextButton(
-                onClick = {
-                    context.startActivity(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY))
-                },
-            ) {
+            TextButton(onClick = onOpenSettings) {
                 Text(
                     text = stringResource(R.string.open_settings),
                     fontWeight = FontWeight.Bold,

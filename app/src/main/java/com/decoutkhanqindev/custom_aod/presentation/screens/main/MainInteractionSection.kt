@@ -14,16 +14,12 @@ import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsValueRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainInteractionState
 
 @Composable
 fun MainInteractionSection(
-    interaction: AodInteractionUiModel,
-    editingGesture: AodGestureValue?,
-    isFlashlightAvailable: Boolean,
-    isLightSensorAvailable: Boolean,
-    isPickupSensorAvailable: Boolean,
+    interaction: MainInteractionState,
     onIntent: (MainIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -33,39 +29,39 @@ fun MainInteractionSection(
         AodGestureValue.entries.forEach { gesture ->
             AodsValueRow(
                 label = stringResource(gesture.labelRes),
-                value = stringResource(interaction.actionOf(gesture).labelRes),
-                onClick = { onIntent(MainIntent.ShowGestureActionPicker(gesture)) },
+                value = stringResource(interaction.settings.actionOf(gesture).labelRes),
+                onClick = { onIntent(MainIntent.Interaction.ShowGestureActionPicker(gesture)) },
             )
         }
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_auto_dim),
-            isChecked = interaction.isAutoDimEnabled && isLightSensorAvailable,
-            onCheckedChange = { onIntent(MainIntent.ToggleAutoDim(it)) },
+            isChecked = interaction.settings.isAutoDimEnabled && interaction.isLightSensorAvailable,
+            onCheckedChange = { onIntent(MainIntent.Interaction.ToggleAutoDim(it)) },
             description = stringResource(
-                if (isLightSensorAvailable) R.string.opt_auto_dim_desc else R.string.sensor_unsupported_light,
+                if (interaction.isLightSensorAvailable) R.string.opt_auto_dim_desc else R.string.sensor_unsupported_light,
             ),
-            isEnabled = isLightSensorAvailable,
+            isEnabled = interaction.isLightSensorAvailable,
         )
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_raise_to_wake),
-            isChecked = interaction.isRaiseToWakeEnabled && isPickupSensorAvailable,
-            onCheckedChange = { onIntent(MainIntent.ToggleRaiseToWake(it)) },
+            isChecked = interaction.settings.isRaiseToWakeEnabled && interaction.isPickupSensorAvailable,
+            onCheckedChange = { onIntent(MainIntent.Interaction.ToggleRaiseToWake(it)) },
             description = stringResource(
-                if (isPickupSensorAvailable) R.string.opt_raise_to_wake_desc else R.string.sensor_unsupported_pickup,
+                if (interaction.isPickupSensorAvailable) R.string.opt_raise_to_wake_desc else R.string.sensor_unsupported_pickup,
             ),
-            isEnabled = isPickupSensorAvailable,
+            isEnabled = interaction.isPickupSensorAvailable,
         )
     }
 
-    editingGesture?.let { gesture ->
+    interaction.editingGesture?.let { gesture ->
         GestureActionDialog(
             gesture = gesture,
-            selected = interaction.actionOf(gesture),
-            isFlashlightAvailable = isFlashlightAvailable,
-            onSelect = { action -> onIntent(MainIntent.ChangeGestureAction(gesture, action)) },
-            onDismiss = { onIntent(MainIntent.DismissGestureActionPicker) },
+            selected = interaction.settings.actionOf(gesture),
+            isFlashlightAvailable = interaction.isFlashlightAvailable,
+            onSelect = { action -> onIntent(MainIntent.Interaction.ChangeGestureAction(gesture, action)) },
+            onDismiss = { onIntent(MainIntent.Interaction.DismissGestureActionPicker) },
         )
     }
 }

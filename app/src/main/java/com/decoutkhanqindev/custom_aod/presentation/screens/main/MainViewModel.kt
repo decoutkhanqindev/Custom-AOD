@@ -36,6 +36,7 @@ import com.decoutkhanqindev.custom_aod.presentation.model.saveGestureAction
 import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainInteractionState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
@@ -55,9 +56,11 @@ class MainViewModel(
     private val refreshWeatherUseCase: RefreshWeatherUseCase,
 ) : BaseViewModel<MainState, MainIntent, MainEffect>(
     initialState = MainState(
-        isFlashlightAvailable = flashlightManager.isAvailable,
-        isLightSensorAvailable = ambientLightManager.isAvailable,
-        isPickupSensorAvailable = pickupGestureManager.isSupported,
+        interaction = MainInteractionState(
+            isFlashlightAvailable = flashlightManager.isAvailable,
+            isLightSensorAvailable = ambientLightManager.isAvailable,
+            isPickupSensorAvailable = pickupGestureManager.isSupported,
+        ),
     ),
 ), Tag {
 
@@ -78,54 +81,119 @@ class MainViewModel(
         Timber.tag(tag).d("onIntent: $intent")
         if (intent.isAodRelated) showPermissionSheet()
         when (intent) {
+            is MainIntent.Options -> onOptionsIntent(intent)
+            is MainIntent.Appearance -> onAppearanceIntent(intent)
+            is MainIntent.Extras -> onExtrasIntent(intent)
+            is MainIntent.Notifications -> onNotificationsIntent(intent)
+            is MainIntent.Interaction -> onInteractionIntent(intent)
+            is MainIntent.Rules -> onRulesIntent(intent)
+            is MainIntent.Permission -> onPermissionIntent(intent)
             is MainIntent.ToggleAod -> toggleAod(intent.isEnabled)
-            is MainIntent.ToggleCustomBrightness -> dataStoreManager.saveIsAodCustomBrightness(intent.isEnabled)
-            is MainIntent.ChangeBrightness -> dataStoreManager.saveAodBrightnessPercent(intent.percent)
-            is MainIntent.ToggleProximity -> dataStoreManager.saveIsAodProximityEnabled(intent.isEnabled)
-            is MainIntent.ChangeTimeout -> dataStoreManager.saveAodTimeoutMinutes(intent.minutes)
-            is MainIntent.ChangeClockFace -> dataStoreManager.saveAodClockFace(intent.face.code)
-            is MainIntent.ChangeClockFont -> dataStoreManager.saveAodClockFont(intent.font.code)
-            is MainIntent.ChangeClockColor -> dataStoreManager.saveAodClockColor(intent.color.code)
-            is MainIntent.ChangeClockSize -> dataStoreManager.saveAodClockSizePercent(intent.percent)
-            is MainIntent.ToggleLandscape -> dataStoreManager.saveIsAodLandscape(intent.isEnabled)
-            is MainIntent.SelectWallpaper -> selectWallpaper(intent.wallpaper)
-            is MainIntent.OpenBackgroundPicker -> viewModelScope.launch { sendEffect(MainEffect.OpenBackgroundPicker) }
-            is MainIntent.BackgroundPickerResult -> onBackgroundPickerResult(intent.uri)
-            is MainIntent.RemoveBackground -> removeBackground()
-            is MainIntent.ShowMemoEditor -> updateState { copy(isEditingMemo = true) }
-            is MainIntent.DismissMemoEditor -> updateState { copy(isEditingMemo = false) }
-            is MainIntent.ChangeMemo -> changeMemo(intent.memo)
-            is MainIntent.ShowDrawingPad -> updateState { copy(isDrawingPadVisible = true) }
-            is MainIntent.DismissDrawingPad -> updateState { copy(isDrawingPadVisible = false) }
-            is MainIntent.ChangeDrawing -> changeDrawing(intent.drawing)
-            is MainIntent.RemoveDrawing -> aodImageManager.removeDrawing()
-            is MainIntent.ToggleCalendar -> toggleCalendar(intent.isEnabled)
-            is MainIntent.CalendarPermissionResult -> onCalendarPermissionResult(intent.isGranted)
-            is MainIntent.ToggleWeather -> toggleWeather(intent.isEnabled)
-            is MainIntent.LocationPermissionResult -> onLocationPermissionResult(intent.isGranted)
-            is MainIntent.ToggleWeatherFahrenheit -> dataStoreManager.saveIsAodWeatherFahrenheit(intent.isEnabled)
-            is MainIntent.ShowGestureActionPicker -> updateState { copy(editingGesture = intent.gesture) }
-            is MainIntent.DismissGestureActionPicker -> updateState { copy(editingGesture = null) }
-            is MainIntent.ChangeGestureAction -> changeGestureAction(intent.gesture, intent.action)
-            is MainIntent.ToggleAutoDim -> dataStoreManager.saveIsAodAutoDimEnabled(intent.isEnabled)
-            is MainIntent.ToggleRaiseToWake -> dataStoreManager.saveIsAodRaiseToWakeEnabled(intent.isEnabled)
-            is MainIntent.ToggleNotificationIcons -> dataStoreManager.saveIsAodNotificationIconsEnabled(intent.isEnabled)
-            is MainIntent.ToggleNotificationContent -> dataStoreManager.saveIsAodNotificationContentEnabled(intent.isEnabled)
-            is MainIntent.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(intent.isEnabled)
-            is MainIntent.ToggleMediaControls -> dataStoreManager.saveIsAodMediaControlsEnabled(intent.isEnabled)
-            is MainIntent.ChangeChargingRule -> dataStoreManager.saveAodChargingRule(intent.rule.code)
-            is MainIntent.ToggleSchedule -> dataStoreManager.saveIsAodScheduleEnabled(intent.isEnabled)
-            is MainIntent.ShowScheduleTimePicker -> updateState { copy(editingScheduleTime = intent.time) }
-            is MainIntent.DismissScheduleTimePicker -> updateState { copy(editingScheduleTime = null) }
-            is MainIntent.ChangeScheduleTime -> changeScheduleTime(intent.time, intent.minuteOfDay)
-            is MainIntent.ChangeMinBattery -> dataStoreManager.saveAodMinBattery(intent.percent)
-            is MainIntent.OpenPermissionSettings -> openPermissionSettings(intent.permission)
-            is MainIntent.RefreshPermissions -> refreshPermissions()
-            is MainIntent.ShowPermissionSheet -> showPermissionSheet()
-            is MainIntent.DismissPermissionSheet -> dismissPermissionSheet()
-            is MainIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
-            is MainIntent.NavigateToLanguage -> viewModelScope.launch { sendEffect(MainEffect.NavigateToLanguage) }
-            is MainIntent.OpenPreview -> viewModelScope.launch { sendEffect(MainEffect.OpenPreview) }
+            is MainIntent.NavigateToLanguage ->
+                viewModelScope.launch { sendEffect(MainEffect.Navigation.NavigateToLanguage) }
+
+            is MainIntent.OpenPreview -> viewModelScope.launch { sendEffect(MainEffect.Navigation.OpenPreview) }
+        }
+    }
+
+    private fun onOptionsIntent(intent: MainIntent.Options) {
+        when (intent) {
+            is MainIntent.Options.ToggleCustomBrightness -> dataStoreManager.saveIsAodCustomBrightness(intent.isEnabled)
+            is MainIntent.Options.ChangeBrightness -> dataStoreManager.saveAodBrightnessPercent(intent.percent)
+            is MainIntent.Options.ToggleProximity -> dataStoreManager.saveIsAodProximityEnabled(intent.isEnabled)
+            is MainIntent.Options.ChangeTimeout -> dataStoreManager.saveAodTimeoutMinutes(intent.minutes)
+        }
+    }
+
+    private fun onAppearanceIntent(intent: MainIntent.Appearance) {
+        when (intent) {
+            is MainIntent.Appearance.ChangeClockFace -> dataStoreManager.saveAodClockFace(intent.face.code)
+            is MainIntent.Appearance.ChangeClockFont -> dataStoreManager.saveAodClockFont(intent.font.code)
+            is MainIntent.Appearance.ChangeClockColor -> dataStoreManager.saveAodClockColor(intent.color.code)
+            is MainIntent.Appearance.ChangeClockSize -> dataStoreManager.saveAodClockSizePercent(intent.percent)
+            is MainIntent.Appearance.ToggleLandscape -> dataStoreManager.saveIsAodLandscape(intent.isEnabled)
+            is MainIntent.Appearance.SelectWallpaper -> selectWallpaper(intent.wallpaper)
+            is MainIntent.Appearance.OpenBackgroundPicker ->
+                viewModelScope.launch { sendEffect(MainEffect.Appearance.OpenBackgroundPicker) }
+
+            is MainIntent.Appearance.BackgroundPickerResult -> onBackgroundPickerResult(intent.uri)
+            is MainIntent.Appearance.RemoveBackground -> removeBackground()
+        }
+    }
+
+    private fun onExtrasIntent(intent: MainIntent.Extras) {
+        when (intent) {
+            is MainIntent.Extras.ToggleDate -> dataStoreManager.saveIsAodDateEnabled(intent.isEnabled)
+            is MainIntent.Extras.ToggleBattery -> dataStoreManager.saveIsAodBatteryEnabled(intent.isEnabled)
+            is MainIntent.Extras.ShowMemoEditor -> updateState { copy(extras = extras.copy(isMemoEditorVisible = true)) }
+            is MainIntent.Extras.DismissMemoEditor ->
+                updateState { copy(extras = extras.copy(isMemoEditorVisible = false)) }
+
+            is MainIntent.Extras.ChangeMemo -> changeMemo(intent.memo)
+            is MainIntent.Extras.ShowDrawingPad -> updateState { copy(extras = extras.copy(isDrawingPadVisible = true)) }
+            is MainIntent.Extras.DismissDrawingPad ->
+                updateState { copy(extras = extras.copy(isDrawingPadVisible = false)) }
+
+            is MainIntent.Extras.ChangeDrawing -> changeDrawing(intent.drawing)
+            is MainIntent.Extras.RemoveDrawing -> aodImageManager.removeDrawing()
+            is MainIntent.Extras.ToggleCalendar -> toggleCalendar(intent.isEnabled)
+            is MainIntent.Extras.ToggleWeather -> toggleWeather(intent.isEnabled)
+            is MainIntent.Extras.ToggleWeatherFahrenheit -> dataStoreManager.saveIsAodWeatherFahrenheit(intent.isEnabled)
+        }
+    }
+
+    private fun onNotificationsIntent(intent: MainIntent.Notifications) {
+        when (intent) {
+            is MainIntent.Notifications.ToggleNotificationIcons ->
+                dataStoreManager.saveIsAodNotificationIconsEnabled(intent.isEnabled)
+
+            is MainIntent.Notifications.ToggleNotificationContent ->
+                dataStoreManager.saveIsAodNotificationContentEnabled(intent.isEnabled)
+
+            is MainIntent.Notifications.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(intent.isEnabled)
+            is MainIntent.Notifications.ToggleMediaControls ->
+                dataStoreManager.saveIsAodMediaControlsEnabled(intent.isEnabled)
+        }
+    }
+
+    private fun onInteractionIntent(intent: MainIntent.Interaction) {
+        when (intent) {
+            is MainIntent.Interaction.ShowGestureActionPicker ->
+                updateState { copy(interaction = interaction.copy(editingGesture = intent.gesture)) }
+
+            is MainIntent.Interaction.DismissGestureActionPicker ->
+                updateState { copy(interaction = interaction.copy(editingGesture = null)) }
+
+            is MainIntent.Interaction.ChangeGestureAction -> changeGestureAction(intent.gesture, intent.action)
+            is MainIntent.Interaction.ToggleAutoDim -> dataStoreManager.saveIsAodAutoDimEnabled(intent.isEnabled)
+            is MainIntent.Interaction.ToggleRaiseToWake -> dataStoreManager.saveIsAodRaiseToWakeEnabled(intent.isEnabled)
+        }
+    }
+
+    private fun onRulesIntent(intent: MainIntent.Rules) {
+        when (intent) {
+            is MainIntent.Rules.ChangeChargingRule -> dataStoreManager.saveAodChargingRule(intent.rule.code)
+            is MainIntent.Rules.ToggleSchedule -> dataStoreManager.saveIsAodScheduleEnabled(intent.isEnabled)
+            is MainIntent.Rules.ShowScheduleTimePicker ->
+                updateState { copy(rules = rules.copy(editingScheduleTime = intent.time)) }
+
+            is MainIntent.Rules.DismissScheduleTimePicker ->
+                updateState { copy(rules = rules.copy(editingScheduleTime = null)) }
+
+            is MainIntent.Rules.ChangeScheduleTime -> changeScheduleTime(intent.time, intent.minuteOfDay)
+            is MainIntent.Rules.ChangeMinBattery -> dataStoreManager.saveAodMinBattery(intent.percent)
+        }
+    }
+
+    private fun onPermissionIntent(intent: MainIntent.Permission) {
+        when (intent) {
+            is MainIntent.Permission.OpenPermissionSettings -> openPermissionSettings(intent.permission)
+            is MainIntent.Permission.RefreshPermissions -> refreshPermissions()
+            is MainIntent.Permission.ShowPermissionSheet -> showPermissionSheet()
+            is MainIntent.Permission.DismissPermissionSheet -> dismissPermissionSheet()
+            is MainIntent.Permission.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
+            is MainIntent.Permission.CalendarPermissionResult -> onCalendarPermissionResult(intent.isGranted)
+            is MainIntent.Permission.LocationPermissionResult -> onLocationPermissionResult(intent.isGranted)
         }
     }
 
@@ -152,9 +220,9 @@ class MainViewModel(
                             isLoading = false,
                             options = settings.options,
                             notificationOptions = settings.notificationOptions,
-                            appearance = settings.appearance,
-                            interaction = settings.interaction,
-                            rules = settings.rules,
+                            appearance = appearance.copy(settings = settings.appearance),
+                            interaction = interaction.copy(settings = settings.interaction),
+                            rules = rules.copy(settings = settings.rules),
                         )
                     }
                 },
@@ -166,7 +234,7 @@ class MainViewModel(
     private fun observeBackground() {
         viewModelScope.launch {
             aodImageManager.hasBackground.filterNotNull().collectCatching(
-                action = { hasBackground -> updateState { copy(hasBackground = hasBackground) } },
+                action = { hasBackground -> updateState { copy(appearance = appearance.copy(hasBackground = hasBackground)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -175,7 +243,9 @@ class MainViewModel(
     private fun observeWallpaper() {
         viewModelScope.launch {
             dataStoreManager.aodWallpaper.filterNotNull().collectCatching(
-                action = { code -> updateState { copy(wallpaper = WallpaperValue.fromCode(code)) } },
+                action = { code ->
+                    updateState { copy(appearance = appearance.copy(wallpaper = WallpaperValue.fromCode(code))) }
+                },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -184,7 +254,7 @@ class MainViewModel(
     private fun observeExtras() {
         viewModelScope.launch {
             dataStoreManager.observeAodExtras().collectCatching(
-                action = { extras -> updateState { copy(extras = extras) } },
+                action = { settings -> updateState { copy(extras = extras.copy(settings = settings)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -193,7 +263,7 @@ class MainViewModel(
     private fun observeDrawing() {
         viewModelScope.launch {
             aodImageManager.hasDrawing.filterNotNull().collectCatching(
-                action = { hasDrawing -> updateState { copy(hasDrawing = hasDrawing) } },
+                action = { hasDrawing -> updateState { copy(extras = extras.copy(hasDrawing = hasDrawing)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -225,25 +295,27 @@ class MainViewModel(
     private fun refreshPermissions() {
         updateState {
             copy(
-                permissions = permissionManager.aodPermissions(),
-                hasCalendarPermission = permissionManager.hasCalendarPermission(),
-                hasLocationPermission = permissionManager.hasCoarseLocationPermission(),
+                permission = permission.copy(permissions = permissionManager.aodPermissions()),
+                extras = extras.copy(
+                    hasCalendarPermission = permissionManager.hasCalendarPermission(),
+                    hasLocationPermission = permissionManager.hasCoarseLocationPermission(),
+                ),
             )
         }
     }
 
     private fun showPermissionSheet() {
-        updateState { copy(isPermissionSheetDismissed = false) }
+        updateState { copy(permission = permission.copy(isSheetDismissed = false)) }
     }
 
     private fun dismissPermissionSheet() {
-        updateState { copy(isPermissionSheetDismissed = true) }
+        updateState { copy(permission = permission.copy(isSheetDismissed = true)) }
     }
 
     private fun toggleAod(isEnabled: Boolean) {
         dataStoreManager.saveIsAodEnabled(isEnabled)
         viewModelScope.launch {
-            sendEffect(if (isEnabled) MainEffect.StartAodService else MainEffect.StopAodService)
+            sendEffect(if (isEnabled) MainEffect.Service.StartAodService else MainEffect.Service.StopAodService)
         }
     }
 
@@ -251,9 +323,9 @@ class MainViewModel(
     private fun onBackgroundPickerResult(uri: String?) {
         if (uri == null) return
         viewModelScope.launch {
-            updateState { copy(isSavingBackground = true) }
+            updateState { copy(appearance = appearance.copy(isSavingBackground = true)) }
             val isSaved = aodImageManager.saveBackground(uri)
-            updateState { copy(isSavingBackground = false) }
+            updateState { copy(appearance = appearance.copy(isSavingBackground = false)) }
             if (isSaved) {
                 dataStoreManager.saveAodWallpaper(WallpaperValue.NONE_CODE)
             } else {
@@ -275,16 +347,16 @@ class MainViewModel(
 
     private fun changeGestureAction(gesture: AodGestureValue, action: AodActionValue) {
         dataStoreManager.saveGestureAction(gesture, action)
-        updateState { copy(editingGesture = null) }
+        updateState { copy(interaction = interaction.copy(editingGesture = null)) }
     }
 
     private fun changeMemo(memo: String) {
         dataStoreManager.saveAodMemo(memo.trim().take(AodExtrasUiModel.MEMO_MAX_LENGTH))
-        updateState { copy(isEditingMemo = false) }
+        updateState { copy(extras = extras.copy(isMemoEditorVisible = false)) }
     }
 
     private fun changeDrawing(drawing: Bitmap) {
-        updateState { copy(isDrawingPadVisible = false) }
+        updateState { copy(extras = extras.copy(isDrawingPadVisible = false)) }
         viewModelScope.launch {
             if (!aodImageManager.saveDrawing(drawing)) sendEffect(MainEffect.ShowMessage(R.string.drawing_save_failed))
         }
@@ -294,7 +366,7 @@ class MainViewModel(
     private fun toggleCalendar(isEnabled: Boolean) {
         if (isEnabled && !permissionManager.hasCalendarPermission()) {
             permissionRequestedFromList = null
-            viewModelScope.launch { sendEffect(MainEffect.RequestCalendarPermission) }
+            viewModelScope.launch { sendEffect(MainEffect.Permission.RequestCalendarPermission) }
         } else {
             dataStoreManager.saveIsAodCalendarEnabled(isEnabled)
         }
@@ -307,7 +379,7 @@ class MainViewModel(
         refreshPermissions()
         viewModelScope.launch {
             when {
-                isFromList -> if (!isGranted) sendEffect(MainEffect.OpenAppSettings)
+                isFromList -> if (!isGranted) sendEffect(MainEffect.Permission.OpenAppSettings)
                 isGranted -> dataStoreManager.saveIsAodCalendarEnabled(true)
                 else -> sendEffect(MainEffect.ShowMessage(R.string.calendar_permission_denied))
             }
@@ -319,7 +391,7 @@ class MainViewModel(
             !isEnabled -> dataStoreManager.saveIsAodWeatherEnabled(false)
             !permissionManager.hasCoarseLocationPermission() -> {
                 permissionRequestedFromList = null
-                viewModelScope.launch { sendEffect(MainEffect.RequestLocationPermission) }
+                viewModelScope.launch { sendEffect(MainEffect.Permission.RequestLocationPermission) }
             }
 
             else -> enableWeather()
@@ -331,7 +403,7 @@ class MainViewModel(
         permissionRequestedFromList = null
         refreshPermissions()
         when {
-            isFromList -> if (!isGranted) viewModelScope.launch { sendEffect(MainEffect.OpenAppSettings) }
+            isFromList -> if (!isGranted) viewModelScope.launch { sendEffect(MainEffect.Permission.OpenAppSettings) }
             isGranted -> enableWeather()
             else -> viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.location_permission_denied)) }
         }
@@ -351,37 +423,37 @@ class MainViewModel(
             ScheduleTimeValue.START -> dataStoreManager.saveAodScheduleStartMinute(minuteOfDay)
             ScheduleTimeValue.END -> dataStoreManager.saveAodScheduleEndMinute(minuteOfDay)
         }
-        updateState { copy(editingScheduleTime = null) }
+        updateState { copy(rules = rules.copy(editingScheduleTime = null)) }
     }
 
     private fun openPermissionSettings(permission: PermissionValue) {
         val effect = when (permission) {
-            PermissionValue.OVERLAY -> MainEffect.OpenOverlaySettings
+            PermissionValue.OVERLAY -> MainEffect.Permission.OpenOverlaySettings
             PermissionValue.MIUI_LOCK_SCREEN,
-            PermissionValue.MIUI_BACKGROUND_POPUP -> MainEffect.OpenMiuiPermissionSettings
+            PermissionValue.MIUI_BACKGROUND_POPUP -> MainEffect.Permission.OpenMiuiPermissionSettings
 
             PermissionValue.NOTIFICATIONS ->
                 if (permissionManager.needsNotificationPermission()) {
-                    MainEffect.RequestNotificationPermission
+                    MainEffect.Permission.RequestNotificationPermission
                 } else {
-                    MainEffect.OpenNotificationSettings
+                    MainEffect.Permission.OpenNotificationSettings
                 }
 
-            PermissionValue.NOTIFICATION_ACCESS -> MainEffect.OpenNotificationAccessSettings
+            PermissionValue.NOTIFICATION_ACCESS -> MainEffect.Permission.OpenNotificationAccessSettings
             PermissionValue.CALENDAR ->
                 if (permissionManager.hasCalendarPermission()) {
-                    MainEffect.OpenAppSettings
+                    MainEffect.Permission.OpenAppSettings
                 } else {
                     permissionRequestedFromList = PermissionValue.CALENDAR
-                    MainEffect.RequestCalendarPermission
+                    MainEffect.Permission.RequestCalendarPermission
                 }
 
             PermissionValue.LOCATION ->
                 if (permissionManager.hasCoarseLocationPermission()) {
-                    MainEffect.OpenAppSettings
+                    MainEffect.Permission.OpenAppSettings
                 } else {
                     permissionRequestedFromList = PermissionValue.LOCATION
-                    MainEffect.RequestLocationPermission
+                    MainEffect.Permission.RequestLocationPermission
                 }
         }
         viewModelScope.launch { sendEffect(effect) }
@@ -392,8 +464,8 @@ class MainViewModel(
         refreshPermissions()
         viewModelScope.launch {
             when {
-                isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(MainEffect.StartAodService)
-                else -> sendEffect(MainEffect.OpenNotificationSettings)
+                isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(MainEffect.Service.StartAodService)
+                else -> sendEffect(MainEffect.Permission.OpenNotificationSettings)
             }
         }
     }
@@ -403,13 +475,15 @@ class MainViewModel(
     private val MainIntent.isAodRelated: Boolean
         get() = when (this) {
             is MainIntent.ToggleAod -> isEnabled
-            is MainIntent.BackgroundPickerResult -> uri != null
-            is MainIntent.ChangeClockFace,
-            is MainIntent.ChangeClockFont,
-            is MainIntent.ChangeClockColor,
-            is MainIntent.ChangeClockSize,
-            is MainIntent.ToggleLandscape,
-            is MainIntent.SelectWallpaper -> true
+            is MainIntent.Appearance.BackgroundPickerResult -> uri != null
+            is MainIntent.Appearance.ChangeClockFace,
+            is MainIntent.Appearance.ChangeClockFont,
+            is MainIntent.Appearance.ChangeClockColor,
+            is MainIntent.Appearance.ChangeClockSize,
+            is MainIntent.Appearance.ToggleLandscape,
+            is MainIntent.Appearance.SelectWallpaper,
+            is MainIntent.Extras.ToggleDate,
+            is MainIntent.Extras.ToggleBattery -> true
 
             else -> false
         }

@@ -3,6 +3,7 @@ package com.decoutkhanqindev.custom_aod.presentation.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -16,9 +17,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -38,6 +41,8 @@ fun AodsOnboardingTopBar(
     step: OnboardingStepValue,
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
+    containerColor: Color = AodsColors.Black,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -67,6 +72,8 @@ fun AodsOnboardingTopBar(
                 }
             }
         },
+        actions = actions,
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
     )
 }
 

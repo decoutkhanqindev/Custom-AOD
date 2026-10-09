@@ -24,7 +24,7 @@ fun MainOptionsSection(
         AodsSwitchRow(
             label = stringResource(R.string.opt_custom_brightness),
             isChecked = options.isCustomBrightness,
-            onCheckedChange = { onIntent(MainIntent.ToggleCustomBrightness(it)) },
+            onCheckedChange = { onIntent(MainIntent.Options.ToggleCustomBrightness(it)) },
         )
 
         AnimatedVisibility(visible = options.isCustomBrightness) {
@@ -33,14 +33,14 @@ fun MainOptionsSection(
                 value = options.brightnessPercent,
                 valueRange = AodOptionsUiModel.BRIGHTNESS_MIN_PERCENT..AodOptionsUiModel.BRIGHTNESS_MAX_PERCENT,
                 step = 1,
-                onValueChange = { onIntent(MainIntent.ChangeBrightness(it)) },
+                onValueChange = { onIntent(MainIntent.Options.ChangeBrightness(it)) },
             )
         }
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_proximity),
             isChecked = options.isProximityEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleProximity(it)) },
+            onCheckedChange = { onIntent(MainIntent.Options.ToggleProximity(it)) },
         )
 
         AodsSliderRow(
@@ -52,7 +52,7 @@ fun MainOptionsSection(
             value = options.timeoutMinutes,
             valueRange = 0..AodOptionsUiModel.TIMEOUT_MAX_MINUTES,
             step = AodOptionsUiModel.TIMEOUT_STEP_MINUTES,
-            onValueChange = { onIntent(MainIntent.ChangeTimeout(it)) },
+            onValueChange = { onIntent(MainIntent.Options.ChangeTimeout(it)) },
         )
     }
 }

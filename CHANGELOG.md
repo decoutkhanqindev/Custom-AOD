@@ -4,6 +4,35 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-10 – Màn chính chia Intent / Effect / State theo cụm, panel Customize như bottom sheet
+
+Không đổi hành vi màn chính. Build được (`compileDebugKotlin`), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.
+
+### Thay đổi
+
+- `MainIntent` (50 Intent phẳng) chia theo đúng các section của màn chính: `Options`, `Appearance`, `Extras`, `Notifications`, `Interaction`, `Rules`, `Permission`; `ToggleAod`, `NavigateToLanguage`, `OpenPreview` ở cấp cha. `MainEffect` chia `Service`, `Appearance`, `Permission`, `Navigation`, `ShowMessage` ở cấp cha. `MainViewModel.onIntent` giao cho `on<Cụm>Intent`.
+- `MainState` từ 24 field còn 10: state con `MainAppearanceState`, `MainExtrasState`, `MainInteractionState`, `MainRulesState` gói UiModel đã lưu của cụm (`settings`) cùng UI tạm (dialog, đang lưu ảnh, cảm biến có / không, quyền lịch / vị trí); `MainPermissionState` giữ danh sách quyền và trạng thái đóng sheet. Mỗi `MainXxxSection` chỉ nhận state con của nó. `isEditingMemo` đổi tên thành `isMemoEditorVisible` cho giống màn Customize. CLAUDE.md mục 10.2.2 và agent `compose-implementer` ghi thêm biến thể này.
+- Panel phía trên thanh tab của màn Customize trượt lên / xuống như bottom sheet M3 (cùng thông số chuyển động với `ModalBottomSheet`), đổi tab thì chỉ nội dung mờ chuyển; bỏ nút thu xuống, tiêu đề căn giữa (đóng bằng cách bấm lại tab hoặc back). Xoá string `customize_close_panel`.
+
+## [Chưa phát hành] – 2026-10-09 – Màn thử tùy chỉnh AOD trong onboarding
+
+Thêm bước "Thử tùy chỉnh AOD" vào onboarding lần đầu: Language → Customize → Permission. Không thêm quyền Manifest, không thêm thư viện. Build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.
+
+### Thêm
+
+- Màn Customize (`screens/customize/`, bước 2/3): khung xem trước toàn màn hình là chính `AodContent` dựng từ bản nháp, dữ liệu mẫu cho thông báo, sự kiện, thời tiết, nhạc, pin. Top bar trong suốt (back, chỉ báo bước, `?` xem lại hướng dẫn, nút chữ Bỏ qua); ngay dưới, căn giữa, là thanh công cụ hoàn tác / làm lại / đặt lại + nút Áp dụng nền mint (chỉ bấm được khi đã có thay đổi); thanh tab vuốt ngang 11 tab chia 4 cụm: Giao diện (đồng hồ, ngày, pin) · Trang trí (nền, vẽ, ghi chú) · Thông tin (thông báo, sự kiện, thời tiết, nhạc) · Hiệu ứng (viền sáng, có Xem thử). Bấm tab mở panel (trượt lên / xuống như bottom sheet M3, tiêu đề căn giữa), bấm lại tab hoặc back thì đóng.
+- Mọi thay đổi là bản nháp (hoàn tác / làm lại tối đa 50 bước, đặt lại có hỏi xác nhận); Áp dụng chỉ ghi phần đã đổi rồi vào Main (đủ quyền bắt buộc) hoặc sang màn quyền. Ảnh của user giải mã giữ trong bộ nhớ, chỉ ghi file khi Áp dụng (`AodImageManager.decodeBackground` / `saveBackground(bitmap)`).
+- Bật mục cần quyền (truy cập thông báo, lịch, vị trí) khi chưa có quyền thì hiện sheet xin đúng quyền đó, cấp xong mục mới bật.
+- Hướng dẫn 6 bước tự hiện ở lần đầu vào màn: xem trước, 4 cụm tab (làm sáng dải tab của cụm, tự cuộn tới), thanh công cụ; bong bóng nằm trên hoặc dưới mục tiêu tuỳ chỗ trống, mũi nhọn chỉ vào mục tiêu; Bỏ qua hoặc xem hết thì không tự hiện lại (`isCustomizeGuideShown`).
+- Tuỳ chọn mới cho AOD: hiện ngày, hiện phần trăm pin (`isAodDateEnabled`, `isAodBatteryEnabled`, mặc định bật), có ở màn chỉnh và mục "Thông tin thêm" ở màn chính.
+- Component dùng chung `AodsPermissionSheet` (sheet xin quyền, ẩn có animation); `MainPermissionSheet` dùng lại nó. `AodsOnboardingTopBar` nhận thêm `containerColor` và `actions`.
+
+### Thay đổi
+
+- Viền LED chạy trong Lottie ở splash / icon động to hơn khoảng 1/3 (`LED_LAYERS`: nét 2.4 / 5.4 / 9.0 thay cho 1.8 / 4.0 / 7.0, đơn vị khung 108); viền tĩnh của icon app giữ nguyên.
+- Màn ngôn ngữ lần đầu luôn sang màn Customize (bỏ nhánh vào thẳng Main / màn quyền, `LanguageViewModel` không cần `PermissionManager`); màn quyền thành bước 3, back về Customize.
+- Intent / Effect / State của màn Customize chia theo cụm (`CustomizeIntent.Appearance`, `.Decor`, `.Info`, `.Effects`, `.History`, `.Permission`, `.Guide`, `.Panel`; state con `history`, `decor`, `effects`; bản nháp chia `appearance` / `decor` / `info` / `effects`). CLAUDE.md thêm mục 10.2.2 cho pattern này và ghi chú hiệu năng cho màn nặng (mục 14); agent `compose-implementer`, skill `compose-optimizer` / `unit-testing` cập nhật theo.
+
 ## [Chưa phát hành] – 2026-10-09 – UI đọc thẳng AodsColors / AodsTypography / AodsShapes
 
 Commit `e743565` cho UI đọc theme qua `MaterialTheme.colorScheme / .typography / .shapes`; bản này đổi lại cho UI đọc thẳng các object, tránh đường vòng. Build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.

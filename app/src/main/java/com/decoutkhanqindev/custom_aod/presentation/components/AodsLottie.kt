@@ -14,19 +14,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 fun AodsLottie(
     @RawRes resId: Int,
     modifier: Modifier = Modifier,
-    placeholder: (@Composable () -> Unit)? = null,
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
 
-    if (composition == null && placeholder != null) {
-        Box(modifier = modifier) {
-            placeholder()
-        }
-    } else {
-        LottieAnimation(
-            composition = composition,
-            iterations = LottieConstants.IterateForever,
-            modifier = modifier,
-        )
-    }
+    LottieAnimation(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        modifier = modifier,
+    )
 }

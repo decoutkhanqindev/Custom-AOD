@@ -36,7 +36,9 @@ internal fun AodDetails(
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AodDate(nowMillis = state.nowMillis, fontFamily = state.appearance.font.fontFamily)
+            AnimatedVisibility(visible = state.extras.isDateEnabled) {
+                AodDate(nowMillis = state.nowMillis, fontFamily = state.appearance.font.fontFamily)
+            }
 
             AodWeather(weather = state.weather, fontFamily = state.appearance.font.fontFamily)
         }
@@ -51,16 +53,18 @@ internal fun AodDetails(
 
         AodNotificationContent(content = state.notifications.latest)
 
-        state.battery?.let { battery ->
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = stringResource(
-                    if (battery.isCharging) R.string.aod_battery_charging else R.string.aod_battery,
-                    battery.percent,
-                ),
-                color = AodsColors.Grey6E,
-                fontSize = 14.sp,
-            )
+        AnimatedVisibility(visible = state.extras.isBatteryEnabled && state.battery != null) {
+            state.battery?.let { battery ->
+                Text(
+                    text = stringResource(
+                        if (battery.isCharging) R.string.aod_battery_charging else R.string.aod_battery,
+                        battery.percent,
+                    ),
+                    modifier = Modifier.padding(top = 20.dp),
+                    color = AodsColors.Grey6E,
+                    fontSize = 14.sp,
+                )
+            }
         }
 
         AnimatedVisibility(visible = state.isFlashlightOn) {

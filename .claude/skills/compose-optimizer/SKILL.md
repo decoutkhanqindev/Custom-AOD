@@ -29,7 +29,7 @@ This skill does NOT handle:
 
 `CLAUDE.md` at the project root is the source of truth; when this skill and `CLAUDE.md` disagree, follow `CLAUDE.md`.
 
-- MVI: Content composables receive `state` + `onIntent` only; optimizations never move ViewModel / Koin / `NavBackStack` into Content.
+- MVI: Content composables receive `state` + `onIntent` only; optimizations never move ViewModel / Koin / `NavBackStack` into Content. Inside Content, pass child composables the narrowest input (one sub-state / sub-UiModel / field — CLAUDE.md § 10.2.2), not the whole State; read fast-changing values (positions, animated colours) in draw / layout lambdas (CLAUDE.md § 14 "Màn nặng").
 - The AOD screen (`screens/aod/`) is not themed on purpose and its behaviour is pinned by CLAUDE.md § 20 (first frame, burn-in shift, focus for volume keys, dark/dim rendering). Never trade those for an optimization.
 - Interactions use `Modifier.onClick`, or `selectable` / `toggleable` with a `Role`; never raw `clickable`.
 - UI code has no comments; text comes from `strings.xml`; Compose files declare no top-level `val` / `const val` / helper classes.

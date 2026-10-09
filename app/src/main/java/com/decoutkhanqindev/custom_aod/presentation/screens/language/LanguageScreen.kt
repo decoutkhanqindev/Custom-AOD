@@ -6,8 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
-import com.decoutkhanqindev.custom_aod.presentation.navigation.MainDestination
-import com.decoutkhanqindev.custom_aod.presentation.navigation.PermissionDestination
+import com.decoutkhanqindev.custom_aod.presentation.navigation.CustomizeDestination
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageEffect
 import com.decoutkhanqindev.custom_aod.utils.navigateBack
 import com.decoutkhanqindev.custom_aod.utils.navigateTo
@@ -25,8 +24,7 @@ fun LanguageScreen(
     LaunchedWithLifecycleEffect {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is LanguageEffect.NavigateToPermission -> backStack.navigateTo(PermissionDestination)
-                is LanguageEffect.NavigateToMain -> backStack.navigateTo(MainDestination, preserveState = false)
+                is LanguageEffect.NavigateToCustomize -> backStack.navigateTo(CustomizeDestination)
                 is LanguageEffect.NavigateBack -> backStack.navigateBack()
             }
         }

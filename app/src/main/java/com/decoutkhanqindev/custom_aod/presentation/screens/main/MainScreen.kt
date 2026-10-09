@@ -36,51 +36,51 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
-        viewModel.onIntent(MainIntent.NotificationPermissionResult(isGranted))
+        viewModel.onIntent(MainIntent.Permission.NotificationPermissionResult(isGranted))
     }
     val calendarPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
-        viewModel.onIntent(MainIntent.CalendarPermissionResult(isGranted))
+        viewModel.onIntent(MainIntent.Permission.CalendarPermissionResult(isGranted))
     }
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
-        viewModel.onIntent(MainIntent.LocationPermissionResult(isGranted))
+        viewModel.onIntent(MainIntent.Permission.LocationPermissionResult(isGranted))
     }
     val backgroundPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
-        viewModel.onIntent(MainIntent.BackgroundPickerResult(uri?.toString()))
+        viewModel.onIntent(MainIntent.Appearance.BackgroundPickerResult(uri?.toString()))
     }
 
     LaunchedWithLifecycleEffect {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is MainEffect.StartAodService -> AodService.start(context)
-                is MainEffect.StopAodService -> AodService.stop(context)
-                is MainEffect.OpenPreview -> AodActivity.preview(context)
-                is MainEffect.OpenOverlaySettings -> context.openOverlaySettings()
-                is MainEffect.OpenMiuiPermissionSettings -> context.openMiuiPermissionSettings()
-                is MainEffect.OpenNotificationSettings -> context.openNotificationSettings()
-                is MainEffect.OpenNotificationAccessSettings ->
+                is MainEffect.Service.StartAodService -> AodService.start(context)
+                is MainEffect.Service.StopAodService -> AodService.stop(context)
+                is MainEffect.Navigation.OpenPreview -> AodActivity.preview(context)
+                is MainEffect.Permission.OpenOverlaySettings -> context.openOverlaySettings()
+                is MainEffect.Permission.OpenMiuiPermissionSettings -> context.openMiuiPermissionSettings()
+                is MainEffect.Permission.OpenNotificationSettings -> context.openNotificationSettings()
+                is MainEffect.Permission.OpenNotificationAccessSettings ->
                     AodNotificationListener.openAccessSettings(context)
 
-                is MainEffect.OpenAppSettings -> context.openAppSettings()
+                is MainEffect.Permission.OpenAppSettings -> context.openAppSettings()
 
-                is MainEffect.RequestNotificationPermission ->
+                is MainEffect.Permission.RequestNotificationPermission ->
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
 
-                is MainEffect.RequestCalendarPermission ->
+                is MainEffect.Permission.RequestCalendarPermission ->
                     calendarPermissionLauncher.launch(Manifest.permission.READ_CALENDAR)
 
-                is MainEffect.RequestLocationPermission ->
+                is MainEffect.Permission.RequestLocationPermission ->
                     locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
 
-                is MainEffect.NavigateToLanguage -> backStack.add(LanguageDestination(isFirstOpen = false))
-                is MainEffect.OpenBackgroundPicker ->
+                is MainEffect.Navigation.NavigateToLanguage -> backStack.add(LanguageDestination(isFirstOpen = false))
+                is MainEffect.Appearance.OpenBackgroundPicker ->
                     backgroundPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
 
                 is MainEffect.ShowMessage -> context.showToast(resources.getString(effect.messageRes))
@@ -89,7 +89,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
     }
 
     LifecycleResumeEffect(Unit) {
-        viewModel.onIntent(MainIntent.RefreshPermissions)
+        viewModel.onIntent(MainIntent.Permission.RefreshPermissions)
         onPauseOrDispose { }
     }
 

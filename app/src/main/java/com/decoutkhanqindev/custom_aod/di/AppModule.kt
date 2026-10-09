@@ -26,6 +26,7 @@ import com.decoutkhanqindev.custom_aod.domain.usecase.ObserveWeatherUseCase
 import com.decoutkhanqindev.custom_aod.domain.usecase.RefreshWeatherUseCase
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodSession
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.AodViewModel
+import com.decoutkhanqindev.custom_aod.presentation.screens.customize.CustomizeViewModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.LanguageViewModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainViewModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.permission.PermissionViewModel
@@ -88,7 +89,8 @@ val useCaseModule = module {
 
 val viewModelModule = module {
     viewModel { MainViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get(), get()) }
+    viewModel { (isFirstOpen: Boolean) -> LanguageViewModel(isFirstOpen, get(), get()) }
+    viewModel { CustomizeViewModel(get(), get(), get(), get()) }
     viewModel { PermissionViewModel(get(), get()) }
     viewModel { (isPreview: Boolean) ->
         AodViewModel(isPreview, get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())

@@ -15,15 +15,12 @@ import com.decoutkhanqindev.custom_aod.presentation.components.AodsValueRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFontValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainAppearanceState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 
 @Composable
 fun MainAppearanceSection(
-    appearance: AodAppearanceUiModel,
-    wallpaper: WallpaperValue?,
-    hasBackground: Boolean,
-    isSavingBackground: Boolean,
+    appearance: MainAppearanceState,
     onIntent: (MainIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -35,8 +32,8 @@ fun MainAppearanceSection(
         ClockFaceValue.entries.forEach { face ->
             AodsRadioRow(
                 label = stringResource(face.labelRes),
-                isSelected = appearance.face == face,
-                onClick = { onIntent(MainIntent.ChangeClockFace(face)) },
+                isSelected = appearance.settings.face == face,
+                onClick = { onIntent(MainIntent.Appearance.ChangeClockFace(face)) },
             )
         }
 
@@ -45,8 +42,8 @@ fun MainAppearanceSection(
         ClockFontValue.entries.forEach { font ->
             AodsRadioRow(
                 label = stringResource(font.labelRes),
-                isSelected = appearance.font == font,
-                onClick = { onIntent(MainIntent.ChangeClockFont(font)) },
+                isSelected = appearance.settings.font == font,
+                onClick = { onIntent(MainIntent.Appearance.ChangeClockFont(font)) },
                 labelFontFamily = font.fontFamily,
             )
         }
@@ -54,48 +51,48 @@ fun MainAppearanceSection(
         AodsSectionLabel(text = stringResource(R.string.opt_clock_color))
 
         ClockColorPicker(
-            selected = appearance.color,
-            onSelect = { color -> onIntent(MainIntent.ChangeClockColor(color)) },
+            selected = appearance.settings.color,
+            onSelect = { color -> onIntent(MainIntent.Appearance.ChangeClockColor(color)) },
         )
 
         AodsSliderRow(
-            label = stringResource(R.string.opt_clock_size_value, appearance.sizePercent),
-            value = appearance.sizePercent,
+            label = stringResource(R.string.opt_clock_size_value, appearance.settings.sizePercent),
+            value = appearance.settings.sizePercent,
             valueRange = AodAppearanceUiModel.SIZE_MIN_PERCENT..AodAppearanceUiModel.SIZE_MAX_PERCENT,
             step = AodAppearanceUiModel.SIZE_STEP_PERCENT,
-            onValueChange = { onIntent(MainIntent.ChangeClockSize(it)) },
+            onValueChange = { onIntent(MainIntent.Appearance.ChangeClockSize(it)) },
         )
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_landscape),
-            isChecked = appearance.isLandscape,
-            onCheckedChange = { onIntent(MainIntent.ToggleLandscape(it)) },
+            isChecked = appearance.settings.isLandscape,
+            onCheckedChange = { onIntent(MainIntent.Appearance.ToggleLandscape(it)) },
         )
 
         AodsSectionLabel(text = stringResource(R.string.opt_background))
 
         WallpaperPicker(
-            selected = wallpaper,
-            onSelect = { selected -> onIntent(MainIntent.SelectWallpaper(selected)) },
+            selected = appearance.wallpaper,
+            onSelect = { selected -> onIntent(MainIntent.Appearance.SelectWallpaper(selected)) },
         )
 
         AodsValueRow(
             label = stringResource(R.string.background_from_device),
             value = stringResource(
                 when {
-                    isSavingBackground -> R.string.background_saving
-                    hasBackground -> R.string.background_change
+                    appearance.isSavingBackground -> R.string.background_saving
+                    appearance.hasBackground -> R.string.background_change
                     else -> R.string.background_choose
                 },
             ),
-            onClick = { onIntent(MainIntent.OpenBackgroundPicker) },
+            onClick = { onIntent(MainIntent.Appearance.OpenBackgroundPicker) },
         )
 
-        AnimatedVisibility(visible = hasBackground || wallpaper != null) {
+        AnimatedVisibility(visible = appearance.hasBackground || appearance.wallpaper != null) {
             AodsValueRow(
                 label = stringResource(R.string.background_remove),
                 value = "",
-                onClick = { onIntent(MainIntent.RemoveBackground) },
+                onClick = { onIntent(MainIntent.Appearance.RemoveBackground) },
             )
         }
     }

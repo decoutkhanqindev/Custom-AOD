@@ -9,79 +9,86 @@ import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsValueRow
-import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainExtrasState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 
 @Composable
 fun MainExtrasSection(
-    extras: AodExtrasUiModel,
-    hasDrawing: Boolean,
-    isEditingMemo: Boolean,
-    isDrawingPadVisible: Boolean,
-    hasCalendarPermission: Boolean,
-    hasLocationPermission: Boolean,
+    extras: MainExtrasState,
     onIntent: (MainIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         AodsSectionHeader(title = stringResource(R.string.section_extras))
 
+        AodsSwitchRow(
+            label = stringResource(R.string.opt_date),
+            isChecked = extras.settings.isDateEnabled,
+            onCheckedChange = { onIntent(MainIntent.Extras.ToggleDate(it)) },
+        )
+
+        AodsSwitchRow(
+            label = stringResource(R.string.opt_battery),
+            isChecked = extras.settings.isBatteryEnabled,
+            onCheckedChange = { onIntent(MainIntent.Extras.ToggleBattery(it)) },
+        )
+
         AodsValueRow(
             label = stringResource(R.string.opt_memo),
-            value = stringResource(if (extras.memo.isBlank()) R.string.memo_add else R.string.memo_edit),
-            onClick = { onIntent(MainIntent.ShowMemoEditor) },
-            description = extras.memo.ifBlank { null },
+            value = stringResource(if (extras.settings.memo.isBlank()) R.string.memo_add else R.string.memo_edit),
+            onClick = { onIntent(MainIntent.Extras.ShowMemoEditor) },
+            description = extras.settings.memo.ifBlank { null },
         )
 
         AodsValueRow(
             label = stringResource(R.string.opt_drawing),
-            value = stringResource(if (hasDrawing) R.string.drawing_redraw else R.string.drawing_draw),
-            onClick = { onIntent(MainIntent.ShowDrawingPad) },
+            value = stringResource(if (extras.hasDrawing) R.string.drawing_redraw else R.string.drawing_draw),
+            onClick = { onIntent(MainIntent.Extras.ShowDrawingPad) },
         )
 
-        AnimatedVisibility(visible = hasDrawing) {
+        AnimatedVisibility(visible = extras.hasDrawing) {
             AodsValueRow(
                 label = stringResource(R.string.drawing_remove),
                 value = "",
-                onClick = { onIntent(MainIntent.RemoveDrawing) },
+                onClick = { onIntent(MainIntent.Extras.RemoveDrawing) },
             )
         }
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_calendar),
-            isChecked = extras.isCalendarEnabled && hasCalendarPermission,
-            onCheckedChange = { onIntent(MainIntent.ToggleCalendar(it)) },
+            isChecked = extras.settings.isCalendarEnabled && extras.hasCalendarPermission,
+            onCheckedChange = { onIntent(MainIntent.Extras.ToggleCalendar(it)) },
             description = stringResource(R.string.opt_calendar_desc),
         )
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_weather),
-            isChecked = extras.isWeatherEnabled && hasLocationPermission,
-            onCheckedChange = { onIntent(MainIntent.ToggleWeather(it)) },
+            isChecked = extras.settings.isWeatherEnabled && extras.hasLocationPermission,
+            onCheckedChange = { onIntent(MainIntent.Extras.ToggleWeather(it)) },
             description = stringResource(R.string.opt_weather_desc),
         )
 
-        AnimatedVisibility(visible = extras.isWeatherEnabled && hasLocationPermission) {
+        AnimatedVisibility(visible = extras.settings.isWeatherEnabled && extras.hasLocationPermission) {
             AodsSwitchRow(
                 label = stringResource(R.string.opt_weather_fahrenheit),
-                isChecked = extras.isWeatherFahrenheit,
-                onCheckedChange = { onIntent(MainIntent.ToggleWeatherFahrenheit(it)) },
+                isChecked = extras.settings.isWeatherFahrenheit,
+                onCheckedChange = { onIntent(MainIntent.Extras.ToggleWeatherFahrenheit(it)) },
             )
         }
     }
 
-    if (isEditingMemo) {
+    if (extras.isMemoEditorVisible) {
         MemoEditorDialog(
-            memo = extras.memo,
-            onConfirm = { memo -> onIntent(MainIntent.ChangeMemo(memo)) },
-            onDismiss = { onIntent(MainIntent.DismissMemoEditor) },
+            memo = extras.settings.memo,
+            onConfirm = { memo -> onIntent(MainIntent.Extras.ChangeMemo(memo)) },
+            onDismiss = { onIntent(MainIntent.Extras.DismissMemoEditor) },
         )
     }
 
-    if (isDrawingPadVisible) {
+    if (extras.isDrawingPadVisible) {
         DrawingPadDialog(
-            onConfirm = { drawing -> onIntent(MainIntent.ChangeDrawing(drawing)) },
-            onDismiss = { onIntent(MainIntent.DismissDrawingPad) },
+            onConfirm = { drawing -> onIntent(MainIntent.Extras.ChangeDrawing(drawing)) },
+            onDismiss = { onIntent(MainIntent.Extras.DismissDrawingPad) },
         )
     }
 }

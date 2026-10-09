@@ -38,26 +38,26 @@ fun MainNotificationsSection(
         AodsSwitchRow(
             label = stringResource(R.string.opt_notification_icons),
             isChecked = options.isIconsEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleNotificationIcons(it)) },
+            onCheckedChange = { onIntent(MainIntent.Notifications.ToggleNotificationIcons(it)) },
         )
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_notification_content),
             isChecked = options.isContentEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleNotificationContent(it)) },
+            onCheckedChange = { onIntent(MainIntent.Notifications.ToggleNotificationContent(it)) },
             description = stringResource(R.string.opt_notification_content_desc),
         )
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_edge_glow),
             isChecked = options.isEdgeGlowEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleEdgeGlow(it)) },
+            onCheckedChange = { onIntent(MainIntent.Notifications.ToggleEdgeGlow(it)) },
         )
 
         AodsSwitchRow(
             label = stringResource(R.string.opt_media_controls),
             isChecked = options.isMediaControlsEnabled,
-            onCheckedChange = { onIntent(MainIntent.ToggleMediaControls(it)) },
+            onCheckedChange = { onIntent(MainIntent.Notifications.ToggleMediaControls(it)) },
         )
     }
 }

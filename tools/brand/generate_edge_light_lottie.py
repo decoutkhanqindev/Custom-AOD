@@ -23,9 +23,9 @@ FPS, FRAMES = 60, 144  # một vòng viền mỗi FRAMES / FPS giây (2,4 giây)
 PEAK = 42.0
 TAIL_CURVE = 1.6
 LED_LAYERS = [  # (độ rộng, số lớp, độ đậm mỗi lớp %, pha trắng 0..1, đuôi %, mép trước %)
-    (1.8, 24, 8, 0.4, 34.0, 7.0),
-    (4.0, 12, 2.6, 0.1, 38.0, 9.0),
-    (7.0, 8, 1.7, 0.0, 40.0, 11.0),
+    (2.4, 24, 8, 0.4, 34.0, 7.0),
+    (5.4, 12, 2.6, 0.1, 38.0, 9.0),
+    (9.0, 8, 1.7, 0.0, 40.0, 11.0),
 ]
 
 # Aura sau điện thoại: vòng gradient tròn, co giãn và sáng / mờ theo nhịp một vòng viền.
