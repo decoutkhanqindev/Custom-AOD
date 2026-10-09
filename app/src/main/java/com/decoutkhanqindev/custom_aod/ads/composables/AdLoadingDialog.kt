@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnit
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
 
 @Composable
 fun AdLoadingDialog(adUnit: () -> AdUnit) {
@@ -40,8 +41,8 @@ fun AdLoadingDialog(adUnit: () -> AdUnit) {
         ),
     ) {
         Card(
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            shape = AodsShapes.RoundedCornerShape12dp,
+            colors = CardDefaults.cardColors(containerColor = AodsColors.NeutralVariant30),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
             Column(
@@ -53,7 +54,7 @@ fun AdLoadingDialog(adUnit: () -> AdUnit) {
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(40.dp),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = AodsColors.Mint,
                     strokeWidth = 3.dp,
                 )
 
@@ -61,7 +62,7 @@ fun AdLoadingDialog(adUnit: () -> AdUnit) {
 
                 Text(
                     text = stringResource(R.string.ad_loading),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = AodsColors.Grey9A,
                     fontWeight = FontWeight.Medium,
                 )
             }

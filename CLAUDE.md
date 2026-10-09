@@ -11,7 +11,7 @@ Hướng dẫn cho Claude Code (và dev) khi làm việc trong project này. **M
 - Hạ tầng dùng chung (ads + consent UMP, DataStore/Language/Network manager, CoroutineExt, Modifiers, dialog) port từ *DexReader* ([decoutkhanqindev/DexReader](https://github.com/decoutkhanqindev/DexReader)), đã đổi Hilt → Koin, navigation-compose → Navigation 3.
 - Package / namespace / applicationId: `com.decoutkhanqindev.custom_aod` · single module `:app`
 - minSdk 30 · compileSdk/targetSdk 37 · Kotlin 2.4.20 · AGP 9.4.1 · Gradle 9.8.0 · JDK 17 (toolchain)
-- Theme: design system `Aods` (UI đọc qua `AodsTheme.colors / .typography / .shapes`; giá trị nằm ở `AodsColors` · `AodsTypography` · `AodsShapes`, theo pattern Lich-Viet-Loc-Phat), luôn tối (nền đen, accent mint — bảng màu của FakeAOD) · XML theme `Theme.App`, `Theme.App.Aod`
+- Theme: design system `Aods` (UI đọc thẳng `AodsColors` · `AodsTypography` · `AodsShapes`, theo pattern Lich-Viet-Loc-Phat; `AodsTheme` chỉ là cầu nối Material 3), luôn tối (nền đen, accent mint — bảng màu của FakeAOD) · XML theme `Theme.App`, `Theme.App.Aod`
 - **Skeleton**: chỗ còn phải implement đều có `// TODO` → Android Studio › View › Tool Windows › **TODO**. Cách build, cấp quyền, test trên máy: [README.md](README.md).
 
 ## Commands
@@ -85,7 +85,7 @@ com.decoutkhanqindev.custom_aod/
     │   ├── permission/            #   bước 2 của onboarding lần đầu: chỉ quyền bắt buộc cho AOD, đủ quyền mới vào Main
     │   ├── main/                  #   cài đặt AOD: công tắc, quyền, tuỳ chọn, giao diện, thông tin thêm (ghi nhớ, hình vẽ, lịch, thời tiết), thông báo trên đồng hồ, thao tác và cảm biến, quy tắc hiện, ngôn ngữ, xem thử (+ MainXxxSection)
     │   └── aod/                   #   đồng hồ AOD, host là AodActivity (không nằm trong NavDisplay): AodContent · AodClockFace · AodDetails · AodExtras · AodNotifications · AodMediaControls · AodBackdrop · AodTimeFormat
-    └── theme/                     # AodsTheme (cửa đọc cho UI + cầu nối Material 3) · AodsColors · AodsTypography · AodsShapes (internal)
+    └── theme/                     # AodsTheme (cầu nối Material 3) · AodsColors · AodsTypography · AodsShapes
 ```
 
 `screens/language/` là màn MVI đầy đủ gọn nhất (6 file) — copy làm khung cho màn mới; `screens/main/` có thêm `MainXxxSection.kt` (Content dài tách theo mục 10.4).
@@ -246,7 +246,7 @@ Rule:
 ### 4.4 Composable ad
 - Nhận `adUnit: () -> XxxAdUnit` (lambda). Tự lo load/release bằng **1** `DisposableEffect(adUnit()) { adUnit().load(context); onDispose { adUnit().release() } }` — key là **chính unit** (không phải `Unit`) để đổi unit trong cùng slot thì release đúng unit cũ. Compose màn = preload, không có bước `preload()` riêng. Effect khai báo **trước** các `return` sớm theo state.
 - `BannerAdView`: thêm `LifecycleResumeEffect(adUnit())` → `resume()`/`pause()`.
-- `NativeAdView(adUnit, layoutType, modifier, isCloseVisible, onCloseClick)`: `NativeLayoutType.{MEDIA_4_3, MEDIA_16_9, FULL_SCREEN}` → layout XML `res/layout/native_ad_*.xml`. Card ẩn khi `NONE`/`FAILED`; `FULL_SCREEN` không ẩn (giữ nút đóng). Màu áp lúc runtime từ `MaterialTheme.colorScheme` (XML chỉ là baseline light, không `values-night`), drawable phải `mutate()`. Thêm layout = 1 entry enum + 1 nhánh `when`. Composable trùng tên class `NativeAdView` của Google là cố ý — không alias.
+- `NativeAdView(adUnit, layoutType, modifier, isCloseVisible, onCloseClick)`: `NativeLayoutType.{MEDIA_4_3, MEDIA_16_9, FULL_SCREEN}` → layout XML `res/layout/native_ad_*.xml`. Card ẩn khi `NONE`/`FAILED`; `FULL_SCREEN` không ẩn (giữ nút đóng). Màu áp lúc runtime từ `AodsColors` (XML chỉ là baseline light, không `values-night`), drawable phải `mutate()`. Thêm layout = 1 entry enum + 1 nhánh `when`. Composable trùng tên class `NativeAdView` của Google là cố ý — không alias.
 - `AdLoadingDialog(adUnit)`: chỉ hiện khi unit `LOADING`, không tự load.
 - Chỗ đặt: ad full-screen load/show ở **Screen** (cần `LocalActivity.current`); banner/native nằm trong UI thì Screen truyền slot `@Composable () -> Unit` xuống Content (Content không `koinInject()`).
 - Splash có dòng `may_contain_ads` dưới thanh loading (policy ad lúc mở app).
@@ -288,7 +288,7 @@ Rule:
 | Enum giá trị UI | `XxxValue` | `LanguageValue` |
 | Component dùng chung (design system, `presentation/components/`) | `AodsXxx` | `AodsSwitchRow`, `AodsLottie`, `AodsNoInternetDialog` |
 | Package | lowercase, nhiều từ → snake_case | `ad_unit` |
-| Giá trị theme | UI đọc qua `AodsTheme.colors.<Màu>` (biến thể alpha `<Màu>Alpha<NN>`), `AodsTheme.typography.<Style>`, `AodsTheme.shapes.RoundedCornerShape<N>dp`; giá trị khai báo trong `internal object` cùng tên file (`AodsColors`, `AodsTypography`, `AodsShapes`) | `AodsTheme.colors.Mint`, `AodsTheme.colors.MintAlpha12`, `AodsTheme.typography.BodyLarge`, `AodsTheme.shapes.RoundedCornerShape16dp` |
+| Giá trị theme | `internal object` cùng tên file trong `presentation/theme/`, UI đọc thẳng: `AodsColors.<Màu>` (biến thể alpha `<Màu>Alpha<NN>`), `AodsTypography.<Style>`, `AodsShapes.RoundedCornerShape<N>dp` | `AodsColors.Mint`, `AodsColors.MintAlpha12`, `AodsTypography.BodyLarge`, `AodsShapes.RoundedCornerShape16dp` |
 | String | snake_case theo nội dung; prefix màn khi trùng/mơ hồ | `no_internet_connection` |
 | Hằng số | `UPPER_SNAKE_CASE` `const val` (`companion object` trong class, `private const val` trong file **không phải Compose**; file Compose không có hằng số top-level — xem mục 15) | `LOAD_TIMEOUT` |
 
@@ -645,13 +645,13 @@ fun MainScreen() {
 
 ## 14. Compose & theme
 
-- **Design system `Aods`, luôn tối** (bảng màu của FakeAOD — app nói về một màn hình phần lớn thời gian tắt, nên nền đen chứ không phải xám tối), theo pattern theme của [Lich-Viet-Loc-Phat](https://github.com/decoutkhanqindev/Lich-Viet-Loc-Phat/tree/main/app/src/main/java/com/decoutkhanqindev/lich_viet_loc_phat/presentation/theme): đơn giản, không tầng token. `presentation/theme/` phẳng, mỗi file một `internal object` cùng tên, **chỉ code trong package `theme` được đọc thẳng các object này** (Kotlin không có visibility theo package nên chặn bằng grep mục 18); UI và mọi nơi khác đọc qua `AodsTheme`:
-  - `AodsColors` — màu FakeAOD + 3 màu trung tính mặc định của Material 3 mà app vẫn dùng (`Neutral12`, `NeutralVariant30`, `NeutralVariant60`), tên theo màu (`Mint`, `GreyED`…). Màu có alpha là biến thể đặt tên sẵn `<Màu>Alpha<NN>` (`MintAlpha12`, `BlackAlpha50`), không `.copy(alpha = …)` trên màu theme trong UI. Hex chỉ có ở file này.
-  - `AodsTypography` — font Inter (`FontFamilyInter`) và các `TextStyle` theo type scale (`DisplaySmall` … `LabelMedium`; `BodyLarge` là bản riêng của app), cộng `Material` (`Typography` cho cầu nối). `AodsShapes` — `RoundedCornerShape8dp` / `12dp` / `16dp`; hình tròn dùng thẳng `CircleShape`. `AodsBrush` chỉ thêm khi có gradient tĩnh dùng lại (gradient hiện tại đều tính theo animation nên viết trong composable).
-  - `AodsTheme.kt`: `internal object AodsTheme { val colors = AodsColors; val typography = AodsTypography; val shapes = AodsShapes }` — cửa duy nhất để UI đọc giá trị theme, trỏ thẳng tới object (không đổi tên, không `CompositionLocal`, không `@Composable`) nên đọc được cả trong lambda vẽ, `onClick`, enum (`ClockColorValue`). Hàm `AodsTheme { }` bọc `MaterialTheme` (color scheme, `AodsTypography.Material`, shapes dựng từ các object trên) để component Material 3 (Button, TopAppBar, Switch…) ra đúng màu, font của app. Không dynamic color, không theo sáng/tối của hệ thống. Chữ của app là **Inter** (`res/font/inter_variable.ttf`, bản variable của Google Fonts, giấy phép OFL; độ đậm chọn bằng trục `wght`) cho mọi style, cả style Material 3 app không dùng. Màn AOD không dùng font này (font đồng hồ do user chọn, mục 20). Không tạo tầng token (`Aods*Tokens`, `LocalAods…`, tên theo vai trò như `primary` / `cardPadding`, object khoảng cách / cỡ icon / thời lượng): 2026-10-07 đã bỏ hết cho bớt lòng vòng.
+- **Design system `Aods`, luôn tối** (bảng màu của FakeAOD — app nói về một màn hình phần lớn thời gian tắt, nên nền đen chứ không phải xám tối), theo pattern theme của [Lich-Viet-Loc-Phat](https://github.com/decoutkhanqindev/Lich-Viet-Loc-Phat/tree/main/app/src/main/java/com/decoutkhanqindev/lich_viet_loc_phat/presentation/theme): đơn giản, không tầng token, không đường vòng. `presentation/theme/` phẳng, mỗi file một `internal object` cùng tên, **UI đọc thẳng các object này** (không qua `MaterialTheme`, không qua object / accessor trung gian):
+  - `AodsColors` — màu FakeAOD + 3 màu trung tính mặc định của Material 3 mà app vẫn dùng (`Neutral12`, `NeutralVariant30`, `NeutralVariant60`), tên theo màu (`Mint`, `GreyED`…). Màu có alpha là biến thể đặt tên sẵn `<Màu>Alpha<NN>` (`MintAlpha12`, `RedAlpha12`, `WhiteAlpha30`, `BlackAlpha50`), không `.copy(alpha = …)` trên màu theme trong UI. Hex chỉ có ở file này.
+  - `AodsTypography` — font **Inter** (`FontFamilyInter`; `res/font/inter_variable.ttf`, bản variable của Google Fonts, giấy phép OFL; độ đậm chọn bằng trục `wght`) và các `TextStyle` theo type scale mặc định của Material 3 (`DisplaySmall` … `LabelMedium`; `BodyLarge` là bản riêng của app). `AodsShapes` — `RoundedCornerShape8dp` / `12dp` / `16dp`; hình tròn dùng thẳng `CircleShape`. Mỗi object có thêm `Material` (`Typography` / `Shapes`) chỉ cho cầu nối. `AodsBrush` chỉ thêm khi có gradient tĩnh dùng lại (gradient hiện tại đều tính theo animation nên viết trong composable).
+  - `AodsTheme { }` chỉ bọc `MaterialTheme` (color scheme dựng từ `AodsColors`, `AodsTypography.Material`, `AodsShapes.Material`) để component Material 3 (Button, TopAppBar, Switch…) ra đúng màu, font của app; UI không đọc `MaterialTheme.*`. Không dynamic color, không theo sáng/tối của hệ thống. Không tạo tầng token hay object trung gian (`Aods*Tokens`, `LocalAods…`, `AodsTheme.xxx`, tên theo vai trò như `primary` / `cardPadding`, object khoảng cách / cỡ icon / thời lượng): 2026-10-07 → 2026-10-09 đã thử rồi bỏ hết cho bớt đường vòng.
   - XML `Theme.App` có `windowBackground` đen để không loé trắng trước khung Compose đầu tiên. Splash của app phát `R.raw.lottie_device_edge_light` qua `AodsLottie` cỡ 200dp (không placeholder). Splash hệ thống từ Android 12 vẽ icon app to hơn khung này, nên lúc chuyển sang Splash của app hình điện thoại nhỏ lại. Lottie và chữ (tên app, câu giới thiệu) nằm chung một cột giữa màn hình: chữ mở dần ra (`expandVertically` + `fadeIn`) làm cả cụm dồn lên giữa; chữ kéo lên 32dp vào khoảng trống dưới hình điện thoại. Dưới đáy là thanh tải và dòng `may_contain_ads`.
-- **UI**: màu `AodsTheme.colors.*` (tên theo màu, không `primary` / `onSurface`…), chữ `AodsTheme.typography.*` (màn AOD: `fontSize = 14.sp`), bo góc `AodsTheme.shapes.*` hoặc `CircleShape`; **không import / gọi thẳng `AodsColors` / `AodsTypography` / `AodsShapes` ngoài `presentation/theme/`**. **Khoảng cách, cỡ icon, viền, kích thước, cỡ chữ `sp`, thời lượng, alpha, elevation viết số thẳng** (`16.dp`, `24.dp`, `1.dp`, `14.sp`, `tween(durationMillis = 600)`, `0.5f`) như repo mẫu. Không `MaterialTheme.*`, không hex / `Color.White/Black`, không `RoundedCornerShape(…)` ngoài `presentation/theme/` (grep mục 18). Màu / style chữ / bo góc mới → thêm `val` vào object tương ứng, UI đọc qua `AodsTheme`; số dp / sp / thời lượng không cần khai báo. Dùng thẳng được: `Color.Transparent`.
-- Màn AOD (`screens/aod/`) **không bọc `AodsTheme`**, cả lúc chạy lẫn `@Preview`. Chữ dùng `AodsTheme.colors.Grey8A` (chính), `Grey6E` (phụ), `Grey5A` (gợi ý), nút `GreyB4` — xám chứ không trắng: ít sáng, ít tốn pin, ít burn-in; màu giờ theo `ClockColorValue` user chọn; cỡ chữ nhân `appearance.scale`. Bọc theme thì `Text` nhận `LocalTextStyle` = `bodyLarge` (lineHeight, letterSpacing) và đồng hồ 76sp bị đè lên dòng ngày, nên cỡ chữ của màn này là `TextUnit` (`fontSize = 14.sp * scale`), không phải `TextStyle`.
+- **UI**: màu `AodsColors.*` (tên theo màu), chữ `AodsTypography.*` (màn AOD: `fontSize = 14.sp`), bo góc `AodsShapes.*` hoặc `CircleShape` — đọc thẳng, kể cả trong lambda vẽ, `onClick`, hàm không phải composable, enum (`ClockColorValue`). **Khoảng cách, cỡ icon, viền, kích thước, cỡ chữ `sp`, thời lượng, alpha, elevation viết số thẳng** (`16.dp`, `24.dp`, `1.dp`, `14.sp`, `tween(durationMillis = 600)`, `0.5f`) như repo mẫu. Không `MaterialTheme.*`, không hex / `Color.White/Black`, không `RoundedCornerShape(…)` ngoài `presentation/theme/` (grep mục 18). Màu / style chữ / bo góc mới → thêm `val` vào object tương ứng; số dp / sp / thời lượng không cần khai báo. Dùng thẳng được: `Color.Transparent`.
+- Màn AOD (`screens/aod/`) **không bọc `AodsTheme`**, cả lúc chạy lẫn `@Preview`. Chữ dùng `AodsColors.Grey8A` (chính), `Grey6E` (phụ), `Grey5A` (gợi ý), nút `GreyB4` — xám chứ không trắng: ít sáng, ít tốn pin, ít burn-in; màu giờ theo `ClockColorValue` user chọn; cỡ chữ nhân `appearance.scale`. Bọc theme thì `Text` nhận `LocalTextStyle` = `bodyLarge` (lineHeight, letterSpacing) và đồng hồ 76sp bị đè lên dòng ngày, nên cỡ chữ của màn này là `TextUnit` (`fontSize = 14.sp * scale`), không phải `TextStyle`.
 - `MainActivity`: `enableEdgeToEdge(SystemBarStyle.dark(…))` (theme luôn tối nên icon thanh hệ thống luôn sáng), khoá dọc, `ComposeUiFlags.isBypassUnfocusableComposeViewEnabled = false` (đặt trước `super.onCreate`, giữ như DexReader), Manifest `adjustResize` → mỗi màn tự xử lý inset (`Scaffold` innerPadding, `navigationBarsPadding()`, `imePadding()`).
 - **Stability**: State/UiModel `@Immutable`; list → `ImmutableList`; truyền `viewModel::onIntent`; không truyền `MutableState`/ViewModel/`NavBackStack` xuống Content.
 - `remember { }` cache; `remember(key) { }` khi input là tham số; `derivedStateOf { }` **chỉ** khi input là Compose `State`:
@@ -678,7 +678,7 @@ fun MainScreen() {
 | Onboarding: top bar có chỉ báo bước ở giữa (kèm nút back nếu truyền `onNavigateBack`) · tiêu đề + mô tả căn giữa (khoảng cách trên/dưới do màn gọi truyền qua `modifier`) · chân trang một nút chính (kèm dòng nhắc khi nút bị khoá) | `AodsOnboardingTopBar(step, onNavigateBack)` · `AodsOnboardingHeader(title, subtitle)` · `AodsOnboardingFooter(actionLabel, isActionEnabled, onAction, disabledHint)` | `components/AodsOnboarding.kt` |
 | Thẻ một quyền: thẻ gọn (icon, tên, mô tả, căn giữa theo chiều dọc; không kiểm tra được thì thêm dòng nhắc), bên phải trong thẻ là nút tròn filled màu primary, cùng cỡ với icon quyền, chỉ báo trạng thái: mũi tên khi chưa cấp / không kiểm tra được (bấm cả thẻ để cấp), dấu tích khi đã cấp (viền thẻ đổi sang primary, thẻ không bấm được) | `AodsPermissionCard(permission, onAllowClick, containerColor)` | `components/AodsPermissionCard.kt` |
 | Danh sách quyền của AOD | `PermissionManager.aodPermissions()` · `requiredAodPermissions()` · `List<PermissionUiModel>.hasRequiredPermissions` | `presentation/model/PermissionUiModel.kt` |
-| Màu · style chữ · bo góc | `AodsTheme.colors` · `AodsTheme.typography` · `AodsTheme.shapes` (dp / sp / thời lượng viết số thẳng) | `presentation/theme/` |
+| Màu · style chữ · bo góc | `AodsColors` · `AodsTypography` · `AodsShapes` (đọc thẳng; dp / sp / thời lượng viết số thẳng) | `presentation/theme/` |
 | UiModel từ tuỳ chọn trong DataStore: đọc 1 lần / theo dõi | `DataStoreManager.currentAodXxx()` · `DataStoreManager.observeAodXxx()` | `presentation/model/AodXxxUiModel.kt` |
 | Manager trong Compose | `val x: XxxManager = koinInject()` (Screen/host) | `di/AppModule.kt` |
 | Banner / Native / loading ad | `BannerAdView` · `NativeAdView` · `AdLoadingDialog` | `ads/composables/` |
@@ -699,7 +699,7 @@ Quy tắc:
 - Không copy-paste: logic giữa ViewModel → UseCase; UI giữa màn → component; giá trị lặp → token/`const val`.
 - Không tạo top-level `val` trung gian dùng 1 lần → inline (trừ token theme, `const val` cho magic number, giá trị tính sẵn để khỏi tính lại mỗi frame).
 - **File Compose (Screen / Content / component) không khai báo `val`, `const val` hay class phụ ở top-level:**
-  - Màu, style chữ, bo góc đọc qua `AodsTheme.colors` / `.typography` / `.shapes` (mục 14); dp, sp, thời lượng viết số thẳng.
+  - Màu, style chữ, bo góc đọc thẳng `AodsColors` / `AodsTypography` / `AodsShapes` (mục 14); dp, sp, thời lượng viết số thẳng.
   - Hằng số của logic → `companion object` của ViewModel (vd `HINT_VISIBLE_MILLIS`); của model → companion của UiModel (vd `AodOptionsUiModel.TIMEOUT_STEP_MINUTES`).
   - Pattern định dạng → `strings.xml` với `translatable="false"`.
   - Intent / hằng số của hệ thống → hàm trong `utils/ContextExt.kt`.
@@ -743,8 +743,8 @@ Quy tắc:
 | Intent/Effect ở thì quá khứ, danh từ trơn, theo nhãn nút (`BackgroundPicked`, `Preview`, `Done`) | Mẫu ở [mục 10.2.1](#1021-đặt-tên-intent--effect) (`BackgroundPickerResult`, `OpenPreview`, `ConfirmLanguage`) |
 | `repeatOnLifecycle` thô rải trong từng Screen · collect effect ngoài helper lifecycle | `LaunchedWithLifecycleEffect { }` (`presentation/effects/`) · `LifecycleResumeEffect` |
 | `context.getString` cho text UI | `stringResource` · `LocalResources.current.getString` |
-| Hex `Color(0x…)`, `Color.White/Black`, `.copy(alpha = …)` của màu theme, `RoundedCornerShape(…)`, `MaterialTheme.*` trong UI | `AodsTheme.colors.*` (biến thể `…AlphaNN`) · `AodsTheme.shapes.*` / `CircleShape` · `AodsTheme.typography.*` (mục 14) |
-| Tầng token: `Aods*Tokens`, `LocalAods…`, tên theo vai trò, object khoảng cách / cỡ icon / thời lượng (`AodsPrimitive*`, `AodsSpacing`…) · gọi thẳng `AodsColors` / `AodsTypography` / `AodsShapes` ngoài `presentation/theme/` | `AodsTheme.colors` / `.typography` / `.shapes` + số viết thẳng (mục 14) |
+| Hex `Color(0x…)`, `Color.White/Black`, `.copy(alpha = …)` của màu theme, `RoundedCornerShape(…)`, `MaterialTheme.*` trong UI | `AodsColors.*` (biến thể `…AlphaNN`) · `AodsShapes.*` / `CircleShape` · `AodsTypography.*` (mục 14) |
+| Tầng token / đường vòng: `Aods*Tokens`, `LocalAods…`, accessor `AodsTheme.xxx`, đọc qua `MaterialTheme.*`, tên theo vai trò, object khoảng cách / cỡ icon / thời lượng (`AodsPrimitive*`, `AodsSpacing`…) | Đọc thẳng `AodsColors` / `AodsTypography` / `AodsShapes` + số viết thẳng (mục 14) |
 | Text hardcode trong composable | `strings.xml` |
 | `collectAsState()` | `collectAsStateWithLifecycle()` |
 | `Modifier.clickable` ngoài `Modifiers.kt` | `Modifier.onClick` |
@@ -767,7 +767,9 @@ grep -rn "LottieAnimation(" app/src/main/java --include="*.kt" | grep -v "/compo
 grep -rn "backStack\.remove" app/src/main/java --include="*.kt"
 ls app/src/main/java/com/decoutkhanqindev/custom_aod/presentation/theme | grep -v "^Aods\(Theme\|Colors\|Typography\|Shapes\|Brush\)\.kt$"
 grep -rn "LocalAods\|Aods[A-Za-z]*Tokens\b\|AodsPrimitive" app/src/main/java --include="*.kt"
-grep -rn "AodsColors\|AodsTypography\|AodsShapes" app/src/main/java --include="*.kt" | grep -v "/presentation/theme/"
+grep -rn "AodsTheme\.[a-z]" app/src/main/java --include="*.kt"
+grep -rn "MaterialTheme\." app/src/main/java --include="*.kt" | grep -v "/presentation/theme/"
+grep -rn "AodsColors\.[A-Za-z0-9]*\.copy(" app/src/main/java --include="*.kt" | grep -v "/presentation/theme/"
 grep -rn "LiveData\|dagger\.hilt\|androidx\.navigation\.compose" app/src/main/java --include="*.kt"
 grep -rn "val .*: \(Mutable\)\?List<" app/src/main/java --include="*State.kt" --include="*UiModel.kt"
 grep -rn "catch (.*: CancellationException)" app/src/main/java --include="*.kt" | grep -v "/ads/ad_unit/\|/utils/CoroutineExt.kt"
@@ -781,8 +783,6 @@ grep -rn "import .*\.domain\.repository\.\|import .*Impl$" app/src/main/java --i
 grep -rn "Timber" app/src/main/java --include="*AdUnit.kt" | grep -v "/ad_unit/AdUnit.kt"
 grep -rn "ManagerImpl\|BaseAds" app/src/main/java --include="*.kt"
 grep -rn "withContext(" app/src/main/java --include="*.kt" | grep -v "/utils/CoroutineExt.kt"
-grep -rn "MaterialTheme\." app/src/main/java --include="*.kt" | grep -v "/presentation/theme/"
-grep -rn "AodsTheme\.colors\.[A-Za-z0-9]*\.copy(" app/src/main/java --include="*.kt"
 ```
 
 ---
@@ -798,7 +798,7 @@ grep -rn "AodsTheme\.colors\.[A-Za-z0-9]*\.copy(" app/src/main/java --include="*
 7. `presentation/screens/xxx/` — copy khung `screens/main/` (State · Intent · Effect · ViewModel · Content · Screen).
 8. `AppDestinations.kt` — `XxxDestination`; đăng ký `entry<XxxDestination>` ở `AppNavDisplay` (hoặc NavDisplay lồng).
 9. Ad cho màn: placement `by lazy` trong `AdsManager` + `<PLACEMENT>_ALL_ID` ở `release {}`/`debug {}`; native/banner truyền slot từ Screen.
-10. Text vào `strings.xml` (+ bản dịch nếu project có); màu / style chữ / bo góc mới vào `AodsColors` / `AodsTypography` / `AodsShapes`, UI đọc qua `AodsTheme` (mục 14); dp, sp, thời lượng viết số thẳng.
+10. Text vào `strings.xml` (+ bản dịch nếu project có); màu / style chữ / bo góc mới vào `AodsColors` / `AodsTypography` / `AodsShapes` (mục 14); dp, sp, thời lượng viết số thẳng.
 11. `./gradlew :app:compileDebugKotlin` + chạy grep [mục 18](#18-banned-patterns).
 
 ---
@@ -924,7 +924,7 @@ AodViewModel lúc mở + mỗi phút: thời tiết (bản đã lưu ngay; Refre
 - Tín hiệu mới → manager mới trong `data/device/<tên>/` theo mục 2. Cần thêm dữ liệu từ thông báo (vd nội dung) → thêm vào `NotificationStateManager`, không đăng ký listener thứ hai.
 - Tuỳ chọn mới → key trong `DataStoreManager` + field trong `AodOptionsUiModel` + Intent của màn Main + đọc snapshot trong `AodViewModel` (hoặc `AodActivity` nếu là thao tác cửa sổ).
 - Quy tắc "khi nào hiện" mới → key trong `DataStoreManager` + field trong `AodRulesUiModel` (`allows()` và `currentAodRules()`) + Intent của màn Main: service và màn AOD tự áp dụng, không viết lại điều kiện ở chỗ khác.
-- Mặt đồng hồ mới → entry trong `ClockFaceValue` + nhánh trong `AodClockFace` (`AodClockFace.kt`). Màu mới → `AodsColors` + entry trong `ClockColorValue` (đọc qua `AodsTheme.colors`). Ảnh nền có sẵn mới → vector `img_wallpaper_<tên>.xml` (mục 16) + entry trong `WallpaperValue` (code mới, `alignment`) + chuỗi tên.
+- Mặt đồng hồ mới → entry trong `ClockFaceValue` + nhánh trong `AodClockFace` (`AodClockFace.kt`). Màu mới → `AodsColors` + entry trong `ClockColorValue`. Ảnh nền có sẵn mới → vector `img_wallpaper_<tên>.xml` (mục 16) + entry trong `WallpaperValue` (code mới, `alignment`) + chuỗi tên.
 - Hành động mới cho thao tác → entry trong `AodActionValue` + nhánh trong `AodViewModel.performGesture`. Thao tác mới → entry trong `AodGestureValue` + key DataStore + nhánh trong `gestureActionCode` / `saveGestureAction` + nơi phát `PerformGesture`.
 - Thông tin thêm trên đồng hồ (kiểu ghi nhớ, sự kiện, thời tiết) → key trong `DataStoreManager` + field trong `AodExtrasUiModel` (`currentAodExtras()`) + Intent của màn Main + composable trong `AodExtras.kt` gọi từ `AodDetails`; dữ liệu lấy từ nguồn ngoài → domain model + Repository + UseCase ([mục 8](#8-domain-layer), [mục 9](#9-data-layer)), quyền runtime xin lúc user bật tuỳ chọn.
 - Danh sách tính năng còn thiếu so với Always On AMOLED: [COMPARISON.md](COMPARISON.md).
@@ -943,7 +943,7 @@ Bản gốc có prefix `kta-`, ở đây đã bỏ. 5 tên đổi hẳn — 4 t�
 |---|---|
 | `idea-pipeline` → `prd-pipeline` → `design-spec` | Ý tưởng app hay tính năng mới → PRD từng tính năng → spec từng màn cho Stitch / Figma / Claude Design |
 | `ui-ux-pro-max` | Chọn hướng UI trước khi làm: style, bảng màu, cặp font, mật độ, luật UX / accessibility (tra dữ liệu CSV bằng script, luôn `--stack jetpack-compose`); chọn xong thì chuyển thành token `Aods`, không dán giá trị vào code UI |
-| `design-tokens` | Sinh token 3 tầng từ Stitch / Figma / Claude Design (chỉ nhận 3 nguồn này). **Project này không dùng kiến trúc token của skill**: chỉ lấy giá trị màu / chữ / bo góc rồi ghi vào `AodsColors` / `AodsTypography` / `AodsShapes` (UI đọc qua `AodsTheme`), không sinh primitive / semantic / component / `CompositionLocal` (mục 14), dựng lần lượt các màn trong `plans/…/screens-todo.md` |
+| `design-tokens` | Sinh token 3 tầng từ Stitch / Figma / Claude Design (chỉ nhận 3 nguồn này). **Project này không dùng kiến trúc token của skill**: chỉ lấy giá trị màu / chữ / bo góc rồi ghi vào `AodsColors` / `AodsTypography` / `AodsShapes` (UI đọc thẳng), không sinh primitive / semantic / component / `CompositionLocal` (mục 14), dựng lần lượt các màn trong `plans/…/screens-todo.md` |
 | Agent `compose-implementer` | Viết UI Compose theo spec (do skill token hoặc optimizer giao); chỉ UI và ViewModel mỏng, xong phải compile + grep mục 18 |
 | `compose-optimizer` | Tối ưu đúng 1 composable: recomposition, animation, tách nhỏ (hỏi user chọn rồi giao agent làm) |
 | `kotlin-review` | Review code Kotlin (diff, file, branch, PR); chạy cả các lệnh grep ở mục 18 |

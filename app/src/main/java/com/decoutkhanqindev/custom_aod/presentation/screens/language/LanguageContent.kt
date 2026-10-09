@@ -19,7 +19,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,7 +41,10 @@ import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
 import com.decoutkhanqindev.custom_aod.presentation.model.OnboardingStepValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageState
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,14 +123,14 @@ private fun LanguageOption(
 ) {
     val containerColor by animateColorAsState(
         targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+            AodsColors.MintAlpha12
         } else {
-            MaterialTheme.colorScheme.surfaceContainer
+            AodsColors.Neutral12
         },
         label = "LanguageOptionContainer",
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+        targetValue = if (isSelected) AodsColors.Mint else AodsColors.NeutralVariant30,
         label = "LanguageOptionBorder",
     )
     val borderWidth by animateDpAsState(
@@ -140,16 +142,16 @@ private fun LanguageOption(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
-            .clip(MaterialTheme.shapes.large)
+            .clip(AodsShapes.RoundedCornerShape16dp)
             .background(containerColor)
-            .border(width = borderWidth, color = borderColor, shape = MaterialTheme.shapes.large)
+            .border(width = borderWidth, color = borderColor, shape = AodsShapes.RoundedCornerShape16dp)
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = language.language.flag,
-            style = MaterialTheme.typography.headlineSmall,
+            style = AodsTypography.HeadlineSmall,
         )
 
         Text(
@@ -157,8 +159,8 @@ private fun LanguageOption(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleMedium,
+            color = AodsColors.GreyED,
+            style = AodsTypography.TitleMedium,
         )
 
         RadioButton(selected = isSelected, onClick = null)

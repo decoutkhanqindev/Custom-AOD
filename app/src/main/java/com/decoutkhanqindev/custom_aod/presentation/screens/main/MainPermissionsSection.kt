@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +20,8 @@ import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionStatusValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -48,10 +49,10 @@ private fun PermissionRow(
 ) {
     val status = permission.status
     val statusColor = when (status) {
-        PermissionStatusValue.GRANTED -> MaterialTheme.colorScheme.primary
-        PermissionStatusValue.MISSING_REQUIRED -> MaterialTheme.colorScheme.error
+        PermissionStatusValue.GRANTED -> AodsColors.Mint
+        PermissionStatusValue.MISSING_REQUIRED -> AodsColors.Red
         PermissionStatusValue.UNKNOWN,
-        PermissionStatusValue.MISSING_OPTIONAL -> MaterialTheme.colorScheme.onSurfaceVariant
+        PermissionStatusValue.MISSING_OPTIONAL -> AodsColors.Grey9A
     }
 
     Row(
@@ -76,14 +77,14 @@ private fun PermissionRow(
         ) {
             Text(
                 text = stringResource(permission.permission.titleRes),
-                style = MaterialTheme.typography.bodyLarge,
+                style = AodsTypography.BodyLarge,
             )
 
             Text(
                 text = stringResource(permission.permission.descriptionRes),
                 modifier = Modifier.padding(top = 2.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                color = AodsColors.Grey9A,
+                style = AodsTypography.BodySmall,
             )
         }
 

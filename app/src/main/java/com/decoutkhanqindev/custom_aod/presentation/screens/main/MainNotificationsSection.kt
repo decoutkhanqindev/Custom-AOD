@@ -3,7 +3,6 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,6 +13,8 @@ import com.decoutkhanqindev.custom_aod.presentation.components.AodsSectionHeader
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @Composable
 fun MainNotificationsSection(
@@ -29,8 +30,8 @@ fun MainNotificationsSection(
             Text(
                 text = stringResource(R.string.notification_access_needed),
                 modifier = Modifier.padding(vertical = 4.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                color = AodsColors.Grey9A,
+                style = AodsTypography.BodySmall,
             )
         }
 

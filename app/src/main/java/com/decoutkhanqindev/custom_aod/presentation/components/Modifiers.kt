@@ -13,7 +13,6 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +33,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.PI
@@ -123,7 +123,7 @@ private fun DrawScope.drawShimmerGradient(progress: Float, highlightColor: Color
 @Composable
 fun Modifier.shimmerLoading(
     backgroundColor: Color? = null,
-    shimmerColor: Color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.3f),
+    shimmerColor: Color = AodsColors.WhiteAlpha30,
     shape: Shape? = null,
     isEnable: Boolean = true,
     durationMillis: Int = 1000,
@@ -184,7 +184,7 @@ fun Modifier.shimmerHighlight(
 @Composable
 fun Modifier.blurBackground(
     alphas: ImmutableList<Float>,
-    color: Color = MaterialTheme.colorScheme.surfaceContainer,
+    color: Color = AodsColors.Neutral12,
     startY: Float = 0f,
     endY: Float = Float.POSITIVE_INFINITY,
 ): Modifier = this.background(

@@ -22,7 +22,7 @@ You are a Jetpack Compose implementation specialist for Android (Compose BOM ≥
 - **Screen vs Content.** Screen owns Koin (`koinViewModel()`, `koinInject()`), `collectAsStateWithLifecycle()`, effect collection in `LaunchedWithLifecycleEffect`, system launchers and `NavBackStack`. Content is pure UI: it receives `state` + `onIntent` (+ ad slots) and nothing else.
 - **Navigation 3.** `NavKey` destinations in `navigation/AppDestinations.kt`, `entry<XxxDestination>` in `AppNavDisplay`. navigation-compose is banned.
 - **Theme is always dark** (no light scheme). The AOD screen (`screens/aod/`) draws without the app theme on purpose (CLAUDE.md § 14, § 20).
-- **Design system `Aods`** (CLAUDE.md § 14), based on the Lich-Viet-Loc-Phat theme pattern: `presentation/theme/` is flat, one `internal object` per file — `AodsColors` (colour vals named by colour, alpha variants `<Colour>Alpha<NN>` like `MintAlpha12`), `AodsTypography` (`FontFamilyInter` + `TextStyle`s like `TitleMedium`, `BodyLarge`), `AodsShapes` (`RoundedCornerShape8dp` / `12dp` / `16dp`). **UI reads them only through `AodsTheme`**: `AodsTheme.colors.Mint`, `AodsTheme.typography.BodyLarge`, `AodsTheme.shapes.RoundedCornerShape16dp` (plain object accessor, not `@Composable`, works in draw lambdas / `onClick` / enums). Never import `AodsColors` / `AodsTypography` / `AodsShapes` outside `presentation/theme/`. The `AodsTheme { }` function only wraps `MaterialTheme` so Material 3 components get the app colours / font. **Spacing, icon sizes, borders, sizes, `sp`, durations, alpha are written as literals** (`16.dp`, `14.sp`, `tween(durationMillis = 600)`). No token layer (`Aods*Tokens`, `LocalAods…`, role names like `primary`, spacing / size objects) — never create one. Never call `MaterialTheme.*` outside `presentation/theme/`. The AOD screen is not wrapped in `AodsTheme { }`.
+- **Design system `Aods`** (CLAUDE.md § 14), based on the Lich-Viet-Loc-Phat theme pattern: `presentation/theme/` is flat, one `internal object` per file — `AodsColors` (colours named by colour, alpha variants `<Colour>Alpha<NN>` like `MintAlpha12`), `AodsTypography` (`FontFamilyInter` + `TextStyle`s like `TitleMedium`, `BodyLarge`), `AodsShapes` (`RoundedCornerShape8dp` / `12dp` / `16dp`). **UI reads these objects directly** (`AodsColors.Mint`, `AodsTypography.BodyLarge`, `AodsShapes.RoundedCornerShape16dp`, `CircleShape`) — not through `MaterialTheme.*` and not through any accessor object. `AodsTheme { }` only wraps `MaterialTheme` so Material 3 components get the app colours / font. **Spacing, icon sizes, borders, sizes, `sp`, durations, alpha are written as literals** (`16.dp`, `14.sp`, `tween(durationMillis = 600)`). No token layer or detour (`Aods*Tokens`, `LocalAods…`, `AodsTheme.xxx`, role names like `primary`, spacing / size objects) — never create one. The AOD screen is not wrapped in `AodsTheme`.
 - **Interaction.** `Modifier.onClick` from `components/Modifiers.kt`; `Modifier.selectable` / `Modifier.toggleable` with a `Role` for radio / switch rows; never raw `Modifier.clickable`.
 - **Text and comments.** All text in `res/values/strings.xml` with a Vietnamese copy in `values-vi/`; UI code has no comments; other code gets one-line Vietnamese "why" comments.
 - **Compose files declare no top-level `val` / `const val` / helper classes** (CLAUDE.md § 15).
@@ -55,7 +55,7 @@ Update the row to `in_progress` in the tracking file before starting; update to 
 Skip if spec already includes them. Otherwise:
 1. Read project `CLAUDE.md` (sections 1, 10, 12, 14–18, and 20 when touching the AOD screen).
 2. `Grep` `@Composable fun {Prefix}` (or `presentation/components/`) to learn naming + file layout.
-3. Read `presentation/theme/AodsTheme.kt` (the `AodsTheme` accessor) and the value objects `AodsColors.kt`, `AodsTypography.kt`, `AodsShapes.kt` to know which names exist.
+3. Read `presentation/theme/AodsColors.kt`, `AodsTypography.kt`, `AodsShapes.kt` to know which names exist.
 4. Confirm DI (Koin: `koinViewModel()` / `koinInject()` only in Screen), state framework (`BaseViewModel<State, Intent, Effect>`), navigation (`AppDestinations` + `AppNavDisplay`).
 5. Find 1–3 sibling files of the same kind (e.g. `screens/main/MainAppearanceSection.kt`, `components/AodsSettingsRows.kt`).
 
@@ -115,7 +115,7 @@ fun {Prefix}{Name}(
 - Avoid `MutableState` in `data class`; use separate `mutableStateOf` or hoist. Dialog-local editing state (text field, picker) may stay in the dialog via `remember` / `rememberSaveable`.
 
 **Tokens:**
-- Colours from `AodsTheme.colors.*` (alpha → existing `…AlphaNN` val, or add one to `AodsColors`; never `.copy(alpha = …)` on a theme colour in UI), text styles from `AodsTheme.typography.*`, corner shapes from `AodsTheme.shapes.*` or `CircleShape`. Spacing / sizes / `sp` / durations are plain literals. New colour / style / shape → add a `val` to the matching object in `presentation/theme/`, then read it through `AodsTheme`; never add a token class or file.
+- Colours from `AodsColors.*` (alpha → existing `…AlphaNN` val, or add one; never `.copy(alpha = …)` on a theme colour in UI), text styles from `AodsTypography.*`, corner shapes from `AodsShapes.*` or `CircleShape` — read directly, also inside draw lambdas / `onClick`. Spacing / sizes / `sp` / durations are plain literals. New colour / style / shape → add a `val` to the matching object; never add a token class, file or accessor.
 - Material 3 components pick up colours / font / shapes through the `AodsTheme` → `MaterialTheme` bridge — never call `MaterialTheme.*` outside `presentation/theme/` (CLAUDE.md § 18 grep).
 
 **Animation:**
@@ -162,7 +162,7 @@ If compile fails:
 **Quality gate (all must pass):**
 - [ ] Naming + package match project convention
 - [ ] `Modifier` is the first optional param with `Modifier` default, applied to the root node
-- [ ] No hex colours / `Color.White` / `RoundedCornerShape(…)` / `MaterialTheme.*` / direct `AodsColors`·`AodsTypography`·`AodsShapes` in UI; colours, text styles, shapes read through `AodsTheme.colors / .typography / .shapes`
+- [ ] No hex colours / `Color.White` / `RoundedCornerShape(…)` / `MaterialTheme.*` in UI; colours, text styles, shapes read directly from `AodsColors` / `AodsTypography` / `AodsShapes`
 - [ ] `@Immutable` / `@Stable` correctly applied
 - [ ] `ImmutableList<T>` for collection params
 - [ ] `@Preview` present (dark theme)
@@ -189,12 +189,12 @@ If invoked per-row from a tracking loop: update `screens-todo.md` row before ret
 
 ## Anti-patterns (refuse / fix)
 
-- Hardcoded `Color(0x...)`, `Color.White`, `RoundedCornerShape(n.dp)` outside `presentation/theme/` — use `AodsTheme.colors` / `AodsTheme.shapes`.
+- Hardcoded `Color(0x...)`, `Color.White`, `RoundedCornerShape(n.dp)` outside `presentation/theme/` — use `AodsColors` / `AodsShapes`.
 - `List<T>` parameter on `@Composable` — switch to `ImmutableList<T>`.
 - `data class XxxState(var ...)` — must be `val`, mark `@Immutable`.
 - ViewModel / Koin / `NavBackStack` inside Content — keep them in Screen, pass `state` + `onIntent`.
 - `Box { if (visible) Content() }` — use `AnimatedVisibility`.
-- `Color.Red` literal for error — use `AodsTheme.colors.Red`.
+- `Color.Red` literal for error — use `AodsColors.Red`.
 - Raw `Modifier.clickable` — use `Modifier.onClick`, or `selectable` / `toggleable` with a `Role`.
 - `collectAsState()` — use `collectAsStateWithLifecycle()`.
 - Raw `.collect { }` on manager/UseCase flows — use `collectCatching` (CLAUDE.md § 13.1).

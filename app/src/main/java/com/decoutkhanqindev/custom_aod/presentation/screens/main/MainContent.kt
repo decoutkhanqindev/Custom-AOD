@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +32,9 @@ import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -81,14 +82,14 @@ private fun MainSettings(
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
+            style = AodsTypography.HeadlineMedium,
         )
 
         Text(
             text = stringResource(R.string.main_subtitle),
             modifier = Modifier.padding(top = 4.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            color = AodsColors.Grey9A,
+            style = AodsTypography.BodyMedium,
         )
 
         MainPermissionWarning(
@@ -170,8 +171,8 @@ private fun MainSettings(
         Text(
             text = stringResource(state.lastWakeMessageRes),
             modifier = Modifier.padding(top = 12.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
+            color = AodsColors.Grey9A,
+            style = AodsTypography.BodySmall,
         )
     }
 }

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,7 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsLottie
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @Composable
 fun SplashContent() {
@@ -40,7 +41,7 @@ fun SplashContent() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(AodsColors.Black),
     ) {
         Column(
             modifier = Modifier
@@ -65,18 +66,18 @@ fun SplashContent() {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(R.string.app_name),
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = AodsColors.GreyED,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = AodsTypography.HeadlineMedium,
                     )
 
                     Text(
                         text = stringResource(R.string.splash_tagline),
                         modifier = Modifier.padding(top = 8.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = AodsColors.Grey9A,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = AodsTypography.BodyMedium,
                     )
                 }
             }
@@ -93,22 +94,22 @@ fun SplashContent() {
         ) {
             Text(
                 text = stringResource(R.string.loading),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                color = AodsColors.Grey9A,
+                style = AodsTypography.BodyMedium,
             )
 
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceContainer,
+                color = AodsColors.Mint,
+                trackColor = AodsColors.Neutral12,
             )
 
             Text(
                 text = stringResource(R.string.may_contain_ads),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = AodsColors.Grey9A,
                 fontStyle = FontStyle.Italic,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodySmall,
+                style = AodsTypography.BodySmall,
             )
         }
     }

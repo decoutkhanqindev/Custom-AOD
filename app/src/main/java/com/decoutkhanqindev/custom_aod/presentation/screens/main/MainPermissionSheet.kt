@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,7 +39,10 @@ import com.decoutkhanqindev.custom_aod.presentation.components.AodsPermissionCar
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -67,7 +69,7 @@ fun MainPermissionSheet(
         ModalBottomSheet(
             onDismissRequest = { onIntent(MainIntent.DismissPermissionSheet) },
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = AodsColors.Neutral12,
         ) {
             PermissionSheetBody(permissions = permissions, onIntent = onIntent)
         }
@@ -85,8 +87,8 @@ fun MainPermissionWarning(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .clip(MaterialTheme.shapes.large)
-                .background(MaterialTheme.colorScheme.error.copy(alpha = 0.12f))
+                .clip(AodsShapes.RoundedCornerShape16dp)
+                .background(AodsColors.RedAlpha12)
                 .padding(start = 16.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -94,7 +96,7 @@ fun MainPermissionWarning(
                 imageVector = Icons.Outlined.ErrorOutline,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.error,
+                tint = AodsColors.Red,
             )
 
             Text(
@@ -102,8 +104,8 @@ fun MainPermissionWarning(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 12.dp),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyLarge,
+                color = AodsColors.GreyED,
+                style = AodsTypography.BodyLarge,
             )
 
             TextButton(onClick = { onIntent(MainIntent.ShowPermissionSheet) }) {
@@ -129,18 +131,18 @@ private fun PermissionSheetBody(
         Text(
             text = stringResource(R.string.permission_sheet_title),
             modifier = Modifier.semantics { heading() },
-            color = MaterialTheme.colorScheme.onSurface,
+            color = AodsColors.GreyED,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
+            style = AodsTypography.TitleLarge,
         )
 
         Text(
             text = stringResource(R.string.permission_sheet_desc),
             modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = AodsColors.Grey9A,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium,
+            style = AodsTypography.BodyMedium,
         )
 
         permissions.forEach { permission ->
@@ -148,7 +150,7 @@ private fun PermissionSheetBody(
                 permission = permission,
                 onAllowClick = { onIntent(MainIntent.OpenPermissionSettings(permission.permission)) },
                 modifier = Modifier.padding(top = 12.dp),
-                containerColor = MaterialTheme.colorScheme.background,
+                containerColor = AodsColors.Black,
             )
         }
 
@@ -168,7 +170,7 @@ private fun PermissionSheetBody(
 @Composable
 private fun PermissionSheetBodyPreview() {
     AodsTheme {
-        Column(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
+        Column(modifier = Modifier.background(AodsColors.Neutral12)) {
             PermissionSheetBody(
                 permissions = persistentListOf(
                     PermissionUiModel(permission = PermissionValue.OVERLAY, isGranted = false),

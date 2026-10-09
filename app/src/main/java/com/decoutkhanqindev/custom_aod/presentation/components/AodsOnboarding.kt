@@ -15,7 +15,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.OnboardingStepValue
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,15 +45,15 @@ fun AodsOnboardingTopBar(
                 text = stringResource(R.string.onboarding_step, step.number, OnboardingStepValue.entries.size),
                 modifier = Modifier
                     .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        color = AodsColors.MintAlpha12,
                         shape = CircleShape,
                     )
                     .padding(
                         horizontal = 12.dp,
                         vertical = 4.dp,
                     ),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelLarge,
+                color = AodsColors.Mint,
+                style = AodsTypography.LabelLarge,
             )
         },
         modifier = modifier,
@@ -82,18 +83,18 @@ fun AodsOnboardingHeader(
         Text(
             text = title,
             modifier = Modifier.semantics { heading() },
-            color = MaterialTheme.colorScheme.onSurface,
+            color = AodsColors.GreyED,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineMedium,
+            style = AodsTypography.HeadlineMedium,
         )
 
         Text(
             text = subtitle,
             modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = AodsColors.Grey9A,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge,
+            style = AodsTypography.BodyLarge,
         )
     }
 }
@@ -117,9 +118,9 @@ fun AodsOnboardingFooter(
             Text(
                 text = disabledHint.orEmpty(),
                 modifier = Modifier.padding(bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = AodsColors.Grey9A,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodySmall,
+                style = AodsTypography.BodySmall,
             )
         }
 

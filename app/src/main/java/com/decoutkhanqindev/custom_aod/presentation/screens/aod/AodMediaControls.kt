@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,6 +28,7 @@ import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
 import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 
 @Composable
 internal fun AodMediaControls(
@@ -48,7 +48,7 @@ internal fun AodMediaControls(
                 Text(
                     text = target.title,
                     modifier = Modifier.widthIn(max = 260.dp),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = AodsColors.Grey8A,
                     fontSize = 14.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -58,7 +58,7 @@ internal fun AodMediaControls(
                     Text(
                         text = artist,
                         modifier = Modifier.widthIn(max = 260.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = AodsColors.Grey6E,
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -118,6 +118,6 @@ private fun AodMediaButton(
                 },
             )
             .padding(8.dp),
-        tint = if (isEnabled) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline,
+        tint = if (isEnabled) AodsColors.GreyB4 else AodsColors.Grey5A,
     )
 }

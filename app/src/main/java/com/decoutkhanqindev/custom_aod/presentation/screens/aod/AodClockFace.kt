@@ -3,7 +3,6 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.aod
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 
 @Composable
 internal fun AodClockFace(
@@ -92,7 +92,6 @@ private fun AodAnalogClock(
     val now = rememberZonedDateTime(nowMillis)
     val timeDescription = now.format(rememberTimeFormatter())
     val color = appearance.color.color
-    val tickColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Canvas(
         modifier = Modifier
@@ -105,7 +104,7 @@ private fun AodAnalogClock(
                 val isMajor = index % 3 == 0
                 rotate(degrees = index * 30f) {
                     drawLine(
-                        color = if (isMajor) color else tickColor,
+                        color = if (isMajor) color else AodsColors.Grey6E,
                         start = Offset(x = center.x, y = center.y - radius),
                         end = Offset(
                             x = center.x,

@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,6 +32,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
 import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @Composable
 internal fun WallpaperPicker(
@@ -51,7 +53,7 @@ internal fun WallpaperPicker(
 
             Column(
                 modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
+                    .clip(AodsShapes.RoundedCornerShape8dp)
                     .selectable(selected = isSelected, role = Role.RadioButton, onClick = { onSelect(wallpaper) })
                     .padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,15 +61,15 @@ internal fun WallpaperPicker(
                 Box(
                     modifier = Modifier
                         .size(width = 60.dp, height = 132.dp)
-                        .clip(MaterialTheme.shapes.medium)
+                        .clip(AodsShapes.RoundedCornerShape12dp)
                         .border(
                             width = if (isSelected) 2.dp else 1.dp,
                             color = if (isSelected) {
-                                MaterialTheme.colorScheme.primary
+                                AodsColors.Mint
                             } else {
-                                MaterialTheme.colorScheme.outlineVariant
+                                AodsColors.NeutralVariant30
                             },
-                            shape = MaterialTheme.shapes.medium,
+                            shape = AodsShapes.RoundedCornerShape12dp,
                         ),
                 ) {
                     Image(
@@ -85,7 +87,7 @@ internal fun WallpaperPicker(
                                 .align(Alignment.TopEnd)
                                 .padding(6.dp)
                                 .size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = AodsColors.Mint,
                         )
                     }
                 }
@@ -94,11 +96,11 @@ internal fun WallpaperPicker(
                     text = stringResource(wallpaper.labelRes),
                     modifier = Modifier.padding(top = 6.dp),
                     color = if (isSelected) {
-                        MaterialTheme.colorScheme.primary
+                        AodsColors.Mint
                     } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                        AodsColors.Grey9A
                     },
-                    style = MaterialTheme.typography.labelMedium,
+                    style = AodsTypography.LabelMedium,
                 )
             }
         }
@@ -130,7 +132,7 @@ internal fun ClockColorPicker(
                         .background(color.color)
                         .border(
                             width = 2.dp,
-                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else color.color,
+                            color = if (isSelected) AodsColors.GreyED else color.color,
                             shape = CircleShape,
                         )
                         .selectable(selected = isSelected, role = Role.RadioButton, onClick = { onSelect(color) })
@@ -142,7 +144,7 @@ internal fun ClockColorPicker(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = AodsColors.Black,
                         )
                     }
                 }

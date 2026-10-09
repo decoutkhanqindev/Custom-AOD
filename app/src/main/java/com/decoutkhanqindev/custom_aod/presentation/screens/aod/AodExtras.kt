@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -55,13 +55,13 @@ internal fun AodWeather(
                     imageVector = target.icon,
                     contentDescription = stringResource(target.condition.labelRes),
                     modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.onBackground,
+                    tint = AodsColors.Grey8A,
                 )
 
                 Text(
                     text = stringResource(R.string.aod_weather_temperature, target.temperature),
                     modifier = Modifier.padding(start = 4.dp),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = AodsColors.Grey8A,
                     fontSize = 16.sp,
                     fontFamily = fontFamily,
                 )
@@ -94,7 +94,7 @@ internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
                                 imageVector = Icons.Default.Event,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = AodsColors.Grey6E,
                             )
 
                             Text(
@@ -104,7 +104,7 @@ internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
                                     rememberZonedDateTime(event.beginMillis).format(timeFormatter)
                                 },
                                 modifier = Modifier.padding(start = 6.dp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = AodsColors.Grey6E,
                                 fontSize = 13.sp,
                             )
 
@@ -113,7 +113,7 @@ internal fun AodEvents(events: ImmutableList<CalendarEventUiModel>) {
                                 modifier = Modifier
                                     .padding(start = 8.dp)
                                     .widthIn(max = 220.dp),
-                                color = MaterialTheme.colorScheme.onBackground,
+                                color = AodsColors.Grey8A,
                                 fontSize = 13.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -137,7 +137,7 @@ internal fun AodMemo(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .widthIn(max = 280.dp),
-            color = MaterialTheme.colorScheme.onBackground,
+            color = AodsColors.Grey8A,
             fontSize = 14.sp,
             fontFamily = fontFamily,
             textAlign = TextAlign.Center,

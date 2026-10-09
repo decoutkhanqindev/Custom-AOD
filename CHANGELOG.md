@@ -4,6 +4,17 @@ Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa theo [Kee
 
 Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file. Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-09 – UI đọc thẳng AodsColors / AodsTypography / AodsShapes
+
+Commit `e743565` cho UI đọc theme qua `MaterialTheme.colorScheme / .typography / .shapes`; bản này đổi lại cho UI đọc thẳng các object, tránh đường vòng. Build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.
+
+### Thay đổi
+
+- UI (22 file) đọc thẳng `AodsColors.Mint`, `AodsTypography.BodyLarge`, `AodsShapes.RoundedCornerShape16dp`; màu có alpha dùng lại biến thể đặt tên sẵn (`MintAlpha12`, `RedAlpha12`, `WhiteAlpha30`, `BlackAlpha50`). Đọc được cả trong lambda vẽ / `onClick` nên bỏ các biến gán tạm.
+- `AodsTypography` / `AodsShapes` có lại các `TextStyle` / `RoundedCornerShape<N>dp`, cộng `Material` cho cầu nối. `AodsTheme { }` chỉ bọc `MaterialTheme` cho component Material 3; bỏ `inverseSurface` / `scrim` thêm riêng cho UI.
+- Bỏ `AodsAodTheme`: màn AOD lại không bọc theme (`AodActivity`, preview giữ nguyên như trước `e743565`). Chữ gợi ý trong bảng vẽ trở lại Grey6E như ban đầu.
+- CLAUDE.md (mục 14, 18), agent `compose-implementer`, skill `design-tokens` / `compose-optimizer`, README cập nhật theo. Lệnh grep: cấm `MaterialTheme.*` ngoài `theme/`, cấm `.copy(` trên `AodsColors` ngoài `theme/`, cấm `AodsTheme.xxx`; bỏ lệnh cấm gọi thẳng các object ngoài `theme/`.
+
 ## [Chưa phát hành] – 2026-10-07 – Quyền bắt buộc, chỉnh UI onboarding, theme theo pattern Lich-Viet-Loc-Phat, script icon
 
 Siết lại bộ quyền bắt buộc theo thử nghiệm trên máy Xiaomi, chỉnh giao diện splash / màn ngôn ngữ / màn quyền, theme đổi sang pattern phẳng của Lich-Viet-Loc-Phat (bỏ tầng token), đưa script sinh icon / Lottie vào repo. Không thêm quyền Manifest, không thêm thư viện. Bản này build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.

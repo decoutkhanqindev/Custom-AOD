@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -53,6 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @Composable
 internal fun MemoEditorDialog(
@@ -106,7 +108,6 @@ internal fun DrawingPadDialog(
 ) {
     val density = LocalDensity.current
     val strokeWidthPx = with(density) { 8.dp.toPx() }
-    val strokeColor = MaterialTheme.colorScheme.inverseSurface
     val strokes = remember { mutableStateListOf<SnapshotStateList<Offset>>() }
     var padSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -121,7 +122,7 @@ internal fun DrawingPadDialog(
                             size = padSize,
                             density = density,
                             strokeWidthPx = strokeWidthPx,
-                            strokeColor = strokeColor,
+                            strokeColor = AodsColors.White,
                         ),
                     )
                 },
@@ -150,9 +151,9 @@ internal fun DrawingPadDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.background)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = MaterialTheme.shapes.medium)
+                    .clip(AodsShapes.RoundedCornerShape12dp)
+                    .background(AodsColors.Black)
+                    .border(width = 1.dp, color = AodsColors.NeutralVariant60, shape = AodsShapes.RoundedCornerShape12dp)
                     .onSizeChanged { size -> padSize = size }
                     .pointerInput(Unit) {
                         awaitEachGesture {
@@ -166,15 +167,15 @@ internal fun DrawingPadDialog(
                         }
                     }
                     .drawBehind {
-                        strokes.forEach { stroke -> drawStroke(points = stroke, color = strokeColor, widthPx = strokeWidthPx) }
+                        strokes.forEach { stroke -> drawStroke(points = stroke, color = AodsColors.White, widthPx = strokeWidthPx) }
                     },
                 contentAlignment = Alignment.Center,
             ) {
                 if (strokes.isEmpty()) {
                     Text(
                         text = stringResource(R.string.drawing_hint),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium,
+                        color = AodsColors.Grey6E,
+                        style = AodsTypography.BodyMedium,
                     )
                 }
             }

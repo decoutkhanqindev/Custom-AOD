@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FlashlightOn
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 
 @Composable
 internal fun AodDetails(
@@ -58,7 +58,7 @@ internal fun AodDetails(
                     if (battery.isCharging) R.string.aod_battery_charging else R.string.aod_battery,
                     battery.percent,
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = AodsColors.Grey6E,
                 fontSize = 14.sp,
             )
         }
@@ -70,7 +70,7 @@ internal fun AodDetails(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .size(18.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = AodsColors.Mint,
             )
         }
 
@@ -94,7 +94,7 @@ private fun AodDate(
 
     Text(
         text = now.format(dateFormatter),
-        color = MaterialTheme.colorScheme.onBackground,
+        color = AodsColors.Grey8A,
         fontSize = 16.sp,
         fontFamily = fontFamily,
     )
@@ -111,7 +111,7 @@ private fun AodExitHint(isVisible: Boolean) {
     Text(
         text = stringResource(R.string.aod_hint),
         modifier = Modifier.alpha(alpha.value),
-        color = MaterialTheme.colorScheme.outline,
+        color = AodsColors.Grey5A,
         fontSize = 12.sp,
     )
 }

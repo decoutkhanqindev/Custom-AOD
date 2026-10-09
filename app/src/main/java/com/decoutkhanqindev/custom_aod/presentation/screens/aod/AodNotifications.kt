@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.NotificationContentUiModel
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 
 @Composable
 internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
@@ -50,7 +50,7 @@ internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
                             bitmap = remember(icon.icon) { icon.icon.asImageBitmap() },
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                            colorFilter = ColorFilter.tint(AodsColors.Grey8A),
                         )
                     }
                 }
@@ -58,7 +58,7 @@ internal fun AodNotificationIcons(notifications: AodNotificationsUiModel) {
                 if (target.overflowCount > 0) {
                     Text(
                         text = stringResource(R.string.aod_notifications_overflow, target.overflowCount),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = AodsColors.Grey6E,
                         fontSize = 12.sp,
                     )
                 }
@@ -86,7 +86,7 @@ internal fun AodNotificationContent(content: NotificationContentUiModel?) {
                         bitmap = remember(target.icon) { target.icon.asImageBitmap() },
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                        colorFilter = ColorFilter.tint(AodsColors.Grey8A),
                     )
 
                     Text(
@@ -96,7 +96,7 @@ internal fun AodNotificationContent(content: NotificationContentUiModel?) {
                             target.title
                         },
                         modifier = Modifier.padding(start = 6.dp),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = AodsColors.Grey8A,
                         fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -107,7 +107,7 @@ internal fun AodNotificationContent(content: NotificationContentUiModel?) {
                     Text(
                         text = target.text,
                         modifier = Modifier.padding(top = 2.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = AodsColors.Grey6E,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
                         maxLines = 2,

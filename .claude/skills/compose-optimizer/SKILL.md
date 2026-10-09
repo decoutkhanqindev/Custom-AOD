@@ -91,7 +91,7 @@ Optimizations to apply (in order):
 4. [custom] <user request verbatim>
 
 Constraints:
-- Match the design-system prefix, tokens and motion presets documented in CLAUDE.md (Custom-AOD: colours / text styles / shapes through `AodsTheme.colors / .typography / .shapes` — never import `AodsColors` / `AodsTypography` / `AodsShapes` outside `presentation/theme/`; dp / sp / durations as literals; never add token classes)
+- Match the design-system prefix, tokens and motion presets documented in CLAUDE.md (Custom-AOD: colours / text styles / shapes read directly from `AodsColors` / `AodsTypography` / `AodsShapes` — not via `MaterialTheme.*` or an accessor; dp / sp / durations as literals; never add token classes)
 - Preserve public signature unless splitting requires extraction
 - Animate every state change (project rule)
 - Compile after writing

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,18 +38,21 @@ import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionStatusValue
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 
 @Composable
 fun AodsPermissionCard(
     permission: PermissionUiModel,
     onAllowClick: () -> Unit,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    containerColor: Color = AodsColors.Neutral12,
 ) {
     val isGranted = permission.status == PermissionStatusValue.GRANTED
     val borderColor by animateColorAsState(
-        targetValue = if (isGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+        targetValue = if (isGranted) AodsColors.Mint else AodsColors.NeutralVariant30,
         label = "PermissionCardBorder",
     )
 
@@ -58,7 +60,7 @@ fun AodsPermissionCard(
         Modifier
     } else {
         Modifier
-            .onClick(shape = MaterialTheme.shapes.large, action = onAllowClick)
+            .onClick(shape = AodsShapes.RoundedCornerShape16dp, action = onAllowClick)
             .semantics { role = Role.Button }
     }
 
@@ -66,12 +68,12 @@ fun AodsPermissionCard(
         modifier = modifier
             .fillMaxWidth()
             .then(clickModifier)
-            .clip(MaterialTheme.shapes.large)
+            .clip(AodsShapes.RoundedCornerShape16dp)
             .background(containerColor)
             .border(
                 width = 1.dp,
                 color = borderColor,
-                shape = MaterialTheme.shapes.large
+                shape = AodsShapes.RoundedCornerShape16dp
             )
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -81,7 +83,7 @@ fun AodsPermissionCard(
             modifier = Modifier
                 .size(40.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    color = AodsColors.MintAlpha12,
                     shape = CircleShape,
                 ),
             contentAlignment = Alignment.Center,
@@ -90,30 +92,30 @@ fun AodsPermissionCard(
                 imageVector = permission.permission.icon,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = AodsColors.Mint,
             )
         }
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(permission.permission.nameRes),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium,
+                color = AodsColors.GreyED,
+                style = AodsTypography.TitleMedium,
             )
 
             Text(
                 text = stringResource(permission.permission.descriptionRes),
                 modifier = Modifier.padding(top = 2.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                color = AodsColors.Grey9A,
+                style = AodsTypography.BodySmall,
             )
 
             AnimatedVisibility(visible = permission.status == PermissionStatusValue.UNKNOWN) {
                 Text(
                     text = stringResource(R.string.permission_unknown_hint),
                     modifier = Modifier.padding(top = 4.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodySmall,
+                    color = AodsColors.Mint,
+                    style = AodsTypography.BodySmall,
                 )
             }
         }
@@ -150,14 +152,14 @@ private fun PermissionCardAction(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+            .background(color = AodsColors.Mint, shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = AodsColors.Black,
         )
     }
 }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -20,6 +19,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
+import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
 import kotlin.math.roundToInt
 
 @Composable
@@ -33,8 +35,8 @@ fun AodsSectionHeader(
             top = 28.dp,
             bottom = 4.dp,
         ),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelMedium,
+        color = AodsColors.Mint,
+        style = AodsTypography.LabelMedium,
     )
 }
 
@@ -49,8 +51,8 @@ fun AodsSectionLabel(
             top = 12.dp,
             bottom = 4.dp,
         ),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = MaterialTheme.typography.bodyMedium,
+        color = AodsColors.Grey9A,
+        style = AodsTypography.BodyMedium,
     )
 }
 
@@ -78,15 +80,15 @@ fun AodsSwitchRow(
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyLarge,
+                style = AodsTypography.BodyLarge,
             )
 
             description?.let { text ->
                 Text(
                     text = text,
                     modifier = Modifier.padding(top = 2.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
+                    color = AodsColors.Grey9A,
+                    style = AodsTypography.BodySmall,
                 )
             }
         }
@@ -116,7 +118,7 @@ fun AodsRadioRow(
             text = label,
             modifier = Modifier.padding(start = 12.dp),
             fontFamily = labelFontFamily,
-            style = MaterialTheme.typography.bodyLarge,
+            style = AodsTypography.BodyLarge,
         )
     }
 }
@@ -133,7 +135,7 @@ fun AodsValueRow(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
-            .onClick(shape = MaterialTheme.shapes.small, action = onClick),
+            .onClick(shape = AodsShapes.RoundedCornerShape8dp, action = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
@@ -143,25 +145,25 @@ fun AodsValueRow(
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyLarge,
+                style = AodsTypography.BodyLarge,
             )
 
             description?.let { text ->
                 Text(
                     text = text,
                     modifier = Modifier.padding(top = 2.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = AodsColors.Grey9A,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = AodsTypography.BodySmall,
                 )
             }
         }
 
         Text(
             text = value,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyLarge,
+            color = AodsColors.Mint,
+            style = AodsTypography.BodyLarge,
         )
     }
 }
@@ -180,7 +182,7 @@ fun AodsSliderRow(
     Column(modifier = modifier.padding(top = 12.dp)) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = AodsTypography.BodyLarge,
         )
 
         Slider(
