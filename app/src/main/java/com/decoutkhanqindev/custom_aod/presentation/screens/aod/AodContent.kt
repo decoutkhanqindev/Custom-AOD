@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -75,7 +75,7 @@ fun AodContent(
         label = "AodShiftY",
     )
 
-    LaunchedEffect(Unit) {
+    SideEffect(Unit) {
         focusRequester.requestFocus()
     }
 

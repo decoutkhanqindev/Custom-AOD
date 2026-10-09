@@ -3,7 +3,7 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.splash
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -39,7 +39,7 @@ fun SplashScreen(backStack: NavBackStack<NavKey>) {
         }
     }
 
-    LaunchedEffect(isConsentGathered, isMobileAdsInitialized, isNetworkAvailable) {
+    SideEffect(isConsentGathered, isMobileAdsInitialized, isNetworkAvailable) {
         when {
             !isConsentGathered || !isNetworkAvailable -> Unit
             !adsManager.canRequestAds -> handleNext()

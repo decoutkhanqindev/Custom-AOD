@@ -135,6 +135,7 @@ Restarts effect on any field change.
 **Fix**
 - Use the smallest necessary key: `LaunchedEffect(state.id)`.
 - `Unit` if it should run once.
+- Body không gọi hàm suspend → đổi sang `SideEffect(key)` (Compose runtime 1.12+), cùng quy tắc key.
 
 **Severity:** medium.
 
@@ -150,8 +151,9 @@ Restarts effect on any field change.
 
 **Fix**
 ```kotlin
-LaunchedEffect(Unit) { analytics.track("seen") }
+SideEffect(Unit) { analytics.track("seen") } // không suspend → SideEffect có key (Compose runtime 1.12+)
 ```
+Chỉ dùng `LaunchedEffect` khi body gọi hàm suspend (`delay`, `collect`, `animateTo`…).
 
 **Severity:** high (correctness, not just perf).
 

@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
         ComposeUiFlags.isBypassUnfocusableComposeViewEnabled = false
         super.onCreate(savedInstanceState)
         adsManager.requestConsent(this)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        runCatching {  requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
         // AodsTheme luôn tối: icon thanh hệ thống luôn sáng, không theo theme hệ thống.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),

@@ -81,7 +81,7 @@ Before writing a single line of Compose, confirm `:app` can compile what you pla
 ### 3. Classify
 - **Leaf component** (Button, Card, Row, Badge…): pure `@Composable` + preview, in `presentation/components/` when used by ≥ 2 screens, otherwise `private` in the screen file.
 - **Container** (Scaffold, ListItem, Section): pure `@Composable`, parameters as content slots.
-- **Effect** (overlay, snackbar host wrapper): `@Composable` wrapping side-effects via `LaunchedEffect` / `LaunchedWithLifecycleEffect`.
+- **Effect** (overlay, snackbar host wrapper): `@Composable` wrapping side-effects via `SideEffect(key)` (non-suspending work) / `LaunchedEffect` (only when the body calls suspend functions) / `LaunchedWithLifecycleEffect`.
 - **Screen recreation**: standalone `@Composable` (no VM, no nav), placeholder data, `*Recreation.kt` filename.
 - **Full screen stack**: `state/{XxxState, XxxIntent, XxxEffect}` + `XxxViewModel` (BaseViewModel) + `XxxScreen` + `XxxContent` + Koin `viewModel { }` in `di/AppModule.kt` + `XxxDestination` NavKey + `entry<XxxDestination>` in `AppNavDisplay`.
 - **Showcase**: gallery aggregating all built components/screens.
@@ -199,6 +199,7 @@ If invoked per-row from a tracking loop: update `screens-todo.md` row before ret
 - `collectAsState()` — use `collectAsStateWithLifecycle()`.
 - Raw `.collect { }` on manager/UseCase flows — use `collectCatching` (CLAUDE.md § 13.1).
 - `LaunchedEffect(Unit)` for one-shot work that belongs in the ViewModel `init` or a Screen effect.
+- `LaunchedEffect(key)` whose body never suspends — use `SideEffect(key)` (Compose runtime 1.12 keyed overloads; `SideEffect(Unit)` runs once). Keep `LaunchedEffect` only for `delay` / `collect` / `animateTo` / other suspend calls.
 
 ## Boundaries
 

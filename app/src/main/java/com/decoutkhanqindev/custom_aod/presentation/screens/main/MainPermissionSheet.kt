@@ -2,6 +2,7 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,13 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
+import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingHeader
 import com.decoutkhanqindev.custom_aod.presentation.components.AodsPermissionCard
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
 import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
@@ -125,31 +123,19 @@ private fun PermissionSheetBody(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
-            .padding(bottom = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(bottom = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(
-            text = stringResource(R.string.permission_sheet_title),
-            modifier = Modifier.semantics { heading() },
-            color = AodsColors.GreyED,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            style = AodsTypography.TitleLarge,
-        )
-
-        Text(
-            text = stringResource(R.string.permission_sheet_desc),
-            modifier = Modifier.padding(top = 8.dp),
-            color = AodsColors.Grey9A,
-            textAlign = TextAlign.Center,
-            style = AodsTypography.BodyMedium,
+        AodsOnboardingHeader(
+            title = stringResource(R.string.permission_sheet_title),
+            subtitle = stringResource(R.string.permission_sheet_desc),
+            modifier = Modifier.padding(top = 8.dp, bottom = 12.dp),
         )
 
         permissions.forEach { permission ->
             AodsPermissionCard(
                 permission = permission,
                 onAllowClick = { onIntent(MainIntent.OpenPermissionSettings(permission.permission)) },
-                modifier = Modifier.padding(top = 12.dp),
                 containerColor = AodsColors.Black,
             )
         }
@@ -158,7 +144,7 @@ private fun PermissionSheetBody(
             onClick = { onIntent(MainIntent.DismissPermissionSheet) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = 8.dp)
                 .heightIn(min = 56.dp),
         ) {
             Text(text = stringResource(R.string.action_later))

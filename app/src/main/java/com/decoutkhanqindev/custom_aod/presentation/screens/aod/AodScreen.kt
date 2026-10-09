@@ -2,7 +2,7 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.aod
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
@@ -30,11 +30,11 @@ fun AodScreen(
         }
     }
 
-    LaunchedEffect(state.isDark) {
+    SideEffect(state.isDark) {
         onDarkChange(state.isDark)
     }
 
-    LaunchedEffect(state.isDimmed) {
+    SideEffect(state.isDimmed) {
         onDimChange(state.isDimmed)
     }
 
