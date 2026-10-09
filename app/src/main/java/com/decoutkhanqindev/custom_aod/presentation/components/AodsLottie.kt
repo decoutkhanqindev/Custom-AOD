@@ -1,7 +1,6 @@
 package com.decoutkhanqindev.custom_aod.presentation.components
 
 import androidx.annotation.RawRes
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier

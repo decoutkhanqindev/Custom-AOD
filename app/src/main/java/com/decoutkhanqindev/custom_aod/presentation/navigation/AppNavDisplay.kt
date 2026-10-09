@@ -19,7 +19,6 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.main.MainScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.permission.PermissionScreen
 import com.decoutkhanqindev.custom_aod.presentation.screens.splash.SplashScreen
 import com.decoutkhanqindev.custom_aod.utils.navigateBack
-import com.decoutkhanqindev.custom_aod.utils.openSettingsPage
 import com.decoutkhanqindev.custom_aod.utils.openWifiSettings
 import org.koin.compose.koinInject
 

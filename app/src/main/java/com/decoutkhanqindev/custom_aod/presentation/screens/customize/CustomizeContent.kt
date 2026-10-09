@@ -91,8 +91,8 @@ import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
 import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
-import kotlin.math.roundToInt
 import kotlinx.collections.immutable.persistentListOf
+import kotlin.math.roundToInt
 
 @Composable
 fun CustomizeContent(
