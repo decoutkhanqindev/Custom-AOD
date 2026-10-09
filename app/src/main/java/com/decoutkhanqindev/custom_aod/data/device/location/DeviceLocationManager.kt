@@ -28,7 +28,7 @@ class DeviceLocationManager(
         }
         return withContextCatching(
             context = Dispatchers.IO,
-            action = {
+            block = {
                 val location = withTimeoutOrNull(LOCATION_TIMEOUT_MILLIS) { requestCurrentLocation() }
                     ?: lastKnownLocation()
                 location?.let { Coordinates(latitude = it.latitude, longitude = it.longitude) }

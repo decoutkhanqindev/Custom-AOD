@@ -21,7 +21,7 @@ class CalendarRepositoryImpl(
     override suspend fun getEvents(fromMillis: Long, toMillis: Long, limit: Int): List<CalendarEvent> =
         withContextCatching(
             context = Dispatchers.IO,
-            action = { queryEvents(fromMillis = fromMillis, toMillis = toMillis, limit = limit) },
+            block = { queryEvents(fromMillis = fromMillis, toMillis = toMillis, limit = limit) },
             catch = { e ->
                 Timber.tag(tag).w("Could not read calendar events: ${e.message}")
                 emptyList()

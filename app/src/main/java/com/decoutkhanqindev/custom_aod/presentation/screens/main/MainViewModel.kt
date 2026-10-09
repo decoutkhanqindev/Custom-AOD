@@ -214,7 +214,7 @@ class MainViewModel(
                     rules = rules,
                 )
             }.collectCatching(
-                action = { settings ->
+                block = { settings ->
                     updateState {
                         copy(
                             isLoading = false,
@@ -234,7 +234,7 @@ class MainViewModel(
     private fun observeBackground() {
         viewModelScope.launch {
             aodImageManager.hasBackground.filterNotNull().collectCatching(
-                action = { hasBackground -> updateState { copy(appearance = appearance.copy(hasBackground = hasBackground)) } },
+                block = { hasBackground -> updateState { copy(appearance = appearance.copy(hasBackground = hasBackground)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -243,7 +243,7 @@ class MainViewModel(
     private fun observeWallpaper() {
         viewModelScope.launch {
             dataStoreManager.aodWallpaper.filterNotNull().collectCatching(
-                action = { code ->
+                block = { code ->
                     updateState { copy(appearance = appearance.copy(wallpaper = WallpaperValue.fromCode(code))) }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
@@ -254,7 +254,7 @@ class MainViewModel(
     private fun observeExtras() {
         viewModelScope.launch {
             dataStoreManager.observeAodExtras().collectCatching(
-                action = { settings -> updateState { copy(extras = extras.copy(settings = settings)) } },
+                block = { settings -> updateState { copy(extras = extras.copy(settings = settings)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -263,7 +263,7 @@ class MainViewModel(
     private fun observeDrawing() {
         viewModelScope.launch {
             aodImageManager.hasDrawing.filterNotNull().collectCatching(
-                action = { hasDrawing -> updateState { copy(extras = extras.copy(hasDrawing = hasDrawing)) } },
+                block = { hasDrawing -> updateState { copy(extras = extras.copy(hasDrawing = hasDrawing)) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -272,7 +272,7 @@ class MainViewModel(
     private fun observeLanguage() {
         viewModelScope.launch {
             dataStoreManager.selectedLangCode.filterNotNull().collectCatching(
-                action = { code ->
+                block = { code ->
                     updateState { copy(language = LanguageValue.fromCode(code).toUiModel(languageManager)) }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
@@ -283,7 +283,7 @@ class MainViewModel(
     private fun observeLastWake() {
         viewModelScope.launch {
             dataStoreManager.aodLastWake.filterNotNull().collectCatching(
-                action = { code ->
+                block = { code ->
                     updateState { copy(lastWakeMessageRes = WakeResultValue.fromCode(code).messageRes) }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },

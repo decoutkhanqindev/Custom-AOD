@@ -90,7 +90,7 @@ class NotificationStateManager(
     ) {
         scope.launch {
             withContextCatching(
-                action = {
+                block = {
                     val lockScreen = readLockScreenPolicy()
                     val shown = active
                         .mapNotNull { sbn ->

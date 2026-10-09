@@ -144,7 +144,7 @@ class AodViewModel(
                 batteryStateManager.isCharging.filterNotNull(),
             ) { percent, isCharging -> BatteryUiModel(percent = percent, isCharging = isCharging) }
                 .collectCatching(
-                    action = { battery ->
+                    block = { battery ->
                         updateState { copy(battery = battery) }
                         checkRules()
                     },
@@ -156,7 +156,7 @@ class AodViewModel(
     private fun observePlugged() {
         viewModelScope.launch {
             batteryStateManager.isPlugged.filterNotNull().collectCatching(
-                action = { isPlugged ->
+                block = { isPlugged ->
                     this@AodViewModel.isPlugged = isPlugged
                     checkRules()
                 },
@@ -173,7 +173,7 @@ class AodViewModel(
                 .drop(1)
                 .filter { isBusy -> isBusy }
                 .collectCatching(
-                    action = { closeAod() },
+                    block = { closeAod() },
                     catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
                 )
         }
@@ -182,7 +182,7 @@ class AodViewModel(
     private fun observeNotifications() {
         viewModelScope.launch {
             notificationStateManager.notifications.collectCatching(
-                action = { notifications ->
+                block = { notifications ->
                     updateState { copy(notifications = notifications.toAodNotificationsUiModel(notificationOptions)) }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
@@ -194,7 +194,7 @@ class AodViewModel(
     private fun observeAlerts() {
         viewModelScope.launch {
             notificationStateManager.alerts.collectCatching(
-                action = { notification -> if (!state.value.isDark) glow(notification.glowColorArgb()) },
+                block = { notification -> if (!state.value.isDark) glow(notification.glowColorArgb()) },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -203,7 +203,7 @@ class AodViewModel(
     private fun observeMedia() {
         viewModelScope.launch {
             mediaStateManager.playback.collectCatching(
-                action = { playback -> updateState { copy(media = playback?.toUiModel()) } },
+                block = { playback -> updateState { copy(media = playback?.toUiModel()) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -212,7 +212,7 @@ class AodViewModel(
     private fun observeFlashlight() {
         viewModelScope.launch {
             flashlightManager.isOn.collectCatching(
-                action = { isOn -> updateState { copy(isFlashlightOn = isOn) } },
+                block = { isOn -> updateState { copy(isFlashlightOn = isOn) } },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -232,7 +232,7 @@ class AodViewModel(
                 }
                 .distinctUntilChanged()
                 .collectLatestCatching(
-                    action = { isDarkRoom ->
+                    block = { isDarkRoom ->
                         if (isDarkRoom == null || isDarkRoom == state.value.isDimmed) return@collectLatestCatching
                         delay(LIGHT_SETTLE_MILLIS)
                         updateState { copy(isDimmed = isDarkRoom) }
@@ -261,7 +261,7 @@ class AodViewModel(
     private fun observeWeather() {
         viewModelScope.launch {
             observeWeatherUseCase().collectCatching(
-                action = { savedWeather ->
+                block = { savedWeather ->
                     val nowMillis = System.currentTimeMillis()
                     updateState {
                         copy(
@@ -328,7 +328,7 @@ class AodViewModel(
     private fun observeProximity() {
         viewModelScope.launch {
             proximityManager.isNear.collectLatestCatching(
-                action = { isNear ->
+                block = { isNear ->
                     if (isNear) {
                         if (isCovered) return@collectLatestCatching
                         delay(COVER_DELAY_MILLIS)

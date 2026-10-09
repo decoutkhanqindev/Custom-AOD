@@ -43,7 +43,7 @@ class MediaStateManager(
     init {
         scope.launch {
             notificationStateManager.mediaSessionToken.collectCatching(
-                action = { token -> attach(token) },
+                block = { token -> attach(token) },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }

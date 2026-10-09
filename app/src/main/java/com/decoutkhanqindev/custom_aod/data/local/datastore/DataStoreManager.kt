@@ -391,7 +391,7 @@ class DataStoreManager(
     private fun edit(transform: (MutablePreferences) -> Unit) {
         scope.launch {
             withContextCatching(
-                action = { app.prefs.edit(transform) },
+                block = { app.prefs.edit(transform) },
                 catch = { throwable ->
                     Timber.tag(tag).e("DataStore edit failed: ${throwable.stackTraceToString()}")
                 },

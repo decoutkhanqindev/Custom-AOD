@@ -53,6 +53,6 @@ fun AodsNoInternetDialog(modifier: Modifier = Modifier, onOpenSettings: () -> Un
 @Composable
 private fun AodsNoInternetDialogPreview() {
     AodsTheme {
-        AodsNoInternetDialog()
+        AodsNoInternetDialog {}
     }
 }

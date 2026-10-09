@@ -41,7 +41,7 @@ class WeatherRepositoryImpl(
 
     // Lỗi (chưa định vị được, mất mạng, API lỗi) thì giữ bản đã lưu; hàm suspend của Retrofit tự chạy ngoài main thread nên không đổi dispatcher.
     override suspend fun refreshWeather(): Unit = withContextCatching(
-        action = {
+        block = {
             val coordinates = checkNotNull(deviceLocationManager.currentCoarseLocation()) {
                 "Location is unavailable (no permission, or location is off)"
             }

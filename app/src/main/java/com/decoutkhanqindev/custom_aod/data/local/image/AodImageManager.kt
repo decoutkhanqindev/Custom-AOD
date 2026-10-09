@@ -37,7 +37,7 @@ class AodImageManager(
     init {
         scope.launch {
             withContextCatching(
-                action = {
+                block = {
                     _hasBackground.value = backgroundFile.exists()
                     _hasDrawing.value = drawingFile.exists()
                 },
@@ -49,7 +49,7 @@ class AodImageManager(
     // Lưu bản sao đã thu về cỡ màn hình: Photo Picker chỉ cho đọc tạm thời, và AOD giải mã ảnh nhỏ nhanh hơn ảnh gốc.
     suspend fun saveBackground(uri: String): Boolean = withContextCatching(
         context = Dispatchers.IO,
-        action = {
+        block = {
             val bitmap = decodeScaled(uri)
             try {
                 writeAtomically(file = backgroundFile, bitmap = bitmap, format = Bitmap.CompressFormat.JPEG)
@@ -68,7 +68,7 @@ class AodImageManager(
     // Màn thử tùy chỉnh giữ ảnh trong bộ nhớ làm bản nháp, chỉ ghi file khi user bấm Áp dụng.
     suspend fun decodeBackground(uri: String): Bitmap? = withContextCatching(
         context = Dispatchers.IO,
-        action = { decodeScaled(uri) },
+        block = { decodeScaled(uri) },
         catch = { e ->
             Timber.tag(tag).e("Could not decode the background image: ${e.stackTraceToString()}")
             null
@@ -77,7 +77,7 @@ class AodImageManager(
 
     suspend fun saveBackground(bitmap: Bitmap): Boolean = withContextCatching(
         context = Dispatchers.IO,
-        action = {
+        block = {
             writeAtomically(file = backgroundFile, bitmap = bitmap, format = Bitmap.CompressFormat.JPEG)
             _hasBackground.value = true
             true
@@ -97,7 +97,7 @@ class AodImageManager(
     // PNG giữ nền trong suốt để AOD tô nét vẽ theo màu đồng hồ.
     suspend fun saveDrawing(bitmap: Bitmap): Boolean = withContextCatching(
         context = Dispatchers.IO,
-        action = {
+        block = {
             writeAtomically(file = drawingFile, bitmap = bitmap, format = Bitmap.CompressFormat.PNG)
             _hasDrawing.value = true
             true
@@ -123,7 +123,7 @@ class AodImageManager(
 
     private suspend fun load(file: File): Bitmap? = withContextCatching(
         context = Dispatchers.IO,
-        action = { if (file.exists()) BitmapFactory.decodeFile(file.path) else null },
+        block = { if (file.exists()) BitmapFactory.decodeFile(file.path) else null },
         catch = { e ->
             Timber.tag(tag).e("Could not load ${file.name}: ${e.stackTraceToString()}")
             null
@@ -133,7 +133,7 @@ class AodImageManager(
     private fun remove(file: File, hasFile: MutableStateFlow<Boolean?>) {
         scope.launch {
             withContextCatching(
-                action = {
+                block = {
                     file.delete()
                     hasFile.value = false
                 },

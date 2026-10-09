@@ -57,7 +57,7 @@ class AodService : Service(), Tag {
         super.onCreate()
         scope.launch {
             screenStateManager.events.collectCatching(
-                action = { event ->
+                block = { event ->
                     when (event) {
                         Intent.ACTION_SCREEN_OFF -> onScreenOff()
                         Intent.ACTION_USER_PRESENT -> onUserPresent()
@@ -71,7 +71,7 @@ class AodService : Service(), Tag {
                 .filterNotNull()
                 .distinctUntilChanged()
                 .collectCatching(
-                    action = { startInForeground() },
+                    block = { startInForeground() },
                     catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
                 )
         }

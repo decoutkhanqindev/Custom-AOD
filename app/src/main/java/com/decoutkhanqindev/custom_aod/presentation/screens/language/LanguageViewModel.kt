@@ -63,7 +63,7 @@ class LanguageViewModel(
     private fun observeAppliedLanguage() {
         viewModelScope.launch {
             dataStoreManager.selectedLangCode.filterNotNull().collectCatching(
-                action = { code ->
+                block = { code ->
                     val appliedLanguage = LanguageValue.fromCode(code)
                     updateState {
                         copy(appliedLanguage = appliedLanguage, selectedLanguage = selectedLanguage ?: appliedLanguage)

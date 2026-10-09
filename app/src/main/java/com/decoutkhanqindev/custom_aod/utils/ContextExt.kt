@@ -18,11 +18,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.decoutkhanqindev.custom_aod.presentation.MainActivity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
-import kotlin.coroutines.cancellation.CancellationException
 
 fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, message, duration).show()
@@ -121,22 +121,24 @@ fun Context.returnAppWhen(
     val scope = (this.findActivity() as? LifecycleOwner)?.lifecycleScope
         ?: ProcessLifecycleOwner.get().lifecycleScope
     scope.launch {
-        try {
-            val canReturnApp = withTimeoutOrNull(timeoutMs) {
-                delay(FIRST_POLL_DELAY_MS)
-                while (!condition()) delay(POLL_INTERVAL_MS)
-            } != null
-            if (canReturnApp) {
-                appContext.startActivity(
-                    Intent(appContext, MainActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "checkSettingOn failed")
-        }
+        withContextCatching(
+            context = Dispatchers.IO,
+            block = {
+                val canReturnApp = withTimeoutOrNull(timeoutMs) {
+                    delay(FIRST_POLL_DELAY_MS)
+                    while (!condition()) delay(POLL_INTERVAL_MS)
+                } != null
+                if (canReturnApp) {
+                    withContext(Dispatchers.Main) {
+                        appContext.startActivity(
+                            Intent(appContext, MainActivity::class.java)
+                                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    }
+                }
+            },
+            catch = {}
+        )
     }
 }
 

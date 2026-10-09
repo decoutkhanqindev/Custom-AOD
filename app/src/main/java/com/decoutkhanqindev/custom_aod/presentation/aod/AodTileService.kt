@@ -31,7 +31,7 @@ class AodTileService : TileService(), Tag {
         listeningJob?.cancel()
         listeningJob = scope.launch {
             dataStoreManager.isAodEnabled.filterNotNull().collectCatching(
-                action = { isEnabled -> renderTile(isEnabled) },
+                block = { isEnabled -> renderTile(isEnabled) },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
