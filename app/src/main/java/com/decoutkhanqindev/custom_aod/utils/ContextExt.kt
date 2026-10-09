@@ -122,19 +122,17 @@ fun Context.returnAppWhen(
         ?: ProcessLifecycleOwner.get().lifecycleScope
     scope.launch {
         withContextCatching(
-            context = Dispatchers.IO,
+            context = Dispatchers.Main,
             block = {
                 val canReturnApp = withTimeoutOrNull(timeoutMs) {
                     delay(FIRST_POLL_DELAY_MS)
                     while (!condition()) delay(POLL_INTERVAL_MS)
                 } != null
                 if (canReturnApp) {
-                    withContext(Dispatchers.Main) {
-                        appContext.startActivity(
-                            Intent(appContext, MainActivity::class.java)
-                                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    }
+                    appContext.startActivity(
+                        Intent(appContext, MainActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
                 }
             },
             catch = {}
