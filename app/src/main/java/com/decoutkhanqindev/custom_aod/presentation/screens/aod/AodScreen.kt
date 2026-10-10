@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.decoutkhanqindev.custom_aod.presentation.components.LocalTag
 import com.decoutkhanqindev.custom_aod.presentation.components.aod.AodContent
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
 import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
@@ -23,13 +24,14 @@ fun AodScreen(
     onDimChange: (Boolean) -> Unit,
     onClose: () -> Unit,
 ) {
+    val tag = LocalTag.current
     val viewModel: AodViewModel = koinViewModel { parametersOf(isPreview) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedWithLifecycleEffect {
         viewModel.effect.filterIsInstance<AodEffect.CloseAod>().collectCatching(
             block = { onClose() },
-            catch = { e -> Timber.tag("AodScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 

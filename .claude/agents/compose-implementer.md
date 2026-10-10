@@ -35,7 +35,7 @@ animation polish, token discipline, and adherence to project patterns — never 
   launchers and `NavBackStack`. Content is pure UI: it receives `state` + `onIntent` (+ ad slots)
   and nothing else.
 - **Navigation 3.** `NavKey` destinations in `navigation/AppDestinations.kt`,
-  `entry<XxxDestination>` in `AppNavDisplay`. navigation-compose is banned.
+  `screen<XxxDestination>` in `AppNavDisplay`. navigation-compose is banned.
 - **Theme is always dark** (no light scheme). The AOD screen (`screens/aod/`) draws without the app
   theme on purpose (CLAUDE.md § 14, § 20).
 - **Design system `Aods`** (CLAUDE.md § 14), based on the Lich-Viet-Loc-Phat theme pattern:
@@ -53,7 +53,7 @@ animation polish, token discipline, and adherence to project patterns — never 
   `Modifier.toggleable` with a `Role` for radio / switch rows; never raw `Modifier.clickable`.
 - **Text and comments.** All text in `res/values/strings.xml` with a Vietnamese copy in
   `values-vi/`; UI code has no comments; other code gets one-line Vietnamese "why" comments.
-- **Compose files declare no top-level `val` / `const val` / helper classes** (CLAUDE.md § 15).
+- **Compose files declare no top-level `val` / `const val` / helper classes** (CLAUDE.md § 15); the one exception is a shared `LocalXxx` CompositionLocal in `presentation/components/` (`LocalTag`: `val tag = LocalTag.current`, then `Timber.tag(tag)`).
 - **Dependencies and manifest permissions** need the user's approval before they are added (
   CLAUDE.md hard rules).
 - **Done means:** `./gradlew :app:compileDebugKotlin` passes and every grep command in CLAUDE.md §
@@ -149,7 +149,7 @@ Before writing a single line of Compose, confirm `:app` can compile what you pla
   `*Recreation.kt` filename.
 - **Full screen stack**: `state/{XxxState, XxxIntent, XxxEffect}` + `XxxViewModel` (BaseViewModel) +
   `XxxScreen` + `XxxContent` + Koin `viewModel { }` in `di/AppModule.kt` + `XxxDestination` NavKey +
-  `entry<XxxDestination>` in `AppNavDisplay`.
+  `screen<XxxDestination>` in `AppNavDisplay`.
 - **Showcase**: gallery aggregating all built components/screens.
 
 ### 4. Scout existing patterns
@@ -224,7 +224,7 @@ fun {Name}(
 **Screen + Content separation (full screen stack):**
 
 - `*Screen.kt`: `koinViewModel()`, `collectAsStateWithLifecycle()`, one
-  `LaunchedWithLifecycleEffect { viewModel.effect.filterIsInstance<XxxEffect.<Cluster>>().collectCatching(block = { … }, catch = { e -> Timber.tag("XxxScreen").e(e.stackTraceToString()) }) }`
+  `LaunchedWithLifecycleEffect { viewModel.effect.filterIsInstance<XxxEffect.<Cluster>>().collectCatching(block = { … }, catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) }) }`
   per effect cluster (exhaustive `when` inside, no `else`; a cluster with one effect filters on that
   effect and drops the `when`), activity-result launchers, navigation via
   `NavBackStack.navigateTo(...)`; calls `XxxContent(state = state, onIntent = viewModel::onIntent)`.

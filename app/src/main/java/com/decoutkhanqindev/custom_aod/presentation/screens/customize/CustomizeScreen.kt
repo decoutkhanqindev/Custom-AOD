@@ -15,6 +15,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodNotificationListener
+import com.decoutkhanqindev.custom_aod.presentation.components.LocalTag
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
 import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.permission.isGranted
@@ -35,6 +36,7 @@ import timber.log.Timber
 fun CustomizeScreen(backStack: NavBackStack<NavKey>) {
     val context = LocalContext.current
     val resources = LocalResources.current
+    val tag = LocalTag.current
     val viewModel: CustomizeViewModel = koinViewModel()
     val permissionManager: PermissionManager = koinInject()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -60,7 +62,7 @@ fun CustomizeScreen(backStack: NavBackStack<NavKey>) {
                 block = {
                     backgroundPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 },
-                catch = { e -> Timber.tag("CustomizeScreen").e(e.stackTraceToString()) },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
     }
 
@@ -80,7 +82,7 @@ fun CustomizeScreen(backStack: NavBackStack<NavKey>) {
                         }
                 }
             },
-            catch = { e -> Timber.tag("CustomizeScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 
@@ -98,7 +100,7 @@ fun CustomizeScreen(backStack: NavBackStack<NavKey>) {
                     is CustomizeEffect.Navigation.NavigateBack -> backStack.navigateBack()
                 }
             },
-            catch = { e -> Timber.tag("CustomizeScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 
@@ -107,7 +109,7 @@ fun CustomizeScreen(backStack: NavBackStack<NavKey>) {
             block = { effect ->
                 context.showToast(resources.getString(effect.messageRes))
             },
-            catch = { e -> Timber.tag("CustomizeScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 

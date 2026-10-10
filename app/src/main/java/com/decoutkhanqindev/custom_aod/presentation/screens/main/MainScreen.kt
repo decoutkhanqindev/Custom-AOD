@@ -17,6 +17,7 @@ import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodActivity
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodNotificationListener
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
+import com.decoutkhanqindev.custom_aod.presentation.components.LocalTag
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
 import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.permission.areMiuiPermissionsGranted
@@ -39,6 +40,7 @@ import timber.log.Timber
 fun MainScreen(backStack: NavBackStack<NavKey>) {
     val context = LocalContext.current
     val resources = LocalResources.current
+    val tag = LocalTag.current
     val viewModel: MainViewModel = koinViewModel()
     val permissionManager: PermissionManager = koinInject()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -71,7 +73,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                     is MainEffect.Service.StopAodService -> AodService.stop(context)
                 }
             },
-            catch = { e -> Timber.tag("MainScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 
@@ -81,7 +83,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                 block = {
                     backgroundPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 },
-                catch = { e -> Timber.tag("MainScreen").e(e.stackTraceToString()) },
+                catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
     }
 
@@ -122,7 +124,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                         locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
                 }
             },
-            catch = { e -> Timber.tag("MainScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 
@@ -139,7 +141,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
                     is MainEffect.Navigation.OpenPreview -> AodActivity.preview(context)
                 }
             },
-            catch = { e -> Timber.tag("MainScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 
@@ -148,7 +150,7 @@ fun MainScreen(backStack: NavBackStack<NavKey>) {
             block = { effect ->
                 context.showToast(resources.getString(effect.messageRes))
             },
-            catch = { e -> Timber.tag("MainScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 

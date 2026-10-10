@@ -13,6 +13,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
+import com.decoutkhanqindev.custom_aod.presentation.components.LocalTag
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
 import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 import com.decoutkhanqindev.custom_aod.presentation.model.permission.areMiuiPermissionsGranted
@@ -33,6 +34,7 @@ import timber.log.Timber
 @Composable
 fun PermissionScreen(backStack: NavBackStack<NavKey>) {
     val context = LocalContext.current
+    val tag = LocalTag.current
     val viewModel: PermissionViewModel = koinViewModel()
     val permissionManager: PermissionManager = koinInject()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -73,7 +75,7 @@ fun PermissionScreen(backStack: NavBackStack<NavKey>) {
                     is PermissionEffect.NavigateBack -> backStack.navigateBack()
                 }
             },
-            catch = { e -> Timber.tag("PermissionScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 

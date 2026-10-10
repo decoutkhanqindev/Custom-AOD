@@ -163,7 +163,6 @@ fun Context.findActivity(): ComponentActivity? = when (this) {
     else -> null
 }
 
-private const val TAG = "SettingsReturn"
 private const val POLL_INTERVAL_MS = 200L
 private const val FIRST_POLL_DELAY_MS = 1_000L
 private const val DEFAULT_TIMEOUT_MS = 60_000L

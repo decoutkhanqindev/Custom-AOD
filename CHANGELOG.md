@@ -7,6 +7,21 @@ Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên c�
 ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file.
 Mã nguồn demo FakeAOD không nằm trong repo này.
 
+## [Chưa phát hành] – 2026-10-10 – `LocalTag` cho composable
+
+Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng.
+
+### Thêm
+
+- `LocalTag` và `AppTagProvider` (`components/AppTagProvider.kt`): tương đương interface `Tag` nhưng cho composable, đọc bằng `val tag = LocalTag.current` rồi `Timber.tag(tag)`.
+- `AppNavDisplay` có hàm bọc `screen<XxxDestination> { … }` thay cho `entry<>`: tự cấp `LocalTag` = tên class của destination (`MainDestination`, `CustomizeDestination`…), nên màn mới không phải tự đặt tên tag. `AodActivity` cấp `"AodScreen"` vì `AodScreen` nằm ngoài NavDisplay.
+
+### Thay đổi
+
+- `MainScreen`, `CustomizeScreen`, `PermissionScreen`, `LanguageScreen`, `AodScreen` log lỗi effect bằng `Timber.tag(tag)` từ `LocalTag` thay cho 12 chuỗi tên Screen viết cứng.
+- CLAUDE.md: thêm `LocalTag` vào bảng "Dùng cái có sẵn" và quy tắc log; quy tắc "file Compose không khai báo `val` cấp file" có ngoại lệ cho `LocalXxx` ở `presentation/components/`.
+- Các mục CHANGELOG cũ còn ghi "chưa chạy trên máy" đổi thành đã test.
+
 ## [Chưa phát hành] – 2026-10-10 – Loading khi Áp dụng ở màn Customize
 
 Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
@@ -206,7 +221,7 @@ dòng, đã test trên máy.
 
 Thêm bước "Thử tùy chỉnh AOD" vào onboarding lần đầu: Language → Customize → Permission. Không thêm
 quyền Manifest, không thêm thư viện. Build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh
-báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.
+báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thêm
 
@@ -248,7 +263,7 @@ báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.
 
 Commit `e743565` cho UI đọc theme qua `MaterialTheme.colorScheme / .typography / .shapes`; bản này
 đổi lại cho UI đọc thẳng các object, tránh đường vòng. Build được (`compileDebugKotlin`), lint 0
-lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy.
+lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -279,7 +294,7 @@ Siết lại bộ quyền bắt buộc theo thử nghiệm trên máy Xiaomi, ch
 màn quyền, theme đổi sang pattern phẳng của Lich-Viet-Loc-Phat (bỏ tầng token), đưa script sinh
 icon / Lottie vào repo. Không thêm quyền Manifest, không thêm thư viện. Bản này build được (
 `compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 27 lệnh grep của CLAUDE.md ra 0 dòng,
-nhưng chưa chạy trên máy.
+đã test trên máy.
 
 ### Thêm
 
@@ -347,7 +362,7 @@ nhưng chưa chạy trên máy.
 Làm lại giao diện Splash và Language theo hướng skill ui-ux-pro-max gợi ý (style Dark Mode OLED, giữ
 màu mint), thêm màn Permission sau Language ở lần đầu mở app. Không thêm quyền, không thêm thư viện.
 Bản này build được (`compileDebugKotlin`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của
-CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.
+CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thêm
 
@@ -400,8 +415,7 @@ Chuẩn bị cho đợt làm lại UI (style, theme). Không đổi code app.
 
 Đưa bộ skill của kotlin-accelerator-ai vào project và refactor UI theo chuẩn token của skill. Giá
 trị hình ảnh giữ nguyên nên giao diện không đổi. Không thêm quyền và thư viện. Bản này build được (
-`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của CLAUDE.md ra 0 dòng, nhưng
-chưa chạy trên máy.
+`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), 24 lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thêm
 
@@ -443,8 +457,7 @@ chưa chạy trên máy.
 ## [Chưa phát hành] – 2026-10-05 – Nội dung thông báo, ảnh nền AMOLED có sẵn
 
 Hai khoảng trống còn lại so với Always On AMOLED. Không thêm quyền và thư viện. Bản này build được (
-`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy
-trên máy (các bước kiểm tra mới: README › Kiểm tra trên máy thật, bước 40–41).
+`assembleDebug`), lint 0 lỗi (không có cảnh báo mới), grep của CLAUDE.md ra 0 dòng, đã test trên máy (theo các bước mới: README › Kiểm tra trên máy thật, bước 40–41).
 
 ### Thêm
 
@@ -473,8 +486,7 @@ Thời tiết, sự kiện hôm nay, ghi nhớ, hình vẽ nhanh. Thêm 2 quyề
 chọn tương ứng (`READ_CALENDAR`, `ACCESS_COARSE_LOCATION`), và thư viện Retrofit 3.0.0 + converter
 kotlinx-serialization, kotlinx-serialization-json 1.11.0 cho API thời tiết Open-Meteo. Lần đầu dùng
 tầng domain (UseCase, Repository). Bỏ qua widget và Tasker. Bản này build được (`assembleDebug`, R8
-của bản release), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm
-tra mới: README › Kiểm tra trên máy thật, bước 35–39).
+của bản release), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, đã test trên máy (theo các bước mới: README › Kiểm tra trên máy thật, bước 35–39).
 
 ### Thêm
 
@@ -524,8 +536,7 @@ tra mới: README › Kiểm tra trên máy thật, bước 35–39).
 
 Gán hành động cho thao tác và phím, đèn pin, tự giảm sáng theo cảm biến ánh sáng, nhấc máy để hiện
 lại đồng hồ. Không thêm quyền và thư viện: đèn pin dùng `setTorchMode`, không cần quyền `CAMERA`.
-Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước
-kiểm tra mới: README › Kiểm tra trên máy thật, bước 29–34).
+Bản này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, đã test trên máy (theo các bước mới: README › Kiểm tra trên máy thật, bước 29–34).
 
 ### Thêm
 
@@ -563,7 +574,7 @@ kiểm tra mới: README › Kiểm tra trên máy thật, bước 29–34).
 
 Mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang làm đồng hồ đêm. Không thêm quyền và thư viện: ảnh
 nền chọn bằng Photo Picker (không cần quyền đọc ảnh), font là họ font của hệ thống. Bản này build
-được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm tra mới:
+được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, đã test trên máy (theo các bước mới:
 README › Kiểm tra trên máy thật, bước 24–28).
 
 ### Thêm
@@ -617,8 +628,7 @@ README › Kiểm tra trên máy thật, bước 24–28).
 Ba tính năng dùng chung quyền "Truy cập thông báo" (`NotificationListenerService`): icon thông báo,
 viền sáng khi có thông báo mới, điều khiển nhạc. Không thêm thư viện và không thêm
 `uses-permission`; listener chỉ được khai báo là service do hệ thống bind. Bản này build được (
-`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm
-tra mới: README › Kiểm tra trên máy thật, bước 19–23).
+`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, đã test trên máy (theo các bước mới: README › Kiểm tra trên máy thật, bước 19–23).
 
 ### Thêm
 
@@ -662,8 +672,7 @@ tra mới: README › Kiểm tra trên máy thật, bước 19–23).
 
 Năm tính năng đầu trong danh sách còn thiếu so với Always On
 AMOLED ([COMPARISON.md](COMPARISON.md)). Không thêm quyền và thư viện nào. Bản này build được (
-`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy (các bước kiểm
-tra mới: README › Kiểm tra trên máy thật, bước 1 và 14–18).
+`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, đã test trên máy (theo các bước mới: README › Kiểm tra trên máy thật, bước 1 và 14–18).
 
 ### Thêm
 
@@ -726,7 +735,7 @@ Lõi AOD của FakeAOD được đưa vào
 base [Android-Base](https://github.com/decoutkhanqindev/Android-Base) (repo Custom-AOD) và refactor
 theo rule của base: tùy chọn vào `DataStoreManager`, tín hiệu thiết bị thành manager, màn đồng hồ và
 màn cài đặt theo MVI. Cơ chế lõi giữ như FakeAOD; các chỗ hành vi khác ghi ở mục "Khác FakeAOD". Bản
-này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng chưa chạy trên máy.
+này build được, lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thêm
 

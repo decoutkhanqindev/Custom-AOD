@@ -98,7 +98,7 @@ com.decoutkhanqindev.custom_aod/
     ├── MainActivity.kt            # requestConsent, áp locale (AppLanguageProvider), Theme, start AodService
     ├── aod/                       # runtime AOD: AodActivity · AodService · AodSession · BootReceiver · AodTileService · AodNotificationListener (mục 20)
     ├── base/BaseViewModel.kt      # MVI <State, Intent, Effect>
-    ├── components/                # dùng chung ≥ 2 màn, tên `AppXxx`: AppModifiers · AppLottie · AppLanguageProvider · AppTimeFormat · settings/AppSettingsRows (AppSectionHeader, AppSwitchRow…) · onboarding/AppOnboarding · permission/ (AppPermissionCard, AppPermissionSheet) · dialog/AppNoInternetDialog · aod/ (riêng AOD: AodContent + hiển thị AOD, AodExtrasDialogs, AodAppearancePickers)
+    ├── components/                # dùng chung ≥ 2 màn, tên `AppXxx`: AppModifiers · AppLottie · AppLanguageProvider · AppTagProvider (LocalTag) · AppTimeFormat · settings/AppSettingsRows (AppSectionHeader, AppSwitchRow…) · onboarding/AppOnboarding · permission/ (AppPermissionCard, AppPermissionSheet) · dialog/AppNoInternetDialog · aod/ (riêng AOD: AodContent + hiển thị AOD, AodExtrasDialogs, AodAppearancePickers)
     ├── effects/                   # LaunchedWithLifecycleEffect (collect flow theo lifecycle)
     ├── model/                     # UiModel + giá trị UI chia theo tính năng: aod/settings (AodOptions, AodExtras, AodInteraction, AodNotificationOptions, AodRules, AodSchedule, AodActionValue, AodGestureValue, ChargingRuleValue, ScheduleTimeValue) · aod/appearance (AodAppearance, ClockFace/Font/Color, Wallpaper) · aod/info (AodNotifications, Battery, Media, Weather, WeatherCondition, CalendarEvent, WakeResult) · customize/ · language/ · permission/ · onboarding/ · AnimationContentKey (dùng chung, ở gốc)
     ├── navigation/                # AppDestinations (NavKey) · AppNavDisplay (+ AppNoInternetDialog)
@@ -813,7 +813,8 @@ class XxxViewModel(
 @Composable
 fun XxxScreen(backStack: NavBackStack<NavKey>) {
     val context = LocalContext.current
-    val resources = LocalResources.current
+        val resources = LocalResources.current
+    val tag = LocalTag.current
     val viewModel: XxxViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -825,7 +826,7 @@ fun XxxScreen(backStack: NavBackStack<NavKey>) {
                     is XxxEffect.ShowMessage -> context.showToast(resources.getString(effect.messageRes))
                 }
             },
-            catch = { e -> Timber.tag("XxxScreen").e(e.stackTraceToString()) },
+            catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
         )
     }
 
@@ -883,7 +884,7 @@ navigation-compose (`NavHost`, `NavController`, route string).
   `NavDisplay(entries = rememberDecoratedNavEntries(...))` với **đủ 2 decorator**:
   `rememberSaveableStateHolderNavEntryDecorator()` (thiếu → mất `rememberSaveable`) +
   `rememberViewModelStoreNavEntryDecorator()` (thiếu → ViewModel không clear khi pop).
-- Màn mới = thêm `entry<XxxDestination> { dest -> XxxScreen(...) }`.
+- Màn mới = thêm `screen<XxxDestination> { dest -> XxxScreen(...) }` (hàm bọc `entry` trong `AppNavDisplay`, tự cấp `LocalTag` = tên class của destination).
   `onBack = { backStack.navigateBack() }`.
 - Root `AppNavDisplay` chỉ chứa màn full-screen; tab nằm ở NavDisplay
   lồng ([11.5](#115-nested-navigation-bottom-tab)). `AppNoInternetDialog` render sau `NavDisplay`.
@@ -1005,8 +1006,8 @@ private trong `AppBottomNavBar`; tab đang chọn so theo `::class`.
   `collectLatestCatching(block = …, catch = …)`, không `.collectLatest { }` thô: chờ che 3 giây của
   tiệm cận, chờ ánh sáng ổn định 2 giây.
 - Collect `effect` của ViewModel trong Screen cũng qua `collectCatching`:
-  `viewModel.effect.filterIsInstance<…>().collectCatching(block = …, catch = { e -> Timber.tag("XxxScreen").e(e.stackTraceToString()) })` (
-  khung [mục 10.4](#104-screen-vs-content); Screen không implement `Tag` nên tag là tên Screen). Lỗi
+  `viewModel.effect.filterIsInstance<…>().collectCatching(block = …, catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) })` (
+  khung [mục 10.4](#104-screen-vs-content); Screen đọc `val tag = LocalTag.current` (tên class của `XxxDestination`)). Lỗi
   ném ra trong thân xử lý (mở màn cài đặt, start service…) được log thay vì làm crash app; khối đó
   dừng cho tới lần vào lại STARTED kế tiếp.
 - Chỉ 1 chỗ được collect thô (grep ở [mục 18](#18-banned-patterns) loại trừ đúng chỗ này):
@@ -1140,6 +1141,7 @@ private trong `AppBottomNavBar`; tab đang chọn so theo `::class`.
 | Tự kéo app về khi user làm xong ở app Cài đặt (poll mỗi 200 ms, tối đa 60 giây): trang cấp quyền tự gọi sau khi mở, mạng thì `openWifiSettings { … }`                                                                                                                                                                                          | `context.returnAppWhen { điều kiện }`; điều kiện của quyền: `permissionManager.isGranted(permission)` · `permissionManager.areMiuiPermissionsGranted()`                                                                                                                                                            | `utils/ContextExt.kt` · `presentation/model/permission/PermissionUiModel.kt` |
 | Áp ngôn ngữ đã chọn cho một Activity (`LocalConfiguration` / `LocalResources`)                                                                                                                                                                                                                                                                 | `setContent { AppLanguageProvider { … } }` — tự `koinInject` `DataStoreManager` (`selectedLangCode`) và `LanguageManager`                                                                                                                                                                                          | `components/AppLanguageProvider.kt`                                          |
 | Tag log                                                                                                                                                                                                                                                                                                                                        | `: Tag` (ViewModel không cần: `BaseViewModel` đã implement) → `Timber.tag(tag)`                                                                                                                                                                                                                                    | `utils/Tag.kt`                                                               |
+| Tag log trong composable | `val tag = LocalTag.current` → `Timber.tag(tag)`; `AppNavDisplay` cấp `LocalTag` = tên class của từng `XxxDestination`, `AodActivity` cấp `"AodScreen"` | `components/AppTagProvider.kt` |
 | Khung màn MVI                                                                                                                                                                                                                                                                                                                                  | copy `screens/main/`                                                                                                                                                                                                                                                                                               | `presentation/screens/main/`                                                 |
 
 Quy tắc:
@@ -1161,6 +1163,7 @@ Quy tắc:
       companion của UiModel (vd `AodOptionsUiModel.TIMEOUT_STEP_MINUTES`).
     - Pattern định dạng → `strings.xml` với `translatable="false"`.
     - Intent / hằng số của hệ thống → hàm trong `utils/ContextExt.kt`.
+  - `CompositionLocal` dùng chung (`LocalTag` trong `components/AppTagProvider.kt`) là ngoại lệ duy nhất: khai báo `val LocalXxx` cấp file ở `presentation/components/`, không ở Screen / Content.
     - Code cũ của base còn 2 chỗ chưa đổi: `ShimmerCosA` / `ShimmerSinA` trong `AppModifiers.kt`,
       `NativeAdColors` trong `NativeAdView.kt`. Token theme trong `presentation/theme/` không tính.
 
@@ -1179,7 +1182,7 @@ Quy tắc:
 ## 17. Logging, comment, test
 
 - Class cần log implement `Tag` (ViewModel không cần: `BaseViewModel` đã implement, lớp con không
-  khai báo lại) → `Timber.tag(tag).d/e(...)`; lỗi
+  khai báo lại) → `Timber.tag(tag).d/e(...)`; composable thì `val tag = LocalTag.current` rồi `Timber.tag(tag)`; lỗi
   `Timber.tag(tag).e(throwable.stackTraceToString())`. `Timber.DebugTree` chỉ plant ở debug.
 - Không comment mô tả "làm gì"; UI không comment. Chỉ giữ 1 dòng **tại sao** cho invariant không
   hiển nhiên (vd `onLost` của NetworkManager, `mutate()` drawable) và `// TODO:` cho chỗ project
@@ -1271,7 +1274,7 @@ grep -rn "^internal " app/src/main/java --include="*.kt"
 6. `presentation/model/<tính năng>/XxxUiModel.kt` (+ `toUiModel()`) nếu cần.
 7. `presentation/screens/xxx/` — copy khung `screens/main/` (State · Intent · Effect · ViewModel ·
    Content · Screen).
-8. `AppDestinations.kt` — `XxxDestination`; đăng ký `entry<XxxDestination>` ở `AppNavDisplay` (hoặc
+8. `AppDestinations.kt` — `XxxDestination`; đăng ký `screen<XxxDestination>` ở `AppNavDisplay` (hoặc
    NavDisplay lồng).
 9. Ad cho màn: placement `by lazy` trong `AdsManager` + `<PLACEMENT>_ALL_ID` ở `release {}`/
    `debug {}`; native/banner truyền slot từ Screen.
