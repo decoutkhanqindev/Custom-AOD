@@ -35,16 +35,14 @@ follow `CLAUDE.md`.
 
 - MVI: Content composables receive `state` + `onIntent` only; optimizations never move ViewModel /
   Koin / `NavBackStack` into Content. Inside Content, pass child composables the narrowest input (
-  one sub-state / sub-UiModel / field — CLAUDE.md § 10.2.2), not the whole State; read fast-changing
-  values (positions, animated colours) in draw / layout lambdas (CLAUDE.md § 14 "Màn nặng").
-- The AOD screen (`screens/aod/`) is not themed on purpose and its behaviour is pinned by
-  CLAUDE.md § 20 (first frame, burn-in shift, focus for volume keys, dark/dim rendering). Never
+  one sub-state / sub-UiModel / field — see CLAUDE.md › Presentation: MVI), not the whole State; read fast-changing values (positions, animated colours) in draw / layout lambdas.
+- The AOD screen (`screens/aod/`) is not themed on purpose and its behaviour is pinned by the comments in its code and README › Các quyết định thiết kế (first frame, burn-in shift, focus for volume keys, dark/dim rendering). Never
   trade those for an optimization.
 - Interactions use `Modifier.onClick`, or `selectable` / `toggleable` with a `Role`; never raw
   `clickable`.
 - UI code has no comments; text comes from `strings.xml`; Compose files declare no top-level `val` /
   `const val` / helper classes.
-- Done = `./gradlew :app:compileDebugKotlin` passes and the CLAUDE.md § 18 greps print 0 lines.
+- Done = `./gradlew :app:compileDebugKotlin` passes and `bash tools/check-rules.sh` reports 0 violations.
 
 ## Security
 
@@ -125,7 +123,7 @@ Constraints:
 
 Reference files (read-only context):
 - <path/to/file.kt>
-- CLAUDE.md sections: 14 Compose & theme, 15 Reuse, 18 Banned patterns (+ 20 AOD core when the target lives in `screens/aod/`)
+- CLAUDE.md (Compose và theme, Presentation: MVI) and `tools/check-rules.sh` (+ README › Các quyết định thiết kế when the target lives in `screens/aod/`)
 ```
 
 ### 6. Delegate to compose-implementer

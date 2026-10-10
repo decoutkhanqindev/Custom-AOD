@@ -9,27 +9,24 @@ có đồng hồ lên trên màn hình khóa, và Activity đó tự bật màn 
 Play đang làm, kể cả việc dùng quyền "Hiển thị trên ứng dụng khác".
 
 - Repo: [decoutkhanqindev/Custom-AOD](https://github.com/decoutkhanqindev/Custom-AOD).
-- Dựng từ base [Android-Base](https://github.com/decoutkhanqindev/Android-Base) (Compose · Clean
-  Architecture · MVI · Navigation 3 · Koin · Coroutines/Flow · AdMob + UMP). Lõi AOD lấy từ demo
-  FakeAOD rồi refactor theo rule của base.
+- Compose · Clean Architecture · MVI · Navigation 3 · Koin · Coroutines/Flow · AdMob + UMP.
 
 Tài liệu khác:
 
-- [CLAUDE.md](CLAUDE.md): rule kiến trúc của base, và mục 20 "AOD core" — luồng chạy, các điểm không
-  được đổi và lý do. Claude Code tự đọc file này.
+- [CLAUDE.md](CLAUDE.md): rule kiến trúc và quy ước code của project. Claude Code tự đọc file này.
 - [CHANGELOG.md](CHANGELOG.md): các thay đổi, kể cả lịch sử của FakeAOD.
 - [COMPARISON.md](COMPARISON.md): so sánh kỹ thuật và tính năng với Always On AMOLED.
 
 ## Trạng thái kiểm thử
 
-Custom AOD build được (`assembleDebug`), lint 0 lỗi, grep của CLAUDE.md ra 0 dòng, nhưng **chưa chạy
+Custom AOD build được (`assembleDebug`), lint 0 lỗi, `tools/check-rules.sh` ra 0 vi phạm, nhưng **chưa chạy
 trên máy**. Lõi đã được viết lại theo MVI và manager, giai đoạn 1 (quy tắc nguồn điện, khung giờ,
 mức độ sáng, ô Cài đặt nhanh, màn chọn ngôn ngữ), giai đoạn 2 (icon thông báo, viền sáng, điều khiển
 nhạc trên đồng hồ), giai đoạn 3 (mặt đồng hồ, font, màu, cỡ, ảnh nền, xoay ngang) và giai đoạn 4 (
 thao tác, đèn pin, tự giảm sáng, nhấc máy) mới được thêm (xem CHANGELOG), nên cần chạy lại toàn bộ
 mục "Kiểm tra trên máy thật".
 
-Kết quả của demo FakeAOD trước khi chuyển sang base:
+Kết quả của demo FakeAOD, trước khi viết lại theo kiến trúc hiện tại:
 
 | Máy                               | Hệ điều hành            | Kết quả                                                                                                                                                                   |
 |-----------------------------------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -70,7 +67,7 @@ Khi chạy bằng dòng lệnh:
 - `install -r` giữ nguyên các quyền đã cấp. Gỡ app rồi cài lại thì mất hết, kể cả hai quyền bắt
   buộc.
 - Bản release (`./gradlew assembleRelease`, R8 + shrink) cần thông tin ký trong `local.properties`,
-  xem mục "Dựng từ Android-Base".
+  xem mục "Còn phải làm".
 
 | Lệnh                                                 | Dùng để                      |
 |------------------------------------------------------|------------------------------|
@@ -164,7 +161,7 @@ Danh sách sau khi gộp manifest của các thư viện (kiểm bằng `aapt2 d
 | `RECEIVE_BOOT_COMPLETED`                                                               | Tự cấp                                  | `BootReceiver` chạy lại service sau khi khởi động máy                                |
 | `READ_CALENDAR`                                                                        | Hỏi lúc chạy, khi bật "Sự kiện hôm nay" | `CalendarRepositoryImpl` đọc sự kiện hôm nay (`CalendarContract.Instances`)          |
 | `ACCESS_COARSE_LOCATION`                                                               | Hỏi lúc chạy, khi bật "Thời tiết"       | `DeviceLocationManager` lấy vị trí gần đúng để tải thời tiết                         |
-| `INTERNET`, `ACCESS_NETWORK_STATE`                                                     | Tự cấp                                  | Quảng cáo và consent (AdMob, UMP), thời tiết (Open-Meteo), `NetworkManager` của base |
+| `INTERNET`, `ACCESS_NETWORK_STATE`                                                     | Tự cấp                                  | Quảng cáo và consent (AdMob, UMP), thời tiết (Open-Meteo), `NetworkManager`          |
 | `com.google.android.gms.permission.AD_ID`                                              | Tự cấp, do Google Mobile Ads thêm       | Mã quảng cáo                                                                         |
 | `ACCESS_ADSERVICES_AD_ID`, `ACCESS_ADSERVICES_ATTRIBUTION`, `ACCESS_ADSERVICES_TOPICS` | Tự cấp, do Google Mobile Ads thêm       | Privacy Sandbox trên Android                                                         |
 
@@ -336,8 +333,6 @@ thông báo ──▶ AodNotificationListener ──▶ NotificationStateManager
 đồng hồ mở, mỗi 15 phút ──▶ CalendarContract ──▶ sự kiện còn lại trong hôm nay
 ```
 
-Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20.1](CLAUDE.md#201-luồng).
-
 ## Cấu trúc mã nguồn
 
 Đường dẫn tính từ `app/src/main/java/com/decoutkhanqindev/custom_aod/`.
@@ -357,7 +352,7 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `presentation/model/` (chia theo `aod/`, `customize/`, `language/`, `permission/`, `onboarding/`)                                                                                                                                                   | `AodOptionsUiModel`, `AodRulesUiModel` (quy tắc hiện, dùng chung cho service và màn AOD), `AodScheduleUiModel`, `ChargingRuleValue`, `ScheduleTimeValue`, `LanguageUiModel`, `BatteryUiModel`, `PermissionValue`, `PermissionStatusValue`, `PermissionUiModel`, `WakeResultValue`, `AodExtrasUiModel`, `WeatherUiModel` (ẩn bản cũ từ 3 giờ), `WeatherConditionValue`, `CalendarEventUiModel`, `AodNotificationsUiModel` (icon và nội dung thông báo mới nhất), `WallpaperValue` (ảnh nền có sẵn) |
 | `presentation/components/AppLanguageProvider.kt`                                                                                                                                                                                                    | Áp ngôn ngữ đã chọn cho `MainActivity` và `AodActivity`                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `presentation/components/settings/AppSettingsRows.kt`                                                                                                                                                                                               | Các dòng cài đặt dùng chung (`AppSectionHeader`, `AppSwitchRow`, `AppRadioRow`, `AppValueRow`, `AppSliderRow`…)                                                                                                                                                                                                                                                                                                                                                                                   |
-| `presentation/theme/`                                                                                                                                                                                                                               | Design system `Aods` theo pattern Lich-Viet-Loc-Phat: `Colors.kt` (màu + biến thể alpha), `Typography.kt` (font Inter, `TextStyle`), `Shapes.kt` (bo góc) là các `val` cấp file, không bọc `object`, UI import từng tên rồi đọc thẳng, dp / sp viết số; `Theme { }` chỉ nối sang Material 3                                                                                                                                                                                                       |
+| `presentation/theme/`                                                                                                                                                                                                                               | Theme: `Colors.kt` (màu + biến thể alpha), `Typography.kt` (font Inter, `TextStyle`), `Shapes.kt` (bo góc) là các `val` cấp file, không bọc `object`, UI import từng tên rồi đọc thẳng, dp / sp viết số; `Theme { }` chỉ nối sang Material 3                                                                                                                                                                                                                                                      |
 | `presentation/MainActivity.kt`                                                                                                                                                                                                                      | Activity chính: consent, ngôn ngữ, theme, khởi động service                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `data/device/screen/ScreenStateManager.kt`                                                                                                                                                                                                          | Sự kiện tắt màn hình / mở khóa, màn hình có đang sáng, có khóa bảo mật, wake lock bật lại màn hình                                                                                                                                                                                                                                                                                                                                                                                                |
 | `data/device/battery/BatteryStateManager.kt`                                                                                                                                                                                                        | Phần trăm pin, trạng thái sạc, có đang cắm nguồn                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -366,7 +361,7 @@ Sơ đồ theo từng lớp (manager, ViewModel, Activity) ở [CLAUDE.md › 20
 | `data/device/notification/NotificationStateManager.kt`                                                                                                                                                                                              | Lọc thông báo hiện được trên đồng hồ, nạp sẵn icon, che nội dung như màn hình khóa của hệ thống, báo thông báo mới, giữ phiên nhạc của thông báo nhạc mới nhất                                                                                                                                                                                                                                                                                                                                    |
 | `data/device/media/MediaStateManager.kt`                                                                                                                                                                                                            | Bài đang phát và các nút điều khiển nhạc                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `data/device/permission/PermissionManager.kt`                                                                                                                                                                                                       | Đọc quyền overlay, thông báo, truy cập thông báo, lịch, vị trí gần đúng, và quyền riêng của Xiaomi                                                                                                                                                                                                                                                                                                                                                                                                |
-| `data/local/datastore/DataStoreManager.kt`                                                                                                                                                                                                          | Lưu tùy chọn AOD cùng các prefs của base                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `data/local/datastore/DataStoreManager.kt`                                                                                                                                                                                                          | Lưu tùy chọn AOD cùng các prefs của app                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `data/local/image/AodImageManager.kt`                                                                                                                                                                                                               | Lưu, đọc, xóa ảnh nền (bản sao JPEG đã thu nhỏ) và hình vẽ nhanh (PNG nền trong suốt)                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `data/device/flashlight/FlashlightManager.kt`                                                                                                                                                                                                       | Bật/tắt và theo dõi đèn pin                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `data/device/light/AmbientLightManager.kt`                                                                                                                                                                                                          | Cảm biến ánh sáng                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -398,7 +393,7 @@ Từ FakeAOD sang Custom AOD:
 | `AodPrefs.kt`          | Các key trong `DataStoreManager`                                                                                                      |
 | `MiuiPerm.kt`          | `PermissionManager` (đọc quyền) + `utils/ContextExt.kt` (`openMiuiPermissionSettings`, mở trang "Quyền khác")                         |
 | `SystemPages.kt`       | `utils/ContextExt.kt` (`registerSystemReceiver`, `openSettingsPage`, `openOverlaySettings`, `openNotificationSettings`, `packageUri`) |
-| `MainActivity.kt`      | `presentation/MainActivity.kt` của base, thêm khởi động service                                                                       |
+| `MainActivity.kt`      | `presentation/MainActivity.kt`, thêm khởi động service                                                                                |
 
 ## Các quyết định thiết kế
 
@@ -497,14 +492,14 @@ Từ FakeAOD sang Custom AOD:
   `noHistory` đóng AOD khi đó. App còn theo dõi `AudioManager` (`AudioStateManager`) để đóng sớm
   hơn, và không mở AOD khi đang có chuông, cuộc gọi hay báo thức. Không cần quyền
   `READ_PHONE_STATE`.
-- **Kiến trúc theo base:** tùy chọn là prefs nên nằm thẳng trong `DataStoreManager` (base cấm bọc
-  manager bằng Repository/UseCase chỉ để chuyển tiếp). Thời tiết và sự kiện là dữ liệu từ nguồn
-  ngoài app nên đi đủ đường ViewModel → UseCase → Repository; lỗi của nguồn dữ liệu được Repository
-  xử lý tại chỗ (ghi log, giữ bản cũ hoặc trả rỗng), không có lớp exception riêng. Mọi tín hiệu
-  thiết bị đi qua manager trong `data/device/`; các manager này chỉ đăng ký receiver hoặc cảm biến
-  khi có người dùng tới, để service chạy nền không nhận `BATTERY_CHANGED` liên tục. Logic của màn
-  đồng hồ nằm trong `AodViewModel`; mọi thao tác với cửa sổ nằm ở `AodActivity`, vì ViewModel không
-  được giữ `Context`. Chi tiết và các ngoại lệ ở [CLAUDE.md › 20](CLAUDE.md#20-aod-core).
+- **Kiến trúc:** tùy chọn là prefs nên nằm thẳng trong `DataStoreManager` (không bọc manager bằng
+  Repository/UseCase chỉ để chuyển tiếp). Thời tiết và sự kiện là dữ liệu từ nguồn ngoài app nên đi
+  đủ đường ViewModel → UseCase → Repository; lỗi của nguồn dữ liệu được Repository xử lý tại chỗ
+  (ghi log, giữ bản cũ hoặc trả rỗng), không có lớp exception riêng. Mọi tín hiệu thiết bị đi qua
+  manager trong `data/device/`; các manager này chỉ đăng ký receiver hoặc cảm biến khi có người dùng
+  tới, để service chạy nền không nhận `BATTERY_CHANGED` liên tục. Logic của màn đồng hồ nằm trong
+  `AodViewModel`; mọi thao tác với cửa sổ nằm ở `AodActivity`, vì ViewModel không được giữ
+  `Context`.
 
 ## Kiểm tra trên máy thật
 
@@ -650,7 +645,7 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
   Android khác.
 - **Mã quyền của Xiaomi** (10020, 10021) không có tài liệu chính thức và có thể đổi theo phiên bản
   HyperOS. Khi đó app hiện dấu "?" thay vì trạng thái.
-- **Màn hình cài đặt cần mạng** (Splash chờ consent, hộp thoại mất mạng của base). AOD không cần
+- **Màn hình cài đặt cần mạng** (Splash chờ consent, hộp thoại mất mạng). AOD không cần
   mạng, trừ thời tiết.
 - **Ô Cài đặt nhanh trên Android 15 trở lên** phải mở app mỗi lần bật AOD (xem "Các quyết định thiết
   kế"), đang khóa máy thì phải mở khóa trước.
@@ -683,7 +678,7 @@ Log của app đi qua Timber nên chỉ có ở bản debug. Cách đọc log:
   kiện vừa thêm hiện ở lần AOD sau, hoặc sau tối đa 15 phút nếu đồng hồ đang hiện.
 - **Hình vẽ nhanh** chỉ có một màu và không xoá từng nét; mở lại khung vẽ là vẽ hình mới.
 - **Form consent có thể hiện trên AOD** nếu nó tải xong đúng lúc AOD đang mở (rất hiếm), xem
-  CLAUDE.md › 20.5.
+  CLAUDE.md › Ads.
 
 ## targetSdk 37
 
@@ -700,7 +695,7 @@ theo `targetSdk` có liên quan tới app, đã rà từ Android 14 tới 17, v�
 | Android 15 (35) | App có quyền "Hiển thị trên ứng dụng khác" chỉ được khởi động foreground service từ nền khi đang có overlay hiển thị | Service chỉ được khởi động khi app ở tiền cảnh, hoặc từ `BOOT_COMPLETED` và `MY_PACKAGE_REPLACED` là hai trường hợp được miễn. Ô Cài đặt nhanh không được miễn: `AodService.start()` bắt lỗi và ô mở app |
 | Android 15 (35) | `BOOT_COMPLETED` không được khởi động một số loại foreground service                                                 | `specialUse` không thuộc danh sách bị chặn                                                                                                                                                               |
 | Android 16 (36) | Bỏ tùy chọn tắt edge-to-edge; bật sẵn predictive back                                                                | App không override `onBackPressed`. Back trong app do Navigation 3 xử lý                                                                                                                                 |
-| Android 16–17   | Màn hình lớn (sw ≥ 600dp) bỏ qua khóa hướng xoay và giới hạn kích thước                                              | `MainActivity` khóa dọc (theo base), nên trên màn hình lớn hệ thống bỏ qua khóa này. `AodActivity` chỉ khóa ngang khi bật "Luôn xoay ngang", và màn hình lớn cũng bỏ qua khóa đó                         |
+| Android 16–17   | Màn hình lớn (sw ≥ 600dp) bỏ qua khóa hướng xoay và giới hạn kích thước                                              | `MainActivity` khóa dọc, nên trên màn hình lớn hệ thống bỏ qua khóa này. `AodActivity` chỉ khóa ngang khi bật "Luôn xoay ngang", và màn hình lớn cũng bỏ qua khóa đó                                     |
 | Android 17 (37) | Siết mở Activity từ nền qua `PendingIntent` và `IntentSender` (`MODE_BACKGROUND_ACTIVITY_START_ALLOWED`)             | App không dùng đường này. AOD được mở trực tiếp nhờ quyền "Hiển thị trên ứng dụng khác"                                                                                                                  |
 | Android 17 (37) | Siết âm thanh khi chạy nền: phát, xin audio focus, đổi âm lượng                                                      | `AudioStateManager` chỉ đọc trạng thái (`getMode`, `getActivePlaybackConfigurations`) và đăng ký listener                                                                                                |
 | Android 17 (37) | Không sửa được field `static final` bằng reflection                                                                  | `PermissionManager` chỉ gọi method ẩn `checkOpNoThrow`. Method này được đánh dấu `@UnsupportedAppUsage` nhưng không giới hạn `targetSdk`                                                                 |
@@ -721,25 +716,15 @@ Nếu đưa lên Google Play:
   nó (icon, nội dung thông báo mới nhất khi bật, viền sáng, nhạc trên đồng hồ), và chính sách quyền
   riêng tư nên ghi rằng dữ liệu thông báo chỉ được xử lý trên máy, không gửi đi đâu.
 
-## Dựng từ Android-Base
+## Còn phải làm
 
-Project được tạo theo các bước "Tạo project mới từ base" của Android-Base:
-
-- Package / namespace / `applicationId` `com.decoutkhanqindev.android_base` →
-  `com.decoutkhanqindev.custom_aod`.
-- `rootProject.name` `Custom-AOD`, `app_name` "Custom AOD", file DataStore `custom_aod_prefs`,
-  `minSdk` 26 → 30.
-- Theme thay bằng bảng màu tối của FakeAOD; launcher icon thay bằng icon đồng hồ của FakeAOD.
-- Git: remote `origin` trỏ về repo Custom-AOD; lịch sử 2 commit của base vẫn giữ.
-
-Còn phải làm (tìm `TODO` trong Android Studio › View › Tool Windows › TODO):
+Tìm `TODO` trong Android Studio › View › Tool Windows › TODO:
 
 | Việc                               | Ở đâu                                                                                                          |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------|
 | AdMob App ID thật                  | `AndroidManifest.xml` › meta-data `com.google.android.gms.ads.APPLICATION_ID`                                  |
 | Ad unit id thật cho từng placement | `app/build.gradle.kts` › `release { buildConfigField("String", "<PLACEMENT>_ALL_ID", …) }` (debug giữ test id) |
 | Form consent                       | AdMob console › Privacy & messaging › publish message cho App ID thật                                          |
-| Onboarding (nếu cần)               | Sau màn chọn ngôn ngữ ở lần mở đầu tiên, CLAUDE.md › 5                                                         |
 | Font, type scale                   | `presentation/theme/Typography.kt`                                                                             |
 
 `local.properties` (đã gitignore):

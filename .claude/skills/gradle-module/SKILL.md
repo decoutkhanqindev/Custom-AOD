@@ -21,11 +21,11 @@ conventions before scaffolding — no hardcoded plugin aliases, namespaces, or D
 `CLAUDE.md` at the project root is the source of truth; when this skill and `CLAUDE.md` disagree,
 follow `CLAUDE.md`.
 
-- Custom-AOD is a single `:app` module by decision (CLAUDE.md § 1): layers are kept apart by
+- Custom-AOD is a single `:app` module by decision (CLAUDE.md › Kiến trúc): layers are kept apart by
   packages. Run this skill only when the user explicitly asks to add a module.
 - If a module is added anyway, mirror the house stack: Koin (no Hilt), Navigation 3 (no
   navigation-compose), MVI `BaseViewModel`, version catalog aliases from
-  `gradle/libs.versions.toml`, minSdk 30 / compileSdk 37, and update CLAUDE.md § 1.
+  `gradle/libs.versions.toml`, minSdk 30 / compileSdk 37, and update CLAUDE.md › Kiến trúc.
 
 ## Scope
 

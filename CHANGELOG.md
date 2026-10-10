@@ -3,9 +3,21 @@
 Các thay đổi đáng chú ý của Custom AOD. Định dạng dựa
 theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/).
 
-Project chưa phát hành (`versionName` vẫn là `v1.0.0` của base), nên các thay đổi được gom theo
-ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước khi chuyển sang base, giữ ở cuối file.
+Project chưa phát hành (`versionName` vẫn là `v1.0.0`), nên các thay đổi được gom theo
+ngày. Lịch sử của demo FakeAOD, nơi lõi AOD được làm ra trước, giữ ở cuối file.
 Mã nguồn demo FakeAOD không nằm trong repo này.
+
+## [Chưa phát hành] – 2026-10-10 – Gọn lại CLAUDE.md
+
+Build được (`compileDebugKotlin`), `tools/check-rules.sh` ra 0 vi phạm. Chỉ đổi tài liệu và script, không đổi code app.
+
+### Thay đổi
+
+- CLAUDE.md từ 1617 dòng (222 KB) còn 237 dòng (18 KB). Chỉ giữ thứ code không tự nói: Hard rules, quy tắc import giữa các layer, quy ước MVI / theme / coroutines / Manager / Navigation / onboarding, ads. Bỏ cây thư mục, bảng method của Manager, danh sách key DataStore, mã mẫu, bảng "Dùng cái có sẵn", lịch sử thử rồi bỏ theme, mô tả giao diện từng màn và bảng phiên bản thư viện (đã có trong `gradle/libs.versions.toml`). Bản cũ còn trong lịch sử git (commit `fe6efd1`).
+- Bỏ hẳn mục "AOD core" (39 bất biến và sơ đồ luồng) và không tạo `.claude/rules/`: lý do của từng điểm đã có trong comment ngay tại code (`AodService`, `AodActivity`, `AodSession`, `ScreenStateManager`, manifest) và README › Các quyết định thiết kế. CLAUDE.md chỉ giữ quy tắc không load ads trên `AodActivity` và một dòng trỏ tới hai nơi đó. Bản đầy đủ còn trong lịch sử git.
+- 32 lệnh grep kiểm tra chuyển từ CLAUDE.md sang `tools/check-rules.sh`: chạy `bash tools/check-rules.sh`, in dòng vi phạm kèm cách sửa, thoát mã 1 nếu có vi phạm. CLAUDE.md, agent `compose-implementer` và các skill gọi script thay vì "grep mục 18". Thêm `.gitattributes` giữ `*.sh` ở LF, vì `core.autocrlf=true` trên Windows sẽ đổi sang CRLF làm script lỗi.
+- Gỡ tham chiếu tới Android-Base, Lịch Việt, DexReader và kotlin-accelerator-ai: README (mục "Dựng từ Android-Base" đổi thành "Còn phải làm", bỏ hàng Onboarding vì đã có đủ 3 bước), COMPARISON, agent và skill.
+- Sửa các số mục CLAUDE.md đã lỗi thời trong agent và skill (nay trỏ theo tên mục). Sửa vài chỗ cũ đi kèm: agent còn ghi dp / thời lượng phải lấy từ token, `ui-ux-pro-max` còn nhắc `presentation/theme/tokens/` và font mặc định của Material 3.
 
 ## [Chưa phát hành] – 2026-10-10 – `LocalTag` cho composable
 

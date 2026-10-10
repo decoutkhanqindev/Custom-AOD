@@ -51,8 +51,7 @@ Usage: `{Prefix}Theme.colors.primary`, `{Prefix}Theme.spacing.screenPadding`
 
 ## Prefix Convention
 
-- `{Prefix}` = project-specific prefix (e.g., `App`, `Acme`); this project's prefix is written in
-  CLAUDE.md § 14
+- `{Prefix}` = project-specific prefix (e.g., `App`, `Acme`); this project uses no prefix (CLAUDE.md › Compose và theme)
 - Set once per project, used consistently across all token files
 - Templates use `{Prefix}` placeholder — replace on first use
 

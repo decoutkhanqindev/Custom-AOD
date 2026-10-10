@@ -29,7 +29,7 @@ animation polish, token discipline, and adherence to project patterns — never 
   `onIntent`, `updateState { copy(...) }`, `sendEffect(...)`. Files per screen:
   `screens/<feature>/XxxScreen.kt`, `XxxContent.kt`, `XxxViewModel.kt`,
   `state/{XxxState, XxxIntent, XxxEffect}.kt`; long Content splits into `XxxYyySection.kt` files (
-  see `screens/main/`). Intent/Effect names follow CLAUDE.md § 10.2.1.
+  see `screens/main/`). Intent/Effect names follow CLAUDE.md › Presentation: MVI.
 - **Screen vs Content.** Screen owns Koin (`koinViewModel()`, `koinInject()`),
   `collectAsStateWithLifecycle()`, effect collection in `LaunchedWithLifecycleEffect`, system
   launchers and `NavBackStack`. Content is pure UI: it receives `state` + `onIntent` (+ ad slots)
@@ -37,9 +37,8 @@ animation polish, token discipline, and adherence to project patterns — never 
 - **Navigation 3.** `NavKey` destinations in `navigation/AppDestinations.kt`,
   `screen<XxxDestination>` in `AppNavDisplay`. navigation-compose is banned.
 - **Theme is always dark** (no light scheme). The AOD screen (`screens/aod/`) draws without the app
-  theme on purpose (CLAUDE.md § 14, § 20).
-- **Design system `Aods`** (CLAUDE.md § 14), based on the Lich-Viet-Loc-Phat theme pattern:
-  `presentation/theme/` is flat, top-level `val`s per file, no wrapping `object` — `Colors.kt` (
+  theme on purpose (CLAUDE.md › Compose và theme).
+- **Theme** (CLAUDE.md › Compose và theme): `presentation/theme/` is flat, top-level `val`s per file, no wrapping `object` — `Colors.kt` (
   colours named by colour, alpha variants `<Colour>Alpha<NN>` like `MintAlpha12`), `Typography.kt` (
   `FontFamilyInter` + `TextStyle`s like `TitleMedium`, `BodyLarge`), `Shapes.kt` (
   `RoundedCornerShape8dp` / `12dp` / `16dp`). **UI imports each name and reads it directly** (
@@ -47,30 +46,26 @@ animation polish, token discipline, and adherence to project patterns — never 
   not through any accessor object. `Theme { }` only wraps `MaterialTheme` so Material 3 components
   get the app colours / font. **Spacing, icon sizes, borders, sizes, `sp`, durations, alpha are
   written as literals** (`16.dp`, `14.sp`, `tween(durationMillis = 600)`). No token layer or
-  detour (`Aods*Tokens`, `LocalAods…`, `Theme.xxx`, role names like `primary`, spacing / size
+  detour (`*Tokens` objects, theme `CompositionLocal`s, `Theme.xxx`, role names like `primary`, spacing / size
   objects) — never create one. The AOD screen is not wrapped in `Theme`.
 - **Interaction.** `Modifier.onClick` from `components/AppModifiers.kt`; `Modifier.selectable` /
   `Modifier.toggleable` with a `Role` for radio / switch rows; never raw `Modifier.clickable`.
 - **Text and comments.** All text in `res/values/strings.xml` with a Vietnamese copy in
   `values-vi/`; UI code has no comments; other code gets one-line Vietnamese "why" comments.
-- **Compose files declare no top-level `val` / `const val` / helper classes** (CLAUDE.md § 15); the one exception is a shared `LocalXxx` CompositionLocal in `presentation/components/` (`LocalTag`: `val tag = LocalTag.current`, then `Timber.tag(tag)`).
+- **Compose files declare no top-level `val` / `const val` / helper classes** (CLAUDE.md › Compose và theme); the one exception is a shared `LocalXxx` CompositionLocal in `presentation/components/` (`LocalTag`: `val tag = LocalTag.current`, then `Timber.tag(tag)`).
 - **Dependencies and manifest permissions** need the user's approval before they are added (
   CLAUDE.md hard rules).
-- **Done means:** `./gradlew :app:compileDebugKotlin` passes and every grep command in CLAUDE.md §
-  18 prints 0 lines.
+- **Done means:** `./gradlew :app:compileDebugKotlin` passes and `bash tools/check-rules.sh` reports 0 violations.
 
 ## Hard Rules
 
 - **UI + minimal build wiring only.** Refuse anything outside `@Composable` / `Modifier` / preview /
   Screen / Content / screen-level State-Intent-Effect / thin ViewModel wiring. Reject requests
   touching secrets, signing, network, or domain layers.
-- **Zero hardcoded visual values.** Every `Color`, `Dp`, `TextStyle`, `Duration`, `Shape`, alpha
-  comes from the `Aods` tokens. If a needed token doesn't exist, add it to the right layer as
-  CLAUDE.md § 14 says — never inline a literal.
+- **No hardcoded colours, text styles or shapes.** Every `Color`, `TextStyle` and `Shape` comes from `presentation/theme/` (`Colors` / `Typography` / `Shapes`); spacing, sizes, `sp`, durations and alpha are written as literals. If a needed colour / style / shape doesn't exist, add a `val` to the right theme file — never inline hex or `RoundedCornerShape(...)`.
 - **Match discovered conventions, not generic Compose.** Naming prefix, package layout, DI,
   navigation, ViewModel base class — all from existing code and CLAUDE.md, never assumed.
-- **Compile before reporting done.** Run `./gradlew :app:compileDebugKotlin` and the CLAUDE.md § 18
-  greps. Max 2 retry attempts. Never add `@Suppress` / `@SuppressLint` to force a build.
+- **Compile before reporting done.** Run `./gradlew :app:compileDebugKotlin` and `bash tools/check-rules.sh`. Max 2 retry attempts. Never add `@Suppress` / `@SuppressLint` to force a build.
 - **Animate state changes.** Snap-cuts are bugs. Use `AnimatedVisibility`, `AnimatedContent`,
   `animate*AsState`, `Crossfade`. Use the project's motion presets if they exist.
 - **No invented APIs.** If unsure whether a Compose API exists at the project's BOM, search the
@@ -89,7 +84,7 @@ If invoked from `design-tokens` Post-Generation, the prompt will include:
 - `tracking_file`: path to `plans/{date-slug}/screens-todo.md`
 - `row`: the specific screen row to implement (number, name, source ID, output file)
 - `theme_path`: path to generated tokens
-- `naming`: component naming (CLAUDE.md § 14: shared app-level components in
+- `naming`: component naming (CLAUDE.md › Presentation: MVI: shared app-level components in
   `presentation/components/` are `AppXxx`; screen-local components plain PascalCase; AOD display
   `AodXxx`)
 
@@ -100,7 +95,7 @@ path) or `failed` (with reason) before returning.
 
 Skip if spec already includes them. Otherwise:
 
-1. Read project `CLAUDE.md` (sections 1, 10, 12, 14–18, and 20 when touching the AOD screen).
+1. Read project `CLAUDE.md` (and README › Các quyết định thiết kế when touching the AOD screen).
 2. `Grep` `@Composable fun` in `presentation/components/` to learn naming + file layout.
 3. Read `presentation/theme/Colors.kt`, `Typography.kt`, `Shapes.kt` to know which names exist.
 4. Confirm DI (Koin: `koinViewModel()` / `koinInject()` only in Screen), state framework (
@@ -182,7 +177,7 @@ fun {Name}(
 
 - Screen passes `viewModel::onIntent` to Content (stable); Content sends `onIntent(XxxIntent.…)`.
 - `remember { }` to cache; `remember(key) { }` when the input is a parameter; `derivedStateOf` only
-  when the input is a Compose `State` (CLAUDE.md § 14).
+  when the input is a Compose `State`.
 - `CompositionLocalProvider` for theme/scope injection — never thread tokens as props. Never write a
   custom CompositionLocal to pass managers.
 - Avoid `MutableState` in `data class`; use separate `mutableStateOf` or hoist. Dialog-local editing
@@ -196,7 +191,7 @@ fun {Name}(
   `onClick`. Spacing / sizes / `sp` / durations are plain literals. New colour / style / shape → add
   a `val` to the matching file; never add a token class, file or accessor.
 - Material 3 components pick up colours / font / shapes through the `Theme` → `MaterialTheme`
-  bridge — never call `MaterialTheme.*` outside `presentation/theme/` (CLAUDE.md § 18 grep).
+  bridge — never call `MaterialTheme.*` outside `presentation/theme/` (`tools/check-rules.sh` checks it).
 
 **Animation:**
 
@@ -210,7 +205,7 @@ fun {Name}(
 
 - Every Content / component file: `private` `@Preview` wrapped in the project theme (always dark —
   no light preview), with sample `XxxState(...)` and `onIntent = {}`.
-- AOD screen previews do not wrap the app theme, matching runtime (CLAUDE.md § 14).
+- AOD screen previews do not wrap the app theme, matching runtime (CLAUDE.md › Compose và theme).
 - For state-bearing components: include 2–3 representative state previews.
 
 **Accessibility:**
@@ -231,9 +226,9 @@ fun {Name}(
 - `*Content.kt`: pure render — parameters only; no ViewModel, no Koin, no `NavBackStack`, no
   `LaunchedEffect` that depends on framework state.
 - `state/XxxState.kt`: `@Immutable data class` with defaults; `XxxIntent` / `XxxEffect` sealed
-  interfaces named per CLAUDE.md § 10.2.1.
+  interfaces named per CLAUDE.md › Presentation: MVI.
 - Screens with many independent groups of actions (≥ 3 clusters or ~15+ intents, e.g.
-  `screens/customize/`): split per cluster (CLAUDE.md § 10.2.2) — nested
+  `screens/customize/`): split per cluster (CLAUDE.md › Presentation: MVI) — nested
   `sealed interface <Cluster> : XxxIntent` / `: XxxEffect` (noun names: `Appearance`, `Decor`,
   `History`, `Permission`, `Guide`, `Navigation`), screen-wide items (`ConfirmXxx`, `NavigateBack`,
   `ShowMessage`) stay on the parent; State holds per-cluster `@Immutable` sub-states / sub-UiModels;
@@ -266,7 +261,7 @@ functions or `{Prefix}{Name}Internals.kt`.
 ./gradlew :app:compileDebugKotlin
 ```
 
-Then run every grep command listed in CLAUDE.md § 18; each must print 0 lines.
+Then run `bash tools/check-rules.sh`; it must report 0 violations.
 
 If compile fails:
 
@@ -288,7 +283,7 @@ If compile fails:
 - [ ] Screen/Content separation honored (Content gets only `state` + `onIntent` + slots)
 - [ ] Text from `strings.xml` (+ `values-vi`)
 - [ ] File ≤ 200 lines (or split)
-- [ ] Compiles clean and CLAUDE.md § 18 greps print 0 lines
+- [ ] Compiles clean and `tools/check-rules.sh` reports 0 violations
 
 ### 7. Report
 
@@ -316,7 +311,7 @@ advance to the next row — that is the caller's job.
 - `Color.Red` literal for error — use `Red` from `Colors.kt`.
 - Raw `Modifier.clickable` — use `Modifier.onClick`, or `selectable` / `toggleable` with a `Role`.
 - `collectAsState()` — use `collectAsStateWithLifecycle()`.
-- Raw `.collect { }` on manager/UseCase flows — use `collectCatching` (CLAUDE.md § 13.1).
+- Raw `.collect { }` on manager/UseCase flows — use `collectCatching` (CLAUDE.md › Coroutines, Manager và DataStore).
 - `LaunchedEffect(Unit)` for one-shot work that belongs in the ViewModel `init` or a Screen effect.
 - `LaunchedEffect(key)` whose body never suspends — use `SideEffect(key)` (Compose runtime 1.12
   keyed overloads; `SideEffect(Unit)` runs once). Keep `LaunchedEffect` only for `delay` /
@@ -331,8 +326,7 @@ advance to the next row — that is the caller's job.
   non-UI layer.
 - Will NOT generate ViewModels with business logic — only thin dispatchers + state mapping. Real
   logic stays in UseCases / managers.
-- Will NOT start a parallel token set — missing tokens go into the existing `Aods` layers (
-  CLAUDE.md § 14); inside the `design-tokens` pipeline, report them to the caller instead.
+- Will NOT start a parallel token set — missing colours / styles / shapes go into the existing `Colors` / `Typography` / `Shapes` files; inside the `design-tokens` pipeline, report them to the caller instead.
 - Will NOT skip the compile + grep step.
 
 ## Security

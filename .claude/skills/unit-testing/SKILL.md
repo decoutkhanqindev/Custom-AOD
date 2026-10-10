@@ -70,7 +70,7 @@ delegate with the Agent tool.
 follow `CLAUDE.md`.
 
 - Tests live in `app/src/test/java/com/decoutkhanqindev/custom_aod/...`, mirroring the source
-  package (CLAUDE.md § 17).
+  package (CLAUDE.md › Thư viện, log, test).
 - Already in the project: JUnit 4, `kotlinx-coroutines-test`. MockK and Turbine are NOT dependencies
   yet — adding them needs the user's approval (CLAUDE.md hard rules); without them, write fakes by
   hand.

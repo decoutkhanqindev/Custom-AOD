@@ -294,20 +294,14 @@ accessibility — scoped to native/mobile app UI (iOS/Android/React Native/Flutt
 - Run the script from the project root with `python` (this machine has no `python3`):
   `python .claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack jetpack-compose`.
 - This skill picks the direction: style, palette, font pairing, spacing density, UX and
-  accessibility rules. Code reads visual values only from the `Aods` design system (CLAUDE.md § 14):
-  turn the chosen palette / type / spacing into tokens in the right layer under
-  `presentation/theme/tokens/` (or through the `design-tokens` skill), then build the UI with the
-  `compose-implementer` agent. Never paste hex, `dp`, `sp` or durations into UI code (CLAUDE.md § 18
-  greps).
-- Theme rules come from CLAUDE.md § 14 (currently always dark, no dynamic colour); the AOD screen
-  also keeps the low-brightness / burn-in rules of § 20. Do not add a light scheme or change the AOD
+  accessibility rules. Code reads colours / text styles / shapes only from `presentation/theme/` (CLAUDE.md › Compose và theme): turn the chosen palette / type / shape into `val`s in `Colors.kt` / `Typography.kt` / `Shapes.kt` (or through the `design-tokens` skill), then build the UI with the `compose-implementer` agent. Never paste hex into UI code (`tools/check-rules.sh` checks it); spacing, `sp` and durations are literals.
+- Theme rules come from CLAUDE.md › Compose và theme (always dark, no dynamic colour); the AOD screen also keeps its low-brightness / burn-in choices (README › Các quyết định thiết kế). Do not add a light scheme or change the AOD
   colours unless the user asks.
 - Units: the data speaks CSS. Map `px` → `dp`, font `px` → `sp`, and use 48dp touch targets (
   Material), not 44px.
-- Fonts: the app uses the Material 3 default type scale. A Google Font means new font resources —
-  ask the user first (CLAUDE.md hard rules).
+- Fonts: the app uses Inter (`res/font/inter_variable.ttf`); another font means new font resources — ask the user first (CLAUDE.md hard rules).
 - Persisting a design system: `--persist --output-dir plans` so the files land in
-  `plans/design-system/<slug>/` with the other skill outputs (CLAUDE.md § 21). Read an existing
+  `plans/design-system/<slug>/` with the other skill outputs (CLAUDE.md › Skills và agent). Read an existing
   `MASTER.md` first; never `--force` without the user's OK.
 - UI text never comes straight from search results: every string goes in `res/values/strings.xml`
   with a Vietnamese copy in `values-vi/`.

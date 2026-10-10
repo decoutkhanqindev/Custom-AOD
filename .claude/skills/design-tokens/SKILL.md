@@ -13,13 +13,13 @@ description: Create Kotlin Compose design tokens from one of three supported sou
 # Compose Design Tokens
 
 > **Custom-AOD override (đọc trước):** project này **không dùng kiến trúc token 3 tầng** của skill
-> mà theo pattern theme của Lich-Viet-Loc-Phat. Chỉ lấy giá trị từ nguồn thiết kế rồi ghi vào
+> mà theo pattern theme phẳng của project này. Chỉ lấy giá trị từ nguồn thiết kế rồi ghi vào
 `presentation/theme/Colors.kt` (màu, biến thể alpha `<Màu>Alpha<NN>`), `Typography.kt` (
 `TextStyle`), `Shapes.kt` (`RoundedCornerShape<N>dp`) — mỗi file là các `val` cấp file (không bọc
 `object`), UI import từng tên rồi đọc thẳng. **Không** sinh Primitive / Semantic / Component,
 `CompositionLocal`, accessor `Theme.xxx`, không đọc qua `MaterialTheme.*`, không object khoảng
 > cách / cỡ icon / thời lượng (UI viết số dp / sp / thời lượng thẳng). Phần còn lại của skill chỉ áp
-> dụng cho project khác. Chi tiết: CLAUDE.md mục 14 và 18.
+> dụng cho project khác. Chi tiết: CLAUDE.md › Compose và theme.
 
 Generate Kotlin Compose design tokens from **exactly one** of three supported sources: **Stitch**, *
 *Figma**, or **Claude Design**. Any other input is rejected with a request for correct seed data.
@@ -160,13 +160,12 @@ follow `CLAUDE.md`.
 - Single module `:app`: token files go to
   `app/src/main/java/com/decoutkhanqindev/custom_aod/presentation/theme/` (package
   `com.decoutkhanqindev.custom_aod.presentation.theme`); there is no `:theme` module.
-- Prefix: read it from CLAUDE.md § 14 and pass it to every script with `--prefix`.
+- Prefix: none. Theme files are plain `Colors.kt` / `Typography.kt` / `Shapes.kt` / `Theme.kt` (CLAUDE.md › Compose và theme); do not generate prefixed token layers.
 - The app is dark-only: generate one colour set (no light variant, no `isSystemInDarkTheme`). Keep
   the FakeAOD palette (black background, mint accent) unless the design source says otherwise.
 - The AOD screen draws without the app theme (fixed greys for less light and burn-in): expose those
   as domain extension tokens instead of folding them into the app scheme.
-- Hex literals are allowed only under `presentation/theme/` (CLAUDE.md § 18 grep). Compile with
-  `./gradlew :app:compileDebugKotlin` and run the § 18 greps.
+- Hex literals are allowed only under `presentation/theme/` (`tools/check-rules.sh` checks it). Compile with `./gradlew :app:compileDebugKotlin` and run `bash tools/check-rules.sh`.
 - Screens are MVI (`XxxScreen` + `XxxContent` + `BaseViewModel`) with Navigation 3 — see the
   `compose-implementer` agent.
 
