@@ -9,8 +9,7 @@ Mã nguồn demo FakeAOD không nằm trong repo này.
 
 ## [Chưa phát hành] – 2026-10-10 – Loading khi Áp dụng ở màn Customize
 
-Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy, chưa
-commit.
+Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thêm
 
@@ -28,8 +27,7 @@ commit.
 
 ## [Chưa phát hành] – 2026-10-10 – Bỏ qua màn Customize vào thẳng Main
 
-Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy, chưa
-commit.
+Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -43,8 +41,7 @@ commit.
 
 ## [Chưa phát hành] – 2026-10-10 – Tự kéo app về sau khi cấp quyền ở app Cài đặt
 
-Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy, chưa
-commit.
+Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thêm
 
@@ -67,8 +64,7 @@ commit.
 
 ## [Chưa phát hành] – 2026-10-10 – `Tag` nằm ở `BaseViewModel`
 
-Không đổi hành vi. Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, chưa
-chạy trên máy, chưa commit.
+Không đổi hành vi. Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -81,8 +77,7 @@ chạy trên máy, chưa commit.
 
 ## [Chưa phát hành] – 2026-10-10 – Component dùng chung cấp app có tiền tố `App`
 
-Không đổi hành vi. Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, chưa
-chạy trên máy, chưa commit.
+Không đổi hành vi. Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -103,8 +98,7 @@ chạy trên máy, chưa commit.
 ## [Chưa phát hành] – 2026-10-10 – Screen collect effect theo cụm, qua `collectCatching`
 
 Không đổi hành vi, trừ việc lỗi ném ra khi xử lý một effect giờ được log thay vì làm crash app.
-Build được (`compileDebugKotlin`), 29 lệnh grep của CLAUDE.md ra 0 dòng, chưa chạy trên máy, chưa
-commit.
+Build được (`compileDebugKotlin`), 29 lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -126,8 +120,7 @@ commit.
 
 ## [Chưa phát hành] – 2026-10-10 – Theme bỏ object bọc ngoài
 
-Không đổi hành vi. Build được (`compileDebugKotlin`), 29 lệnh grep của CLAUDE.md ra 0 dòng, chưa
-chạy trên máy, chưa commit.
+Không đổi hành vi. Build được (`compileDebugKotlin`), 29 lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -146,12 +139,11 @@ chạy trên máy, chưa commit.
 
 Không đổi hành vi. `Colors`, `Typography`, `Shapes` trong `presentation/theme/` từ `internal object`
 thành `object` public, cùng quy tắc với composable: `private` hoặc public, không `internal`. Lệnh
-grep `^internal ` trong checklist của CLAUDE.md ra 0 dòng. Chưa chạy trên máy, chưa commit.
+grep `^internal ` trong checklist của CLAUDE.md ra 0 dòng. Đã test trên máy.
 
 ## [Chưa phát hành] – 2026-10-10 – Bỏ tiền tố `Aods` khỏi tên code
 
-Không đổi hành vi. Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, chưa
-chạy trên máy, chưa commit.
+Không đổi hành vi. Build được (`compileDebugKotlin`), các lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -170,8 +162,7 @@ chạy trên máy, chưa commit.
 
 ## [Chưa phát hành] – 2026-10-10 – Sắp xếp thư mục `presentation` theo tính năng
 
-Không đổi hành vi. Build được (`compileDebugKotlin`), 28 lệnh grep của CLAUDE.md ra 0 dòng, chưa
-chạy trên máy, chưa commit.
+Không đổi hành vi. Build được (`compileDebugKotlin`), 28 lệnh grep của CLAUDE.md ra 0 dòng, đã test trên máy.
 
 ### Thay đổi
 
@@ -192,7 +183,7 @@ chạy trên máy, chưa commit.
 ## [Chưa phát hành] – 2026-10-10 – Màn chính chia Intent / Effect / State theo cụm, panel Customize như bottom sheet
 
 Không đổi hành vi màn chính. Build được (`compileDebugKotlin`), 27 lệnh grep của CLAUDE.md ra 0
-dòng, chưa chạy trên máy.
+dòng, đã test trên máy.
 
 ### Thay đổi
 

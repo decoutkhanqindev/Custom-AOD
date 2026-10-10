@@ -49,6 +49,7 @@ Repo: [decoutkhanqindev/Custom-AOD](https://github.com/decoutkhanqindev/Custom-A
 
 - **Git — KHÔNG tự chạy khi chưa được phép:** `git commit` · `git push` / `--force` ·
   `git reset --hard` · `git rebase` · `git merge` · `git branch -D`.
+- Commit message không thêm dòng `Co-Authored-By` (hay trailer đồng tác giả nào khác).
 - Thêm dependency, permission Manifest, hoặc xoá code/resource đang dùng → hỏi trước.
 - Xong việc phải: `./gradlew :app:compileDebugKotlin` pass +
   chạy [grep kiểm tra](#18-banned-patterns) ra 0 kết quả.
