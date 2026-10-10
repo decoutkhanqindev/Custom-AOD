@@ -12,33 +12,32 @@ import com.decoutkhanqindev.custom_aod.data.local.image.AodImageManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.domain.usecase.RefreshWeatherUseCase
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.model.aodPermissions
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodAppearance
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodExtras
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodInteraction
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodNotificationOptions
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodOptions
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodRules
-import com.decoutkhanqindev.custom_aod.presentation.model.saveGestureAction
-import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.observeAodAppearance
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodActionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodExtrasUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodInteractionUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodNotificationOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodRulesUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.ScheduleTimeValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodExtras
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodInteraction
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodNotificationOptions
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodOptions
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodRules
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.saveGestureAction
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
+import com.decoutkhanqindev.custom_aod.presentation.model.language.toUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.aodPermissions
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainInteractionState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
-import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -62,7 +61,7 @@ class MainViewModel(
             isPickupSensorAvailable = pickupGestureManager.isSupported,
         ),
     ),
-), Tag {
+) {
 
     // Quyền lịch / vị trí đang được hỏi từ danh sách quyền (chỉ để cấp) hay từ công tắc "Sự kiện hôm nay" / "Thời tiết" (cấp xong thì bật luôn mục đó).
     private var permissionRequestedFromList: PermissionValue? = null
@@ -98,9 +97,18 @@ class MainViewModel(
 
     private fun onOptionsIntent(intent: MainIntent.Options) {
         when (intent) {
-            is MainIntent.Options.ToggleCustomBrightness -> dataStoreManager.saveIsAodCustomBrightness(intent.isEnabled)
-            is MainIntent.Options.ChangeBrightness -> dataStoreManager.saveAodBrightnessPercent(intent.percent)
-            is MainIntent.Options.ToggleProximity -> dataStoreManager.saveIsAodProximityEnabled(intent.isEnabled)
+            is MainIntent.Options.ToggleCustomBrightness -> dataStoreManager.saveIsAodCustomBrightness(
+                intent.isEnabled
+            )
+
+            is MainIntent.Options.ChangeBrightness -> dataStoreManager.saveAodBrightnessPercent(
+                intent.percent
+            )
+
+            is MainIntent.Options.ToggleProximity -> dataStoreManager.saveIsAodProximityEnabled(
+                intent.isEnabled
+            )
+
             is MainIntent.Options.ChangeTimeout -> dataStoreManager.saveAodTimeoutMinutes(intent.minutes)
         }
     }
@@ -110,7 +118,10 @@ class MainViewModel(
             is MainIntent.Appearance.ChangeClockFace -> dataStoreManager.saveAodClockFace(intent.face.code)
             is MainIntent.Appearance.ChangeClockFont -> dataStoreManager.saveAodClockFont(intent.font.code)
             is MainIntent.Appearance.ChangeClockColor -> dataStoreManager.saveAodClockColor(intent.color.code)
-            is MainIntent.Appearance.ChangeClockSize -> dataStoreManager.saveAodClockSizePercent(intent.percent)
+            is MainIntent.Appearance.ChangeClockSize -> dataStoreManager.saveAodClockSizePercent(
+                intent.percent
+            )
+
             is MainIntent.Appearance.ToggleLandscape -> dataStoreManager.saveIsAodLandscape(intent.isEnabled)
             is MainIntent.Appearance.SelectWallpaper -> selectWallpaper(intent.wallpaper)
             is MainIntent.Appearance.OpenBackgroundPicker ->
@@ -125,12 +136,26 @@ class MainViewModel(
         when (intent) {
             is MainIntent.Extras.ToggleDate -> dataStoreManager.saveIsAodDateEnabled(intent.isEnabled)
             is MainIntent.Extras.ToggleBattery -> dataStoreManager.saveIsAodBatteryEnabled(intent.isEnabled)
-            is MainIntent.Extras.ShowMemoEditor -> updateState { copy(extras = extras.copy(isMemoEditorVisible = true)) }
+            is MainIntent.Extras.ShowMemoEditor -> updateState {
+                copy(
+                    extras = extras.copy(
+                        isMemoEditorVisible = true
+                    )
+                )
+            }
+
             is MainIntent.Extras.DismissMemoEditor ->
                 updateState { copy(extras = extras.copy(isMemoEditorVisible = false)) }
 
             is MainIntent.Extras.ChangeMemo -> changeMemo(intent.memo)
-            is MainIntent.Extras.ShowDrawingPad -> updateState { copy(extras = extras.copy(isDrawingPadVisible = true)) }
+            is MainIntent.Extras.ShowDrawingPad -> updateState {
+                copy(
+                    extras = extras.copy(
+                        isDrawingPadVisible = true
+                    )
+                )
+            }
+
             is MainIntent.Extras.DismissDrawingPad ->
                 updateState { copy(extras = extras.copy(isDrawingPadVisible = false)) }
 
@@ -138,7 +163,9 @@ class MainViewModel(
             is MainIntent.Extras.RemoveDrawing -> aodImageManager.removeDrawing()
             is MainIntent.Extras.ToggleCalendar -> toggleCalendar(intent.isEnabled)
             is MainIntent.Extras.ToggleWeather -> toggleWeather(intent.isEnabled)
-            is MainIntent.Extras.ToggleWeatherFahrenheit -> dataStoreManager.saveIsAodWeatherFahrenheit(intent.isEnabled)
+            is MainIntent.Extras.ToggleWeatherFahrenheit -> dataStoreManager.saveIsAodWeatherFahrenheit(
+                intent.isEnabled
+            )
         }
     }
 
@@ -150,7 +177,10 @@ class MainViewModel(
             is MainIntent.Notifications.ToggleNotificationContent ->
                 dataStoreManager.saveIsAodNotificationContentEnabled(intent.isEnabled)
 
-            is MainIntent.Notifications.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(intent.isEnabled)
+            is MainIntent.Notifications.ToggleEdgeGlow -> dataStoreManager.saveIsAodEdgeGlowEnabled(
+                intent.isEnabled
+            )
+
             is MainIntent.Notifications.ToggleMediaControls ->
                 dataStoreManager.saveIsAodMediaControlsEnabled(intent.isEnabled)
         }
@@ -164,9 +194,18 @@ class MainViewModel(
             is MainIntent.Interaction.DismissGestureActionPicker ->
                 updateState { copy(interaction = interaction.copy(editingGesture = null)) }
 
-            is MainIntent.Interaction.ChangeGestureAction -> changeGestureAction(intent.gesture, intent.action)
-            is MainIntent.Interaction.ToggleAutoDim -> dataStoreManager.saveIsAodAutoDimEnabled(intent.isEnabled)
-            is MainIntent.Interaction.ToggleRaiseToWake -> dataStoreManager.saveIsAodRaiseToWakeEnabled(intent.isEnabled)
+            is MainIntent.Interaction.ChangeGestureAction -> changeGestureAction(
+                intent.gesture,
+                intent.action
+            )
+
+            is MainIntent.Interaction.ToggleAutoDim -> dataStoreManager.saveIsAodAutoDimEnabled(
+                intent.isEnabled
+            )
+
+            is MainIntent.Interaction.ToggleRaiseToWake -> dataStoreManager.saveIsAodRaiseToWakeEnabled(
+                intent.isEnabled
+            )
         }
     }
 
@@ -180,7 +219,11 @@ class MainViewModel(
             is MainIntent.Rules.DismissScheduleTimePicker ->
                 updateState { copy(rules = rules.copy(editingScheduleTime = null)) }
 
-            is MainIntent.Rules.ChangeScheduleTime -> changeScheduleTime(intent.time, intent.minuteOfDay)
+            is MainIntent.Rules.ChangeScheduleTime -> changeScheduleTime(
+                intent.time,
+                intent.minuteOfDay
+            )
+
             is MainIntent.Rules.ChangeMinBattery -> dataStoreManager.saveAodMinBattery(intent.percent)
         }
     }
@@ -191,7 +234,10 @@ class MainViewModel(
             is MainIntent.Permission.RefreshPermissions -> refreshPermissions()
             is MainIntent.Permission.ShowPermissionSheet -> showPermissionSheet()
             is MainIntent.Permission.DismissPermissionSheet -> dismissPermissionSheet()
-            is MainIntent.Permission.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
+            is MainIntent.Permission.NotificationPermissionResult -> onNotificationPermissionResult(
+                intent.isGranted
+            )
+
             is MainIntent.Permission.CalendarPermissionResult -> onCalendarPermissionResult(intent.isGranted)
             is MainIntent.Permission.LocationPermissionResult -> onLocationPermissionResult(intent.isGranted)
         }
@@ -234,7 +280,15 @@ class MainViewModel(
     private fun observeBackground() {
         viewModelScope.launch {
             aodImageManager.hasBackground.filterNotNull().collectCatching(
-                block = { hasBackground -> updateState { copy(appearance = appearance.copy(hasBackground = hasBackground)) } },
+                block = { hasBackground ->
+                    updateState {
+                        copy(
+                            appearance = appearance.copy(
+                                hasBackground = hasBackground
+                            )
+                        )
+                    }
+                },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
         }
@@ -244,7 +298,15 @@ class MainViewModel(
         viewModelScope.launch {
             dataStoreManager.aodWallpaper.filterNotNull().collectCatching(
                 block = { code ->
-                    updateState { copy(appearance = appearance.copy(wallpaper = WallpaperValue.fromCode(code))) }
+                    updateState {
+                        copy(
+                            appearance = appearance.copy(
+                                wallpaper = WallpaperValue.fromCode(
+                                    code
+                                )
+                            )
+                        )
+                    }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
@@ -273,7 +335,11 @@ class MainViewModel(
         viewModelScope.launch {
             dataStoreManager.selectedLangCode.filterNotNull().collectCatching(
                 block = { code ->
-                    updateState { copy(language = LanguageValue.fromCode(code).toUiModel(languageManager)) }
+                    updateState {
+                        copy(
+                            language = LanguageValue.fromCode(code).toUiModel(languageManager)
+                        )
+                    }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
@@ -379,7 +445,12 @@ class MainViewModel(
         refreshPermissions()
         viewModelScope.launch {
             when {
-                isFromList -> if (!isGranted) sendEffect(MainEffect.Permission.OpenAppSettings)
+                isFromList -> if (!isGranted) sendEffect(
+                    MainEffect.Permission.OpenAppSettings(
+                        PermissionValue.CALENDAR
+                    )
+                )
+
                 isGranted -> dataStoreManager.saveIsAodCalendarEnabled(true)
                 else -> sendEffect(MainEffect.ShowMessage(R.string.calendar_permission_denied))
             }
@@ -403,7 +474,16 @@ class MainViewModel(
         permissionRequestedFromList = null
         refreshPermissions()
         when {
-            isFromList -> if (!isGranted) viewModelScope.launch { sendEffect(MainEffect.Permission.OpenAppSettings) }
+            isFromList -> if (!isGranted) {
+                viewModelScope.launch {
+                    sendEffect(
+                        MainEffect.Permission.OpenAppSettings(
+                            PermissionValue.LOCATION
+                        )
+                    )
+                }
+            }
+
             isGranted -> enableWeather()
             else -> viewModelScope.launch { sendEffect(MainEffect.ShowMessage(R.string.location_permission_denied)) }
         }
@@ -442,7 +522,7 @@ class MainViewModel(
             PermissionValue.NOTIFICATION_ACCESS -> MainEffect.Permission.OpenNotificationAccessSettings
             PermissionValue.CALENDAR ->
                 if (permissionManager.hasCalendarPermission()) {
-                    MainEffect.Permission.OpenAppSettings
+                    MainEffect.Permission.OpenAppSettings(PermissionValue.CALENDAR)
                 } else {
                     permissionRequestedFromList = PermissionValue.CALENDAR
                     MainEffect.Permission.RequestCalendarPermission
@@ -450,7 +530,7 @@ class MainViewModel(
 
             PermissionValue.LOCATION ->
                 if (permissionManager.hasCoarseLocationPermission()) {
-                    MainEffect.Permission.OpenAppSettings
+                    MainEffect.Permission.OpenAppSettings(PermissionValue.LOCATION)
                 } else {
                     permissionRequestedFromList = PermissionValue.LOCATION
                     MainEffect.Permission.RequestLocationPermission

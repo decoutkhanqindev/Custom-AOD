@@ -1,6 +1,6 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.permission.state
 
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 
 sealed interface PermissionIntent {
     data object RefreshPermissions : PermissionIntent

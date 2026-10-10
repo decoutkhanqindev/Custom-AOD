@@ -1,10 +1,13 @@
 # Phase 1 — Style Foundation
 
-Run once per app, before any per-screen spec. Output: `plans/{slug}/design/style-foundation.md`. **No Kotlin, no Compose, no code.**
+Run once per app, before any per-screen spec. Output: `plans/{slug}/design/style-foundation.md`. *
+*No Kotlin, no Compose, no code.**
 
 ## Why this gates Phase 2
 
-Per-screen specs reference tokens from this file. Without style-foundation, every screen would re-define colors / type / spacing — breaks consistency, breaks AI design tool output. Phase 2 REFUSES to run if `style-foundation.md` missing.
+Per-screen specs reference tokens from this file. Without style-foundation, every screen would
+re-define colors / type / spacing — breaks consistency, breaks AI design tool output. Phase 2
+REFUSES to run if `style-foundation.md` missing.
 
 ## Schema (9 sections, all required)
 
@@ -40,7 +43,9 @@ Either pick a palette OR write "use Material 3 default".
 OR:
 
 ```
+
 Use Material 3 baseline palette (default). No custom tokens this version.
+
 ```
 
 ## 3. Typography
@@ -120,8 +125,10 @@ Pick one: **springy** | **precise** | **minimal**.
 
 ## Process
 
-1. Ask student about mood/voice (3 adjectives + 1 anti-pattern). Beginner mode offers 3 mood templates: "calm/focused", "playful/bold", "professional/restrained".
-2. Ask about color preference. Default to Material 3 baseline. Beginner mode skips custom palette unless student insists.
+1. Ask student about mood/voice (3 adjectives + 1 anti-pattern). Beginner mode offers 3 mood
+   templates: "calm/focused", "playful/bold", "professional/restrained".
+2. Ask about color preference. Default to Material 3 baseline. Beginner mode skips custom palette
+   unless student insists.
 3. Typography — default to Material 3 scale unless student has brand fonts.
 4. Spacing/radii/elevation — defaults above almost always fine; ask once, accept defaults.
 5. References — REQUIRE 3 + 1 anti. This is the non-negotiable creative input.

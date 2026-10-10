@@ -57,8 +57,8 @@ class ScreenStateManager(
     fun wakeUp(holdMillis: Long) {
         powerManager.newWakeLock(
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
-                PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                PowerManager.ON_AFTER_RELEASE, // sau đó màn hình khoá tự tắt theo thời gian chờ như thường
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                    PowerManager.ON_AFTER_RELEASE, // sau đó màn hình khoá tự tắt theo thời gian chờ như thường
             WAKE_LOCK_TAG,
         ).acquire(holdMillis)
     }

@@ -1,8 +1,8 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.language.state
 
 import androidx.compose.runtime.Immutable
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

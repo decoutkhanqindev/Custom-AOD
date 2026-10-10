@@ -4,13 +4,12 @@ import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.data.device.permission.PermissionManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.hasRequiredPermissions
-import com.decoutkhanqindev.custom_aod.presentation.model.requiredAodPermissions
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.hasRequiredPermissions
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.requiredAodPermissions
 import com.decoutkhanqindev.custom_aod.presentation.screens.permission.state.PermissionEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.permission.state.PermissionIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.permission.state.PermissionState
-import com.decoutkhanqindev.custom_aod.utils.Tag
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -19,14 +18,17 @@ class PermissionViewModel(
     private val permissionManager: PermissionManager,
 ) : BaseViewModel<PermissionState, PermissionIntent, PermissionEffect>(
     initialState = PermissionState(permissions = permissionManager.requiredAodPermissions()),
-), Tag {
+) {
 
     override fun onIntent(intent: PermissionIntent) {
         Timber.tag(tag).d("onIntent: $intent")
         when (intent) {
             is PermissionIntent.RefreshPermissions -> refreshPermissions()
             is PermissionIntent.OpenPermissionSettings -> openPermissionSettings(intent.permission)
-            is PermissionIntent.NotificationPermissionResult -> onNotificationPermissionResult(intent.isGranted)
+            is PermissionIntent.NotificationPermissionResult -> onNotificationPermissionResult(
+                intent.isGranted
+            )
+
             is PermissionIntent.ConfirmPermissions -> confirmPermissions()
             is PermissionIntent.NavigateBack -> viewModelScope.launch { sendEffect(PermissionEffect.NavigateBack) }
         }
@@ -61,7 +63,10 @@ class PermissionViewModel(
         refreshPermissions()
         viewModelScope.launch {
             when {
-                isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(PermissionEffect.StartAodService)
+                isGranted -> if (dataStoreManager.isAodEnabled.value == true) sendEffect(
+                    PermissionEffect.StartAodService
+                )
+
                 else -> sendEffect(PermissionEffect.OpenNotificationSettings)
             }
         }

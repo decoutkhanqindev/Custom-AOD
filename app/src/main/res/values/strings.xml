@@ -1,263 +1,264 @@
 <resources>
-  <string name="app_name" translatable="false">Custom AOD</string>
+    <string name="app_name" translatable="false">Custom AOD</string>
 
-  <string name="loading">Loading …</string>
-  <string name="may_contain_ads">This action may contain ads</string>
-  <string name="open_settings">Open Settings</string>
-  <string name="no_internet_connection">No internet connection. Please check your connection and try again.</string>
+    <string name="loading">Loading …</string>
+    <string name="may_contain_ads">This action may contain ads</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="no_internet_connection">No internet connection. Please check your connection and try again.</string>
 
-  <!-- Onboarding: Splash, Language, Permission -->
-  <string name="splash_tagline">The clock stays on while the screen is off</string>
-  <string name="onboarding_step">Step %1$d of %2$d</string>
-  <string name="language_title">Choose your language</string>
-  <string name="language_subtitle">You can change it later on the home screen.</string>
-  <string name="action_continue">Continue</string>
-  <string name="permission_title">Allow the clock to appear</string>
-  <string name="permission_subtitle">Custom AOD needs these permissions to show the clock when the screen turns off.</string>
-  <string name="permission_missing_hint">Allow every permission above to continue.</string>
-  <string name="permission_unknown_hint">Your phone does not let the app check this one. Open Settings to make sure it is on.</string>
-  <string name="action_allow">Allow</string>
-  <string name="action_get_started">Get started</string>
+    <!-- Onboarding: Splash, Language, Permission -->
+    <string name="splash_tagline">The clock stays on while the screen is off</string>
+    <string name="onboarding_step">Step %1$d of %2$d</string>
+    <string name="language_title">Choose your language</string>
+    <string name="language_subtitle">You can change it later on the home screen.</string>
+    <string name="action_continue">Continue</string>
+    <string name="permission_title">Allow the clock to appear</string>
+    <string name="permission_subtitle">Custom AOD needs these permissions to show the clock when the screen turns off.</string>
+    <string name="permission_missing_hint">Allow every permission above to continue.</string>
+    <string name="permission_unknown_hint">Your phone does not let the app check this one. Open Settings to make sure it is on.</string>
+    <string name="action_allow">Allow</string>
+    <string name="action_get_started">Get started</string>
 
-  <!-- Ads -->
-  <string name="ad_loading">Loading ad…</string>
-  <string name="ad_label">Ad</string>
+    <!-- Ads -->
+    <string name="ad_loading">Loading ad…</string>
+    <string name="ad_label">Ad</string>
 
-  <!-- AodService -->
-  <string name="channel_service">Clock in the background</string>
-  <string name="notif_service_title">Shows the clock each time the screen turns off</string>
+    <!-- AodService -->
+    <string name="channel_service">Clock in the background</string>
+    <string name="notif_service_title">Shows the clock each time the screen turns off</string>
 
-  <!-- Main -->
-  <string name="main_subtitle">An always-on clock for phones whose built-in one switches off after a few seconds.</string>
-  <string name="opt_enabled">Show the clock when the screen turns off</string>
+    <!-- Main -->
+    <string name="main_subtitle">An always-on clock for phones whose built-in one switches off after a few seconds.</string>
+    <string name="opt_enabled">Show the clock when the screen turns off</string>
 
-  <string name="section_permissions">Permissions</string>
-  <string name="section_options">Options</string>
-  <string name="action_open">Open</string>
+    <string name="section_permissions">Permissions</string>
+    <string name="section_options">Options</string>
+    <string name="action_open">Open</string>
 
-  <string name="perm_overlay_title">Display over other apps (required)</string>
-  <string name="perm_overlay_desc">Lets the app open the clock by itself when the screen turns off.</string>
-  <string name="perm_lock_title">Xiaomi: show on Lock screen (required)</string>
-  <string name="perm_lock_desc">Under Other permissions, allow Show on Lock screen. Without it the clock stays hidden behind the lock screen.</string>
-  <string name="perm_popup_title">Xiaomi: pop-up windows in the background (required)</string>
-  <string name="perm_popup_desc">Under Other permissions, allow Open new windows while running in the background. Without it the clock cannot open by itself when the screen turns off.</string>
-  <string name="perm_notif_title">Notifications (required)</string>
-  <string name="perm_notif_desc">Shows the notification that keeps the clock running in the background.</string>
-  <string name="perm_notif_access_title">Notification access</string>
-  <string name="perm_notif_access_desc">Shows notification icons, the edge glow and music controls on the clock. The clock works without it.</string>
-  <string name="perm_overlay_name">Display over other apps</string>
-  <string name="perm_lock_name">Show on Lock screen</string>
-  <string name="perm_popup_name">Pop-up windows in the background</string>
-  <string name="perm_notif_name">Notifications</string>
-  <string name="perm_calendar_title">Calendar</string>
-  <string name="perm_calendar_desc">Shows today\'s events on the clock. Only needed for Today\'s events.</string>
-  <string name="perm_location_title">Approximate location</string>
-  <string name="perm_location_desc">Gets the weather where you are. Only needed for Weather.</string>
+    <string name="perm_overlay_title">Display over other apps (required)</string>
+    <string name="perm_overlay_desc">Lets the app open the clock by itself when the screen turns off.</string>
+    <string name="perm_lock_title">Xiaomi: show on Lock screen (required)</string>
+    <string name="perm_lock_desc">Under Other permissions, allow Show on Lock screen. Without it the clock stays hidden behind the lock screen.</string>
+    <string name="perm_popup_title">Xiaomi: pop-up windows in the background (required)</string>
+    <string name="perm_popup_desc">Under Other permissions, allow Open new windows while running in the background. Without it the clock cannot open by itself when the screen turns off.</string>
+    <string name="perm_notif_title">Notifications (required)</string>
+    <string name="perm_notif_desc">Shows the notification that keeps the clock running in the background.</string>
+    <string name="perm_notif_access_title">Notification access</string>
+    <string name="perm_notif_access_desc">Shows notification icons, the edge glow and music controls on the clock. The clock works without it.</string>
+    <string name="perm_overlay_name">Display over other apps</string>
+    <string name="perm_lock_name">Show on Lock screen</string>
+    <string name="perm_popup_name">Pop-up windows in the background</string>
+    <string name="perm_notif_name">Notifications</string>
+    <string name="perm_calendar_title">Calendar</string>
+    <string name="perm_calendar_desc">Shows today\'s events on the clock. Only needed for Today\'s events.</string>
+    <string name="perm_location_title">Approximate location</string>
+    <string name="perm_location_desc">Gets the weather where you are. Only needed for Weather.</string>
 
-  <string name="permission_state_granted">Granted</string>
-  <string name="permission_state_missing">Not granted</string>
-  <string name="permission_state_unknown">Unknown</string>
+    <string name="permission_state_granted">Granted</string>
+    <string name="permission_state_missing">Not granted</string>
+    <string name="permission_state_unknown">Unknown</string>
 
-  <string name="permission_sheet_title">The clock cannot appear yet</string>
-  <string name="permission_sheet_desc">Allow these permissions so the clock shows when the screen turns off.</string>
-  <string name="action_later">Later</string>
+    <string name="permission_sheet_title">The clock cannot appear yet</string>
+    <string name="permission_sheet_desc">Allow these permissions so the clock shows when the screen turns off.</string>
+    <string name="action_later">Later</string>
 
-  <string name="opt_custom_brightness">Use a custom brightness for the clock</string>
-  <string name="opt_brightness_value">Brightness: %1$d%%</string>
-  <string name="opt_proximity">Go dark in a pocket or face down</string>
-  <string name="opt_timeout_never">Go dark after: never</string>
-  <string name="opt_timeout_value">Go dark after: %1$d min</string>
+    <string name="opt_custom_brightness">Use a custom brightness for the clock</string>
+    <string name="opt_brightness_value">Brightness: %1$d%%</string>
+    <string name="opt_proximity">Go dark in a pocket or face down</string>
+    <string name="opt_timeout_never">Go dark after: never</string>
+    <string name="opt_timeout_value">Go dark after: %1$d min</string>
 
-  <string name="section_appearance">Clock style</string>
-  <string name="opt_clock_face">Clock face</string>
-  <string name="clock_face_digital">Digital</string>
-  <string name="clock_face_stacked">Digital, stacked</string>
-  <string name="clock_face_analog">Analog</string>
-  <string name="clock_face_analog_minimal">Analog, minimal</string>
-  <string name="opt_clock_font">Font</string>
-  <string name="clock_font_default">Default</string>
-  <string name="clock_font_serif">Serif</string>
-  <string name="clock_font_monospace">Monospace</string>
-  <string name="clock_font_cursive">Handwriting</string>
-  <string name="opt_clock_color">Color</string>
-  <string name="clock_color_grey">Grey</string>
-  <string name="clock_color_white">White</string>
-  <string name="clock_color_mint">Mint</string>
-  <string name="clock_color_blue">Blue</string>
-  <string name="clock_color_purple">Purple</string>
-  <string name="clock_color_orange">Orange</string>
-  <string name="clock_color_pink">Pink</string>
-  <string name="clock_color_red">Red</string>
-  <string name="opt_clock_size_value">Clock size: %1$d%%</string>
-  <string name="opt_landscape">Always landscape (night clock)</string>
-  <string name="opt_background">Background image</string>
-  <string name="wallpaper_stars">Stars</string>
-  <string name="wallpaper_aurora">Aurora</string>
-  <string name="wallpaper_eclipse">Eclipse</string>
-  <string name="wallpaper_waves">Waves</string>
-  <string name="wallpaper_nebula">Nebula</string>
-  <string name="wallpaper_horizon">Horizon</string>
-  <string name="background_from_device">Your own image</string>
-  <string name="background_choose">Choose</string>
-  <string name="background_change">Change</string>
-  <string name="background_saving">Saving…</string>
-  <string name="background_remove">Remove background image</string>
-  <string name="background_save_failed">Could not use this image.</string>
+    <string name="section_appearance">Clock style</string>
+    <string name="opt_clock_face">Clock face</string>
+    <string name="clock_face_digital">Digital</string>
+    <string name="clock_face_stacked">Digital, stacked</string>
+    <string name="clock_face_analog">Analog</string>
+    <string name="clock_face_analog_minimal">Analog, minimal</string>
+    <string name="opt_clock_font">Font</string>
+    <string name="clock_font_default">Default</string>
+    <string name="clock_font_serif">Serif</string>
+    <string name="clock_font_monospace">Monospace</string>
+    <string name="clock_font_cursive">Handwriting</string>
+    <string name="opt_clock_color">Color</string>
+    <string name="clock_color_grey">Grey</string>
+    <string name="clock_color_white">White</string>
+    <string name="clock_color_mint">Mint</string>
+    <string name="clock_color_blue">Blue</string>
+    <string name="clock_color_purple">Purple</string>
+    <string name="clock_color_orange">Orange</string>
+    <string name="clock_color_pink">Pink</string>
+    <string name="clock_color_red">Red</string>
+    <string name="opt_clock_size_value">Clock size: %1$d%%</string>
+    <string name="opt_landscape">Always landscape (night clock)</string>
+    <string name="opt_background">Background image</string>
+    <string name="wallpaper_stars">Stars</string>
+    <string name="wallpaper_aurora">Aurora</string>
+    <string name="wallpaper_eclipse">Eclipse</string>
+    <string name="wallpaper_waves">Waves</string>
+    <string name="wallpaper_nebula">Nebula</string>
+    <string name="wallpaper_horizon">Horizon</string>
+    <string name="background_from_device">Your own image</string>
+    <string name="background_choose">Choose</string>
+    <string name="background_change">Change</string>
+    <string name="background_saving">Saving…</string>
+    <string name="background_remove">Remove background image</string>
+    <string name="background_save_failed">Could not use this image.</string>
 
-  <string name="section_extras">Extras on the clock</string>
-  <string name="opt_memo">Memo</string>
-  <string name="memo_add">Add</string>
-  <string name="memo_edit">Edit</string>
-  <string name="memo_hint">A short note under the clock</string>
-  <string name="memo_length" translatable="false">%1$d/%2$d</string>
-  <string name="opt_drawing">Quick drawing</string>
-  <string name="drawing_draw">Draw</string>
-  <string name="drawing_redraw">Redraw</string>
-  <string name="drawing_remove">Remove drawing</string>
-  <string name="drawing_hint">Draw with your finger</string>
-  <string name="drawing_save_failed">Could not save the drawing.</string>
-  <string name="opt_calendar">Today\'s events</string>
-  <string name="opt_calendar_desc">Upcoming events for today from your calendar. Needs calendar access.</string>
-  <string name="calendar_permission_denied">Calendar access was not allowed. You can allow it in the app\'s system settings.</string>
-  <string name="opt_weather">Weather</string>
-  <string name="opt_weather_desc">From Open-Meteo, using your approximate location. Needs location access.</string>
-  <string name="opt_weather_fahrenheit">Show the temperature in °F</string>
-  <string name="location_permission_denied">Location access was not allowed. You can allow it in the app\'s system settings.</string>
+    <string name="section_extras">Extras on the clock</string>
+    <string name="opt_memo">Memo</string>
+    <string name="memo_add">Add</string>
+    <string name="memo_edit">Edit</string>
+    <string name="memo_hint">A short note under the clock</string>
+    <string name="memo_length" translatable="false">%1$d/%2$d</string>
+    <string name="opt_drawing">Quick drawing</string>
+    <string name="drawing_draw">Draw</string>
+    <string name="drawing_redraw">Redraw</string>
+    <string name="drawing_remove">Remove drawing</string>
+    <string name="drawing_hint">Draw with your finger</string>
+    <string name="drawing_save_failed">Could not save the drawing.</string>
+    <string name="opt_calendar">Today\'s events</string>
+    <string name="opt_calendar_desc">Upcoming events for today from your calendar. Needs calendar access.</string>
+    <string name="calendar_permission_denied">Calendar access was not allowed. You can allow it in the app\'s system settings.</string>
+    <string name="opt_weather">Weather</string>
+    <string name="opt_weather_desc">From Open-Meteo, using your approximate location. Needs location access.</string>
+    <string name="opt_weather_fahrenheit">Show the temperature in °F</string>
+    <string name="location_permission_denied">Location access was not allowed. You can allow it in the app\'s system settings.</string>
 
-  <string name="section_notifications">Notifications on the clock</string>
-  <string name="notification_access_needed">Needs Notification access under Permissions.</string>
-  <string name="opt_notification_icons">Show notification icons</string>
-  <string name="opt_notification_content">Show the latest notification\'s content</string>
-  <string name="opt_notification_content_desc">Title and text under the icons. What the lock screen hides stays hidden here too.</string>
-  <string name="opt_edge_glow">Glow the screen edges for new notifications</string>
-  <string name="opt_media_controls">Music controls</string>
+    <string name="section_notifications">Notifications on the clock</string>
+    <string name="notification_access_needed">Needs Notification access under Permissions.</string>
+    <string name="opt_notification_icons">Show notification icons</string>
+    <string name="opt_notification_content">Show the latest notification\'s content</string>
+    <string name="opt_notification_content_desc">Title and text under the icons. What the lock screen hides stays hidden here too.</string>
+    <string name="opt_edge_glow">Glow the screen edges for new notifications</string>
+    <string name="opt_media_controls">Music controls</string>
 
-  <string name="section_interaction">Gestures and sensors</string>
-  <string name="aod_gesture_double_tap">Double-tap</string>
-  <string name="aod_gesture_swipe_up">Swipe up</string>
-  <string name="aod_gesture_swipe_down">Swipe down</string>
-  <string name="aod_gesture_volume_up">Volume up key</string>
-  <string name="aod_gesture_volume_down">Volume down key</string>
-  <string name="aod_gesture_back">Back</string>
-  <string name="aod_action_none">Do nothing</string>
-  <string name="aod_action_close">Go to the lock screen</string>
-  <string name="aod_action_go_dark">Darken the screen</string>
-  <string name="aod_action_flashlight">Flashlight on/off</string>
-  <string name="aod_action_play_pause">Play/pause music</string>
-  <string name="aod_action_previous_track">Previous track</string>
-  <string name="aod_action_next_track">Next track</string>
-  <string name="opt_auto_dim">Dim in a dark room</string>
-  <string name="opt_auto_dim_desc">Uses the light sensor and drops to the lowest brightness.</string>
-  <string name="opt_raise_to_wake">Lift to show the clock again</string>
-  <string name="opt_raise_to_wake_desc">After the clock has gone dark and the screen has turned off.</string>
-  <string name="sensor_unsupported_light">This phone has no light sensor.</string>
-  <string name="sensor_unsupported_pickup">This phone does not offer a lift sensor to apps.</string>
+    <string name="section_interaction">Gestures and sensors</string>
+    <string name="aod_gesture_double_tap">Double-tap</string>
+    <string name="aod_gesture_swipe_up">Swipe up</string>
+    <string name="aod_gesture_swipe_down">Swipe down</string>
+    <string name="aod_gesture_volume_up">Volume up key</string>
+    <string name="aod_gesture_volume_down">Volume down key</string>
+    <string name="aod_gesture_back">Back</string>
+    <string name="aod_action_none">Do nothing</string>
+    <string name="aod_action_close">Go to the lock screen</string>
+    <string name="aod_action_go_dark">Darken the screen</string>
+    <string name="aod_action_flashlight">Flashlight on/off</string>
+    <string name="aod_action_play_pause">Play/pause music</string>
+    <string name="aod_action_previous_track">Previous track</string>
+    <string name="aod_action_next_track">Next track</string>
+    <string name="opt_auto_dim">Dim in a dark room</string>
+    <string name="opt_auto_dim_desc">Uses the light sensor and drops to the lowest brightness.</string>
+    <string name="opt_raise_to_wake">Lift to show the clock again</string>
+    <string name="opt_raise_to_wake_desc">After the clock has gone dark and the screen has turned off.</string>
+    <string name="sensor_unsupported_light">This phone has no light sensor.</string>
+    <string name="sensor_unsupported_pickup">This phone does not offer a lift sensor to apps.</string>
 
-  <string name="section_rules">When to show</string>
-  <string name="opt_charging_rule">Power</string>
-  <string name="charging_rule_always">Always</string>
-  <string name="charging_rule_plugged">Only while plugged in</string>
-  <string name="charging_rule_on_battery">Only on battery</string>
-  <string name="opt_schedule">Only during set hours</string>
-  <string name="opt_schedule_start">Start</string>
-  <string name="opt_schedule_end">End</string>
-  <string name="opt_battery_off">Skip the clock on low battery: off</string>
-  <string name="opt_battery_value">Skip the clock when the battery is below %1$d%%</string>
-  <string name="time_skeleton_24h" translatable="false">Hm</string>
-  <string name="time_skeleton_12h" translatable="false">hma</string>
+    <string name="section_rules">When to show</string>
+    <string name="opt_charging_rule">Power</string>
+    <string name="charging_rule_always">Always</string>
+    <string name="charging_rule_plugged">Only while plugged in</string>
+    <string name="charging_rule_on_battery">Only on battery</string>
+    <string name="opt_schedule">Only during set hours</string>
+    <string name="opt_schedule_start">Start</string>
+    <string name="opt_schedule_end">End</string>
+    <string name="opt_battery_off">Skip the clock on low battery: off</string>
+    <string name="opt_battery_value">Skip the clock when the battery is below %1$d%%</string>
+    <string name="time_skeleton_24h" translatable="false">Hm</string>
+    <string name="time_skeleton_12h" translatable="false">hma</string>
 
-  <string name="section_app">App</string>
-  <string name="language">Language</string>
+    <string name="section_app">App</string>
+    <string name="language">Language</string>
 
-  <string name="action_preview">Preview</string>
-  <string name="action_done">Done</string>
-  <string name="action_ok">OK</string>
-  <string name="action_cancel">Cancel</string>
-  <string name="action_back">Back</string>
-  <string name="action_save">Save</string>
-  <string name="action_clear">Clear</string>
+    <string name="action_preview">Preview</string>
+    <string name="action_done">Done</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_back">Back</string>
+    <string name="action_save">Save</string>
+    <string name="action_clear">Clear</string>
 
-  <string name="wake_unknown">The clock has not been shown from a screen-off yet.</string>
-  <string name="wake_ok">Last time: the clock opened over the lock screen.</string>
-  <string name="wake_failed">Last time: the clock could not open over the lock screen. Check the permissions above.</string>
+    <string name="wake_unknown">The clock has not been shown from a screen-off yet.</string>
+    <string name="wake_ok">Last time: the clock opened over the lock screen.</string>
+    <string name="wake_failed">Last time: the clock could not open over the lock screen. Check the permissions above.</string>
 
-  <!-- AOD -->
-  <string name="aod_time_pattern_24h" translatable="false">HH:mm</string>
-  <string name="aod_time_pattern_12h" translatable="false">h:mm</string>
-  <string name="aod_hour_pattern_24h" translatable="false">HH</string>
-  <string name="aod_hour_pattern_12h" translatable="false">hh</string>
-  <string name="aod_minute_pattern" translatable="false">mm</string>
-  <string name="aod_date_pattern" translatable="false">EEE, d MMM</string>
-  <string name="aod_hint">Double-tap to exit</string>
-  <string name="aod_battery" translatable="false">%1$d%%</string>
-  <string name="aod_battery_charging">Charging · %1$d%%</string>
-  <string name="aod_notifications_overflow" translatable="false">+%1$d</string>
-  <string name="aod_media_previous">Previous</string>
-  <string name="aod_media_play">Play</string>
-  <string name="aod_media_pause">Pause</string>
-  <string name="aod_media_next">Next</string>
-  <string name="aod_flashlight_on">Flashlight on</string>
-  <string name="aod_notification_content_hidden">Contents hidden</string>
-  <string name="aod_weather_temperature" translatable="false">%1$d°</string>
-  <string name="aod_event_all_day">All day</string>
-  <string name="aod_drawing">Drawing</string>
-  <string name="weather_clear">Clear</string>
-  <string name="weather_partly_cloudy">Partly cloudy</string>
-  <string name="weather_cloudy">Cloudy</string>
-  <string name="weather_fog">Fog</string>
-  <string name="weather_drizzle">Drizzle</string>
-  <string name="weather_rain">Rain</string>
-  <string name="weather_snow">Snow</string>
-  <string name="weather_thunderstorm">Thunderstorm</string>
-  <string name="opt_date">Show the date</string>
-  <string name="opt_battery">Show the battery level</string>
-  <string name="customize_tab_clock">Clock</string>
-  <string name="customize_tab_date">Date</string>
-  <string name="customize_tab_battery">Battery</string>
-  <string name="customize_tab_background">Background</string>
-  <string name="customize_tab_drawing">Drawing</string>
-  <string name="customize_tab_memo">Memo</string>
-  <string name="customize_tab_notifications">Notifications</string>
-  <string name="customize_tab_events">Events</string>
-  <string name="customize_tab_weather">Weather</string>
-  <string name="customize_tab_media">Music</string>
-  <string name="customize_tab_effects">Effects</string>
-  <string name="customize_cluster_appearance">Look</string>
-  <string name="customize_cluster_decor">Decor</string>
-  <string name="customize_cluster_info">Info</string>
-  <string name="customize_cluster_effect">Effects</string>
-  <string name="customize_guide_preview_title">This is your clock</string>
-  <string name="customize_guide_preview_desc">Everything you change shows up here right away, just like when the screen is off.</string>
-  <string name="customize_guide_appearance_title">Clock, date and battery</string>
-  <string name="customize_guide_appearance_desc">Pick a clock face, font, color and size, and choose whether the date and battery level show.</string>
-  <string name="customize_guide_decor_title">Background, drawing and memo</string>
-  <string name="customize_guide_decor_desc">Add a dark wallpaper or your own photo, a quick drawing or a short note.</string>
-  <string name="customize_guide_info_title">Notifications, events and weather</string>
-  <string name="customize_guide_info_desc">Swipe the bar for more. Items that need a permission ask for it when you turn them on.</string>
-  <string name="customize_guide_effect_title">Edge glow</string>
-  <string name="customize_guide_effect_desc">Light up the screen edges for new notifications. Tap Preview to see it.</string>
-  <string name="customize_guide_actions_title">Undo or apply</string>
-  <string name="customize_guide_actions_desc">Undo, redo or reset anytime. Tap Apply to keep this look, or Skip at the top to keep the default.</string>
-  <string name="customize_guide_skip">Skip</string>
-  <string name="customize_guide_next">Next</string>
-  <string name="customize_guide_done">Got it</string>
-  <string name="customize_show_guide">Show tips</string>
-  <string name="customize_apply">Apply</string>
-  <string name="customize_skip">Skip</string>
-  <string name="customize_undo">Undo</string>
-  <string name="customize_redo">Redo</string>
-  <string name="customize_reset">Reset</string>
-  <string name="customize_reset_title">Reset to default?</string>
-  <string name="customize_reset_desc">Your changes on this screen will be cleared. You can still undo this.</string>
-  <string name="customize_permission_title">Allow access first</string>
-  <string name="customize_permission_desc">This item needs the permission below. It turns on once you allow it.</string>
-  <string name="customize_background_loading">Opening…</string>
-  <string name="customize_memo_remove">Remove memo</string>
-  <string name="customize_glow_preview">Try the edge glow</string>
-  <string name="customize_sample_notification_title">Anna</string>
-  <string name="customize_sample_notification_text">See you at 7?</string>
-  <string name="customize_sample_event_title">Coffee with Minh</string>
-  <string name="customize_sample_media_title">Night drive</string>
-  <string name="customize_sample_media_artist">Lo-fi Radio</string>
-  <string name="customize_guide_progress" translatable="false">%1$d/%2$d</string>
+    <!-- AOD -->
+    <string name="aod_time_pattern_24h" translatable="false">HH:mm</string>
+    <string name="aod_time_pattern_12h" translatable="false">h:mm</string>
+    <string name="aod_hour_pattern_24h" translatable="false">HH</string>
+    <string name="aod_hour_pattern_12h" translatable="false">hh</string>
+    <string name="aod_minute_pattern" translatable="false">mm</string>
+    <string name="aod_date_pattern" translatable="false">EEE, d MMM</string>
+    <string name="aod_hint">Double-tap to exit</string>
+    <string name="aod_battery" translatable="false">%1$d%%</string>
+    <string name="aod_battery_charging">Charging · %1$d%%</string>
+    <string name="aod_notifications_overflow" translatable="false">+%1$d</string>
+    <string name="aod_media_previous">Previous</string>
+    <string name="aod_media_play">Play</string>
+    <string name="aod_media_pause">Pause</string>
+    <string name="aod_media_next">Next</string>
+    <string name="aod_flashlight_on">Flashlight on</string>
+    <string name="aod_notification_content_hidden">Contents hidden</string>
+    <string name="aod_weather_temperature" translatable="false">%1$d°</string>
+    <string name="aod_event_all_day">All day</string>
+    <string name="aod_drawing">Drawing</string>
+    <string name="weather_clear">Clear</string>
+    <string name="weather_partly_cloudy">Partly cloudy</string>
+    <string name="weather_cloudy">Cloudy</string>
+    <string name="weather_fog">Fog</string>
+    <string name="weather_drizzle">Drizzle</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_thunderstorm">Thunderstorm</string>
+    <string name="opt_date">Show the date</string>
+    <string name="opt_battery">Show the battery level</string>
+    <string name="customize_tab_clock">Clock</string>
+    <string name="customize_tab_date">Date</string>
+    <string name="customize_tab_battery">Battery</string>
+    <string name="customize_tab_background">Background</string>
+    <string name="customize_tab_drawing">Drawing</string>
+    <string name="customize_tab_memo">Memo</string>
+    <string name="customize_tab_notifications">Notifications</string>
+    <string name="customize_tab_events">Events</string>
+    <string name="customize_tab_weather">Weather</string>
+    <string name="customize_tab_media">Music</string>
+    <string name="customize_tab_effects">Effects</string>
+    <string name="customize_cluster_appearance">Look</string>
+    <string name="customize_cluster_decor">Decor</string>
+    <string name="customize_cluster_info">Info</string>
+    <string name="customize_cluster_effect">Effects</string>
+    <string name="customize_guide_preview_title">This is your clock</string>
+    <string name="customize_guide_preview_desc">Everything you change shows up here right away, just like when the screen is off.</string>
+    <string name="customize_guide_appearance_title">Clock, date and battery</string>
+    <string name="customize_guide_appearance_desc">Pick a clock face, font, color and size, and choose whether the date and battery level show.</string>
+    <string name="customize_guide_decor_title">Background, drawing and memo</string>
+    <string name="customize_guide_decor_desc">Add a dark wallpaper or your own photo, a quick drawing or a short note.</string>
+    <string name="customize_guide_info_title">Notifications, events and weather</string>
+    <string name="customize_guide_info_desc">Swipe the bar for more. Items that need a permission ask for it when you turn them on.</string>
+    <string name="customize_guide_effect_title">Edge glow</string>
+    <string name="customize_guide_effect_desc">Light up the screen edges for new notifications. Tap Preview to see it.</string>
+    <string name="customize_guide_actions_title">Undo or apply</string>
+    <string name="customize_guide_actions_desc">Undo, redo or reset anytime. Tap Apply to keep this look, or Skip at the top to keep the default.</string>
+    <string name="customize_guide_skip">Skip</string>
+    <string name="customize_guide_next">Next</string>
+    <string name="customize_guide_done">Got it</string>
+    <string name="customize_show_guide">Show tips</string>
+    <string name="customize_apply">Apply</string>
+    <string name="customize_skip">Skip</string>
+    <string name="customize_undo">Undo</string>
+    <string name="customize_redo">Redo</string>
+    <string name="customize_reset">Reset</string>
+    <string name="customize_reset_title">Reset to default?</string>
+    <string name="customize_reset_desc">Your changes on this screen will be cleared. You can still undo this.</string>
+    <string name="customize_permission_title">Allow access first</string>
+    <string name="customize_permission_desc">This item needs the permission below. It turns on once you allow it.</string>
+    <string name="customize_background_loading">Opening…</string>
+    <string name="customize_applying">Applying…</string>
+    <string name="customize_memo_remove">Remove memo</string>
+    <string name="customize_glow_preview">Try the edge glow</string>
+    <string name="customize_sample_notification_title">Anna</string>
+    <string name="customize_sample_notification_text">See you at 7?</string>
+    <string name="customize_sample_event_title">Coffee with Minh</string>
+    <string name="customize_sample_media_title">Night drive</string>
+    <string name="customize_sample_media_artist">Lo-fi Radio</string>
+    <string name="customize_guide_progress" translatable="false">%1$d/%2$d</string>
 </resources>

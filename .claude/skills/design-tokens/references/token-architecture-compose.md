@@ -21,6 +21,7 @@ object AppPrimitiveSpacing {
 ```
 
 **Rules:**
+
 - `object` (singleton, no state)
 - PascalCase properties: `{ColorName}{Scale}` (e.g., `Blue500`)
 - No `@Immutable` needed (object with val = inherently stable)
@@ -53,6 +54,7 @@ val LocalAppColors = staticCompositionLocalOf { darkAppColors }
 ```
 
 **Rules:**
+
 - `@Immutable data class` (Compose stability)
 - camelCase properties: `primary`, `onPrimary`, `surfaceVariant`
 - Dark + Light instances for color tokens
@@ -82,6 +84,7 @@ val LocalAppDialog = staticCompositionLocalOf { defaultAppDialog }
 ```
 
 **Rules:**
+
 - Same pattern as semantic, but scoped to one component
 - Properties named `{aspect}`: `containerShape`, `contentPadding`, `borderColor`
 - Reference primitives directly (not semantic) for component-level control
@@ -91,6 +94,7 @@ val LocalAppDialog = staticCompositionLocalOf { defaultAppDialog }
 Every token must register in two places:
 
 ### 1. CompositionLocalProvider (AppTheme composable)
+
 ```kotlin
 CompositionLocalProvider(
     LocalAppNewToken provides defaultAppNewToken,
@@ -98,6 +102,7 @@ CompositionLocalProvider(
 ```
 
 ### 2. AppTheme accessor object
+
 ```kotlin
 object AppTheme {
     val newToken: AppNewTokens
@@ -116,24 +121,24 @@ val shape = AppTheme.dialog.containerShape
 
 ## Existing Token Inventory
 
-| Layer | Class | Properties |
-|-------|-------|------------|
-| Primitive | AppPrimitiveColors | ~80 colors (10 scales) |
-| Primitive | AppPrimitiveSpacing | 18 sizes (1-140dp) |
-| Primitive | AppPrimitiveShape | 9 shapes (None-Full) |
-| Primitive | AppPrimitiveMotion | 4 durations + 3 easings |
-| Primitive | AppPrimitiveElevation | elevation values |
-| Primitive | AppPrimitiveOpacity | opacity values |
-| Primitive | AppPrimitiveBorder | border values |
-| Primitive | AppPrimitiveIconSize | icon sizes |
-| Semantic | AppColorTokens | 28 colors (dark+light) |
-| Semantic | AppSpacingTokens | 8 spacings |
-| Semantic | AppShapeTokens | shape aliases |
-| Semantic | AppElevationTokens | elevation aliases |
-| Semantic | AppTypographyTokens | 21 text styles |
-| Semantic | AppMotionTokens | 4 durations + 3 easings |
-| Semantic | AppOpacityTokens | opacity aliases |
-| Semantic | AppDomainColorTokens | domain colors (e.g. AOD clock colors) |
-| Component | AppDialogTokens | 8 properties |
-| Component | AppBottomSheetTokens | 7 properties |
-| Component | AppCardTokens | 9 properties |
+| Layer     | Class                 | Properties                            |
+|-----------|-----------------------|---------------------------------------|
+| Primitive | AppPrimitiveColors    | ~80 colors (10 scales)                |
+| Primitive | AppPrimitiveSpacing   | 18 sizes (1-140dp)                    |
+| Primitive | AppPrimitiveShape     | 9 shapes (None-Full)                  |
+| Primitive | AppPrimitiveMotion    | 4 durations + 3 easings               |
+| Primitive | AppPrimitiveElevation | elevation values                      |
+| Primitive | AppPrimitiveOpacity   | opacity values                        |
+| Primitive | AppPrimitiveBorder    | border values                         |
+| Primitive | AppPrimitiveIconSize  | icon sizes                            |
+| Semantic  | AppColorTokens        | 28 colors (dark+light)                |
+| Semantic  | AppSpacingTokens      | 8 spacings                            |
+| Semantic  | AppShapeTokens        | shape aliases                         |
+| Semantic  | AppElevationTokens    | elevation aliases                     |
+| Semantic  | AppTypographyTokens   | 21 text styles                        |
+| Semantic  | AppMotionTokens       | 4 durations + 3 easings               |
+| Semantic  | AppOpacityTokens      | opacity aliases                       |
+| Semantic  | AppDomainColorTokens  | domain colors (e.g. AOD clock colors) |
+| Component | AppDialogTokens       | 8 properties                          |
+| Component | AppBottomSheetTokens  | 7 properties                          |
+| Component | AppCardTokens         | 9 properties                          |

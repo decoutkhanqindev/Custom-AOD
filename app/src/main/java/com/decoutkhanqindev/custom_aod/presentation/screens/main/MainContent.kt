@@ -20,23 +20,35 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.AodsSwitchRow
+import com.decoutkhanqindev.custom_aod.presentation.components.settings.AppSwitchRow
 import com.decoutkhanqindev.custom_aod.presentation.model.AnimationContentKey
-import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodRulesUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.ChargingRuleValue
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainAppSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainAppearanceSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainExtrasSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainInteractionSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainNotificationsSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainOptionsSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainPermissionSheet
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainPermissionWarning
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainPermissionsSection
+import com.decoutkhanqindev.custom_aod.presentation.screens.main.components.MainRulesSection
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainPermissionState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainRulesState
 import com.decoutkhanqindev.custom_aod.presentation.screens.main.state.MainState
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
+import com.decoutkhanqindev.custom_aod.presentation.theme.BodyMedium
+import com.decoutkhanqindev.custom_aod.presentation.theme.BodySmall
+import com.decoutkhanqindev.custom_aod.presentation.theme.Grey9A
+import com.decoutkhanqindev.custom_aod.presentation.theme.HeadlineMedium
+import com.decoutkhanqindev.custom_aod.presentation.theme.Theme
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -84,14 +96,14 @@ private fun MainSettings(
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = AodsTypography.HeadlineMedium,
+            style = HeadlineMedium,
         )
 
         Text(
             text = stringResource(R.string.main_subtitle),
             modifier = Modifier.padding(top = 4.dp),
-            color = AodsColors.Grey9A,
-            style = AodsTypography.BodyMedium,
+            color = Grey9A,
+            style = BodyMedium,
         )
 
         MainPermissionWarning(
@@ -101,7 +113,7 @@ private fun MainSettings(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        AodsSwitchRow(
+        AppSwitchRow(
             label = stringResource(R.string.opt_enabled),
             isChecked = state.options.isEnabled,
             onCheckedChange = { onIntent(MainIntent.ToggleAod(it)) },
@@ -160,8 +172,8 @@ private fun MainSettings(
         Text(
             text = stringResource(state.lastWakeMessageRes),
             modifier = Modifier.padding(top = 12.dp),
-            color = AodsColors.Grey9A,
-            style = AodsTypography.BodySmall,
+            color = Grey9A,
+            style = BodySmall,
         )
     }
 }
@@ -169,7 +181,7 @@ private fun MainSettings(
 @Preview(widthDp = 360, heightDp = 3800)
 @Composable
 private fun MainContentPreview() {
-    AodsTheme {
+    Theme {
         MainContent(
             state = MainState(
                 isLoading = false,
@@ -178,13 +190,28 @@ private fun MainContentPreview() {
                 permission = MainPermissionState(
                     permissions = persistentListOf(
                         PermissionUiModel(permission = PermissionValue.OVERLAY, isGranted = true),
-                        PermissionUiModel(permission = PermissionValue.MIUI_LOCK_SCREEN, isGranted = false),
-                        PermissionUiModel(permission = PermissionValue.MIUI_BACKGROUND_POPUP, isGranted = null),
-                        PermissionUiModel(permission = PermissionValue.NOTIFICATIONS, isGranted = false),
-                        PermissionUiModel(permission = PermissionValue.NOTIFICATION_ACCESS, isGranted = false),
+                        PermissionUiModel(
+                            permission = PermissionValue.MIUI_LOCK_SCREEN,
+                            isGranted = false
+                        ),
+                        PermissionUiModel(
+                            permission = PermissionValue.MIUI_BACKGROUND_POPUP,
+                            isGranted = null
+                        ),
+                        PermissionUiModel(
+                            permission = PermissionValue.NOTIFICATIONS,
+                            isGranted = false
+                        ),
+                        PermissionUiModel(
+                            permission = PermissionValue.NOTIFICATION_ACCESS,
+                            isGranted = false
+                        ),
                     ),
                 ),
-                language = LanguageUiModel(language = LanguageValue.ENGLISH, displayName = "English"),
+                language = LanguageUiModel(
+                    language = LanguageValue.ENGLISH,
+                    displayName = "English"
+                ),
                 lastWakeMessageRes = WakeResultValue.OK.messageRes,
             ),
             onIntent = {},

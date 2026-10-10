@@ -34,7 +34,8 @@ class AdsManager : KoinComponent, Application.ActivityLifecycleCallbacks, Tag {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private val testDeviceIds = BuildConfig.ADMOB_TEST_DEVICE_IDS.split(',').filter { it.isNotBlank() }
+    private val testDeviceIds =
+        BuildConfig.ADMOB_TEST_DEVICE_IDS.split(',').filter { it.isNotBlank() }
     private val consentInformation: ConsentInformation by lazy {
         UserMessagingPlatform.getConsentInformation(application)
     }
@@ -104,12 +105,15 @@ class AdsManager : KoinComponent, Application.ActivityLifecycleCallbacks, Tag {
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(
                     currentActivity ?: activity
                 ) { formError ->
-                    formError?.let { Timber.tag(tag).w("Consent form: ${it.errorCode} ${it.message}") }
+                    formError?.let {
+                        Timber.tag(tag).w("Consent form: ${it.errorCode} ${it.message}")
+                    }
                     consentGatheringComplete()
                 }
             },
             { requestError ->
-                Timber.tag(tag).w("Consent info update: ${requestError.errorCode} ${requestError.message}")
+                Timber.tag(tag)
+                    .w("Consent info update: ${requestError.errorCode} ${requestError.message}")
                 consentGatheringComplete()
             },
         )

@@ -37,7 +37,14 @@ import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.NativeAdUnit
 import com.decoutkhanqindev.custom_aod.presentation.components.onClick
 import com.decoutkhanqindev.custom_aod.presentation.components.shimmerLoading
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.Black
+import com.decoutkhanqindev.custom_aod.presentation.theme.BlackAlpha50
+import com.decoutkhanqindev.custom_aod.presentation.theme.Grey9A
+import com.decoutkhanqindev.custom_aod.presentation.theme.GreyED
+import com.decoutkhanqindev.custom_aod.presentation.theme.Mint
+import com.decoutkhanqindev.custom_aod.presentation.theme.Neutral12
+import com.decoutkhanqindev.custom_aod.presentation.theme.NeutralVariant30
+import com.decoutkhanqindev.custom_aod.presentation.theme.White
 import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -55,12 +62,12 @@ fun NativeAdView(
     val adState by adUnit().state.collectAsStateWithLifecycle()
     val nativeAd = adUnit().nativeAd
     val colors = NativeAdColors(
-        cardBackground = AodsColors.Neutral12,
-        cardBorder = AodsColors.NeutralVariant30,
-        accent = AodsColors.Mint,
-        headline = AodsColors.GreyED,
-        body = AodsColors.Grey9A,
-        ctaText = AodsColors.Black,
+        cardBackground = Neutral12,
+        cardBorder = NeutralVariant30,
+        accent = Mint,
+        headline = GreyED,
+        body = Grey9A,
+        ctaText = Black,
     )
 
     DisposableEffect(adUnit()) {
@@ -119,7 +126,7 @@ private fun NativeAdContent(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .shimmerLoading(backgroundColor = AodsColors.NeutralVariant30),
+                    .shimmerLoading(backgroundColor = NeutralVariant30),
             )
         }
     }
@@ -134,13 +141,13 @@ private fun CloseButton(
         modifier = modifier
             .size(36.dp)
             .onClick(shape = CircleShape, action = onClick)
-            .background(color = AodsColors.BlackAlpha50, shape = CircleShape),
+            .background(color = BlackAlpha50, shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = Icons.Filled.Close,
             contentDescription = null,
-            tint = AodsColors.White,
+            tint = White,
             modifier = Modifier.size(20.dp),
         )
     }

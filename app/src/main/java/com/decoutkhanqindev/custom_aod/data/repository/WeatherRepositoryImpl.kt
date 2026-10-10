@@ -61,7 +61,8 @@ class WeatherRepositoryImpl(
     )
 
     // Làm tròn 2 chữ số thập phân (khoảng 1 km) trước khi gửi: đủ cho thời tiết, không gửi vị trí chính xác ra ngoài.
-    private fun Double.roundedCoordinate(): Double = (this * COORDINATE_SCALE).roundToInt() / COORDINATE_SCALE
+    private fun Double.roundedCoordinate(): Double =
+        (this * COORDINATE_SCALE).roundToInt() / COORDINATE_SCALE
 
     companion object {
         private const val COORDINATE_SCALE = 100.0

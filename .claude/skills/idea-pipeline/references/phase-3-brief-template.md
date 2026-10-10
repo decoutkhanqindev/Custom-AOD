@@ -2,7 +2,9 @@
 
 Output file — `plans/{slug}/idea-brief.md`. Filled by skill, consumed by `prd-pipeline`.
 
-**Scope: feature build only.** No monetization section. If user volunteered a pricing/billing/ads preference earlier, capture it as a single `monetization_note:` line in frontmatter — do NOT expand into a model/price/justification section.
+**Scope: feature build only.** No monetization section. If user volunteered a pricing/billing/ads
+preference earlier, capture it as a single `monetization_note:` line in frontmatter — do NOT expand
+into a model/price/justification section.
 
 ## Required Schema
 
@@ -97,9 +99,12 @@ This section is the contract — `prd-pipeline` MUST honor it (no PRD for deferr
 ## After Writing the Brief
 
 Once this file is written, the skill MUST run **Phase 4 Handoff** (defined in `SKILL.md`):
+
 1. Confirm the absolute brief path back to the user.
-2. Use `AskUserQuestion` to offer two options — "Run PRD next" (auto-invoke `prd-pipeline` with brief path) or "Exit to read".
-3. If "Run PRD next" → invoke `Skill tool` with `skill: "prd-pipeline"` and `args` containing the brief path.
+2. Use `AskUserQuestion` to offer two options — "Run PRD next" (auto-invoke `prd-pipeline` with
+   brief path) or "Exit to read".
+3. If "Run PRD next" → invoke `Skill tool` with `skill: "prd-pipeline"` and `args` containing the
+   brief path.
 4. If "Exit to read" → print path once more and stop.
 
 Do NOT skip the handoff prompt.
@@ -111,12 +116,16 @@ Do NOT skip the handoff prompt.
 - Section 4 (Core-Value Feature) is mandatory — exactly ONE starred feature, named in plain English
 - Killer feature must be testable in MVP (not "AI assistant" handwave)
 - Risks must be ranked, not listed at random
-- **Section 7.2 (Scope Tradeoffs) MANDATORY** — if Phase 2 produced no tradeoff blocks, the brief is incomplete and the skill must loop back
-- **Feature Seeds (section 10) MANDATORY — 5 minimum, 8 maximum**, with ⭐ marker on the core-value feature. Downstream skill refuses to run without this section populated.
-- **Do NOT** include a Monetization section, pricing field, or revenue model. `monetization_note:` frontmatter ONLY (if at all).
+- **Section 7.2 (Scope Tradeoffs) MANDATORY** — if Phase 2 produced no tradeoff blocks, the brief is
+  incomplete and the skill must loop back
+- **Feature Seeds (section 10) MANDATORY — 5 minimum, 8 maximum**, with ⭐ marker on the core-value
+  feature. Downstream skill refuses to run without this section populated.
+- **Do NOT** include a Monetization section, pricing field, or revenue model. `monetization_note:`
+  frontmatter ONLY (if at all).
 
 ## Sensible Defaults (always pre-fill when student didn't choose)
 
 - Section 8 — D7 retention target → `15%` (typical indie baseline)
 - Section 9 — Backend → `none (offline-first)` unless features demand sync
-- Section 10 — Feature Seeds → ensure Auth, Settings always included if relevant; ⭐ marker on whichever single feature delivers the core value
+- Section 10 — Feature Seeds → ensure Auth, Settings always included if relevant; ⭐ marker on
+  whichever single feature delivers the core value

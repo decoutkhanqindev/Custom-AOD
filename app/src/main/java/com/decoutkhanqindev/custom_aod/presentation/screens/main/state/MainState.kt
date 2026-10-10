@@ -2,20 +2,20 @@ package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import com.decoutkhanqindev.custom_aod.presentation.model.AodAppearanceUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationOptionsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodOptionsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodRulesUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.model.hasRequiredPermissions
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.AodAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodExtrasUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodInteractionUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodNotificationOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodOptionsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodRulesUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.ScheduleTimeValue
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.hasRequiredPermissions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -33,7 +33,7 @@ data class MainState(
     val language: LanguageUiModel? = null,
     @param:StringRes val lastWakeMessageRes: Int = WakeResultValue.UNKNOWN.messageRes,
 ) {
-    // Lần đầu mở app đã có màn quyền riêng (vào màn đó là xong onboarding); về sau thiếu quyền bắt buộc thì nhắc ở màn chính.
+    // Onboarding có màn quyền riêng nhưng user bỏ qua màn Customize thì vào thẳng đây; thiếu quyền bắt buộc thì nhắc bằng bottom sheet.
     private val isMissingRequiredPermissions: Boolean
         get() = !isLoading && permission.permissions.isNotEmpty() && !permission.permissions.hasRequiredPermissions
 

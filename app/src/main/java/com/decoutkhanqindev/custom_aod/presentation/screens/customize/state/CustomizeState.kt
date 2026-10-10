@@ -1,10 +1,10 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.customize.state
 
 import androidx.compose.runtime.Immutable
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeDraftUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeGuideStepValue
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeTabValue
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeDraftUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeGuideStepValue
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeTabValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 
 @Immutable
 data class CustomizeState(

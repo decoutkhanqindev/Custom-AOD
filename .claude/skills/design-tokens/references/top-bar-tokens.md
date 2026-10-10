@@ -59,12 +59,12 @@ fun default{Prefix}TopBarTokens(
 
 ## Variants
 
-| Variant       | containerHeight | titleStyle      | centered | subtitleVisible |
-|---------------|-----------------|-----------------|----------|-----------------|
-| small         | 64dp            | titleLarge      | false    | no              |
-| centerAligned | 64dp            | titleLarge      | true     | no              |
-| medium        | 112dp           | headlineSmall   | false    | yes             |
-| large         | 152dp           | headlineMedium  | false    | yes             |
+| Variant       | containerHeight | titleStyle     | centered | subtitleVisible |
+|---------------|-----------------|----------------|----------|-----------------|
+| small         | 64dp            | titleLarge     | false    | no              |
+| centerAligned | 64dp            | titleLarge     | true     | no              |
+| medium        | 112dp           | headlineSmall  | false    | yes             |
+| large         | 152dp           | headlineMedium | false    | yes             |
 
 ```kotlin
 // Large variant helper
@@ -77,12 +77,12 @@ fun large{Prefix}TopBarTokens(colors: {Prefix}ColorTokens, typography: {Prefix}T
 
 ## State Matrix
 
-| State      | containerColor    | elevation | titleColor      |
-|------------|-------------------|-----------|-----------------|
-| default    | surface           | 0dp       | onSurface       |
-| scrolled   | surfaceContainer  | 2dp       | onSurface       |
-| collapsed  | surfaceContainer  | 2dp       | onSurface       |
-| pinned     | surface           | 0dp       | onSurface       |
+| State     | containerColor   | elevation | titleColor |
+|-----------|------------------|-----------|------------|
+| default   | surface          | 0dp       | onSurface  |
+| scrolled  | surfaceContainer | 2dp       | onSurface  |
+| collapsed | surfaceContainer | 2dp       | onSurface  |
+| pinned    | surface          | 0dp       | onSurface  |
 
 ## Usage
 

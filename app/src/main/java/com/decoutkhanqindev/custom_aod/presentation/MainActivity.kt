@@ -17,7 +17,7 @@ import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.presentation.aod.AodService
 import com.decoutkhanqindev.custom_aod.presentation.components.AppLanguageProvider
 import com.decoutkhanqindev.custom_aod.presentation.navigation.AppNavDisplay
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
+import com.decoutkhanqindev.custom_aod.presentation.theme.Theme
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -33,8 +33,8 @@ class MainActivity : ComponentActivity() {
         ComposeUiFlags.isBypassUnfocusableComposeViewEnabled = false
         super.onCreate(savedInstanceState)
         adsManager.requestConsent(this)
-        runCatching {  requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
-        // AodsTheme luôn tối: icon thanh hệ thống luôn sáng, không theo theme hệ thống.
+        runCatching { requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+        // Theme luôn tối: icon thanh hệ thống luôn sáng, không theo theme hệ thống.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         startAodServiceIfEnabled()
         setContent {
             AppLanguageProvider {
-                AodsTheme {
+                Theme {
                     AppNavDisplay(modifier = Modifier.fillMaxSize())
                 }
             }
@@ -52,7 +52,9 @@ class MainActivity : ComponentActivity() {
     // Mở app là cách chạy lại service nếu hệ thống (vd Xiaomi) đã đóng nó; khi khởi động máy thì BootReceiver lo.
     private fun startAodServiceIfEnabled() {
         lifecycleScope.launch {
-            if (dataStoreManager.isAodEnabled.filterNotNull().first()) AodService.start(this@MainActivity)
+            if (dataStoreManager.isAodEnabled.filterNotNull()
+                    .first()
+            ) AodService.start(this@MainActivity)
         }
     }
 }

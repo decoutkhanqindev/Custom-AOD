@@ -95,13 +95,18 @@ If none: `Local-only, no persistence beyond session.`
 
 ## Fill Rules
 
-- Every section header must appear, even if empty (write "None." or "N/A" rather than removing the section)
-- Screens section: at least 1 screen; for features with no UI (e.g., a background sync feature), justify in Summary
+- Every section header must appear, even if empty (write "None." or "N/A" rather than removing the
+  section)
+- Screens section: at least 1 screen; for features with no UI (e.g., a background sync feature),
+  justify in Summary
 - Frontmatter `screens:` count MUST match number of screens in body
 - User Stories: 1 minimum, 5 maximum
-- Use real names, not "Screen1 / Screen2" — names should communicate purpose (RunDetail, OnboardingWelcome, etc.)
+- Use real names, not "Screen1 / Screen2" — names should communicate purpose (RunDetail,
+  OnboardingWelcome, etc.)
 - No code snippets, no implementation specifics — PRD is the WHAT and WHY, not the HOW
 
 ## Pre-fill Defaults
 
-See `phase-2-feature-prd.md` § "Pre-fill Lookup Table" for the lookup. Pre-fills go directly into the appropriate section; student picks from options or overrides after — they never write blank fields from scratch.
+See `phase-2-feature-prd.md` § "Pre-fill Lookup Table" for the lookup. Pre-fills go directly into
+the appropriate section; student picks from options or overrides after — they never write blank
+fields from scratch.

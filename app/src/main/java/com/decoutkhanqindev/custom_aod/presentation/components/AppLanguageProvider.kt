@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
 import org.koin.compose.koinInject
 
 @Composable

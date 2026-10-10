@@ -24,7 +24,7 @@ class BootReceiver : BroadcastReceiver(), KoinComponent {
         }
         // DataStore đọc bất đồng bộ: giữ broadcast sống bằng goAsync() tới khi đọc xong.
         val pendingResult = goAsync()
-        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
                 if (dataStoreManager.isAodEnabled.filterNotNull().first()) AodService.start(context)
             } finally {

@@ -1,8 +1,11 @@
 # Library Module Structure
 
-Plain Android library — for reusable utilities, data, domain, design tokens, shared UI primitives. Always ships in the base APK. Cannot own a feature nav route in a dynamic-feature delivery graph.
+Plain Android library — for reusable utilities, data, domain, design tokens, shared UI primitives.
+Always ships in the base APK. Cannot own a feature nav route in a dynamic-feature delivery graph.
 
-> The templates below are **vanilla AGP defaults**. Before writing files, adapt to the project's actual conventions discovered in Step 0 of SKILL.md (convention plugins, version-catalog aliases, namespace pattern, sibling deps, JVM/SDK levels).
+> The templates below are **vanilla AGP defaults**. Before writing files, adapt to the project's
+> actual conventions discovered in Step 0 of SKILL.md (convention plugins, version-catalog aliases,
+> namespace pattern, sibling deps, JVM/SDK levels).
 
 ## File Layout
 
@@ -65,9 +68,14 @@ dependencies {
 }
 ```
 
-**If the project uses a convention plugin** (e.g. `acme.android.library` published from `build-logic/`), apply that single plugin and skip the manual `compileSdk` / `minSdk` / `compileOptions` / `kotlinOptions` blocks — the convention provides them. Detect this in Step 0 by reading sibling library `build.gradle.kts` files.
+**If the project uses a convention plugin** (e.g. `acme.android.library` published from
+`build-logic/`), apply that single plugin and skip the manual `compileSdk` / `minSdk` /
+`compileOptions` / `kotlinOptions` blocks — the convention provides them. Detect this in Step 0 by
+reading sibling library `build.gradle.kts` files.
 
-**If the project uses a version catalog** (`gradle/libs.versions.toml`), use `alias(libs.plugins.xxx)` and `libs.xxx` references instead of raw plugin IDs and dep coordinates. Match catalog naming.
+**If the project uses a version catalog** (`gradle/libs.versions.toml`), use
+`alias(libs.plugins.xxx)` and `libs.xxx` references instead of raw plugin IDs and dep coordinates.
+Match catalog naming.
 
 ## 2. `AndroidManifest.xml`
 
@@ -84,8 +92,10 @@ Empty file. Add ProGuard rules only if this library ships APIs that consumers mu
 
 ## 4. Wiring
 
-- `settings.gradle.kts` → `include(":{module}")` (top-level) or `include(":{group}:{module}")` if the project groups modules. Mirror existing path style.
-- **No** application module change — application module already pulls libraries via `implementation(project(":{module}"))` as needed.
+- `settings.gradle.kts` → `include(":{module}")` (top-level) or `include(":{group}:{module}")` if
+  the project groups modules. Mirror existing path style.
+- **No** application module change — application module already pulls libraries via
+  `implementation(project(":{module}"))` as needed.
 - Add `implementation(project(":{module}"))` in every consumer module.
 
 ## 5. Verify
@@ -97,6 +107,7 @@ Empty file. Add ProGuard rules only if this library ships APIs that consumers mu
 
 ## When NOT to Pick Library
 
-- You need a navigation route registered with the app's nav graph → use Feature Module or Dynamic Feature.
+- You need a navigation route registered with the app's nav graph → use Feature Module or Dynamic
+  Feature.
 - You need on-demand / conditional / instant delivery → use Dynamic Feature.
 - The code has zero consumers besides one feature → just inline; don't make a module.

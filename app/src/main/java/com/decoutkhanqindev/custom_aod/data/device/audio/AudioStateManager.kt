@@ -70,7 +70,7 @@ class AudioStateManager(
 
     fun isBusyNow(): Boolean =
         audioManager.mode != AudioManager.MODE_NORMAL ||
-            audioManager.activePlaybackConfigurations.any { it.audioAttributes.usage in URGENT_USAGES }
+                audioManager.activePlaybackConfigurations.any { it.audioAttributes.usage in URGENT_USAGES }
 
     // Class riêng để OnModeChangedListener (API 31) không bao giờ được nạp trên máy cũ hơn.
     @RequiresApi(Build.VERSION_CODES.S)
@@ -80,7 +80,8 @@ class AudioStateManager(
     ) {
         private val listener = AudioManager.OnModeChangedListener { onModeChanged() }
 
-        fun start(context: Context) = audioManager.addOnModeChangedListener(context.mainExecutor, listener)
+        fun start(context: Context) =
+            audioManager.addOnModeChangedListener(context.mainExecutor, listener)
 
         fun stop() = audioManager.removeOnModeChangedListener(listener)
     }

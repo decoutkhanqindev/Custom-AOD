@@ -79,20 +79,20 @@ fun default{Prefix}BottomNavTokens(
 
 ## Variants
 
-| Variant  | containerColor    | elevation | shape    | Notes                     |
-|----------|-------------------|-----------|----------|---------------------------|
-| standard | surfaceContainer  | 0dp tonal | none     | full-width, docked        |
-| floating | surfaceContainer  | medium    | pill     | margin from screen edges  |
-| sticky   | surfaceContainer  | 0dp       | none     | top divider line          |
+| Variant  | containerColor   | elevation | shape | Notes                    |
+|----------|------------------|-----------|-------|--------------------------|
+| standard | surfaceContainer | 0dp tonal | none  | full-width, docked       |
+| floating | surfaceContainer | medium    | pill  | margin from screen edges |
+| sticky   | surfaceContainer | 0dp       | none  | top divider line         |
 
 ## State Matrix (per item)
 
-| State     | iconColor           | labelColor          | indicatorColor      |
-|-----------|---------------------|---------------------|---------------------|
-| unselected| onSurfaceVariant    | onSurfaceVariant    | transparent         |
-| selected  | onSecondaryContainer| onSecondaryContainer| secondaryContainer  |
-| pressed   | onSecondaryContainer| onSecondaryContainer| secondaryContainer 0.88f |
-| disabled  | onSurface 0.38f     | onSurface 0.38f     | transparent         |
+| State      | iconColor            | labelColor           | indicatorColor           |
+|------------|----------------------|----------------------|--------------------------|
+| unselected | onSurfaceVariant     | onSurfaceVariant     | transparent              |
+| selected   | onSecondaryContainer | onSecondaryContainer | secondaryContainer       |
+| pressed    | onSecondaryContainer | onSecondaryContainer | secondaryContainer 0.88f |
+| disabled   | onSurface 0.38f      | onSurface 0.38f      | transparent              |
 
 ## Usage
 

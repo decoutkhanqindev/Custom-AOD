@@ -54,11 +54,11 @@ fun default{Prefix}CardTokens(
 
 ## Variants
 
-| Variant  | containerColor        | elevation | borderColor  | borderWidth |
-|----------|-----------------------|-----------|--------------|-------------|
-| filled   | surfaceContainerLow   | 1dp       | transparent  | 0dp         |
-| outlined | surface               | 0dp       | outline      | 1dp         |
-| elevated | surfaceContainerLow   | 2dp       | transparent  | 0dp         |
+| Variant  | containerColor      | elevation | borderColor | borderWidth |
+|----------|---------------------|-----------|-------------|-------------|
+| filled   | surfaceContainerLow | 1dp       | transparent | 0dp         |
+| outlined | surface             | 0dp       | outline     | 1dp         |
+| elevated | surfaceContainerLow | 2dp       | transparent | 0dp         |
 
 ```kotlin
 // Variant helpers — also accept colors parameter at call site
@@ -76,13 +76,13 @@ fun elevated{Prefix}CardTokens(colors: {Prefix}ColorTokens, typography: {Prefix}
 
 ## State Matrix
 
-| State    | containerColor          | elevation           |
-|----------|-------------------------|---------------------|
-| default  | surfaceContainerLow     | 1dp                 |
-| hovered  | surfaceContainerLow+8%  | 2dp                 |
-| pressed  | surfaceContainerLow+12% | 1dp                 |
-| dragging | surfaceContainerLow     | 8dp                 |
-| disabled | surfaceContainerLow     | 0dp, alpha 0.38f    |
+| State    | containerColor          | elevation        |
+|----------|-------------------------|------------------|
+| default  | surfaceContainerLow     | 1dp              |
+| hovered  | surfaceContainerLow+8%  | 2dp              |
+| pressed  | surfaceContainerLow+12% | 1dp              |
+| dragging | surfaceContainerLow     | 8dp              |
+| disabled | surfaceContainerLow     | 0dp, alpha 0.38f |
 
 ## Usage
 

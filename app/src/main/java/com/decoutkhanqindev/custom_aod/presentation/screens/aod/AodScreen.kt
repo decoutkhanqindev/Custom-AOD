@@ -5,12 +5,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.decoutkhanqindev.custom_aod.presentation.components.aod.AodContent
 import com.decoutkhanqindev.custom_aod.presentation.effects.LaunchedWithLifecycleEffect
-import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
+import com.decoutkhanqindev.custom_aod.utils.collectCatching
+import kotlinx.coroutines.flow.filterIsInstance
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @Composable
 fun AodScreen(
@@ -23,11 +27,10 @@ fun AodScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedWithLifecycleEffect {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is AodEffect.CloseAod -> onClose()
-            }
-        }
+        viewModel.effect.filterIsInstance<AodEffect.CloseAod>().collectCatching(
+            block = { onClose() },
+            catch = { e -> Timber.tag("AodScreen").e(e.stackTraceToString()) },
+        )
     }
 
     SideEffect(state.isDark) {

@@ -84,7 +84,8 @@ class BatteryStateManager(
 
     fun readIsPlugged(): Boolean? = readBatteryChanged()?.isPlugged()
 
-    private fun readBatteryChanged(): Intent? = app.registerSystemReceiver(null, batteryChangedFilter)
+    private fun readBatteryChanged(): Intent? =
+        app.registerSystemReceiver(null, batteryChangedFilter)
 
     private fun Intent.levelPercent(): Int? {
         val level = getIntExtra(BatteryManager.EXTRA_LEVEL, -1)

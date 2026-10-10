@@ -40,7 +40,8 @@ class NotificationStateManager(
     private val iconSizePx = (ICON_SIZE_DP * app.resources.displayMetrics.density).roundToInt()
     private val iconCache = HashMap<String, Bitmap>()
     private val keyguardManager = app.getSystemService(KeyguardManager::class.java)
-    private val devicePolicyManager: DevicePolicyManager? = app.getSystemService(DevicePolicyManager::class.java)
+    private val devicePolicyManager: DevicePolicyManager? =
+        app.getSystemService(DevicePolicyManager::class.java)
     private var shownKeys = emptySet<String>()
 
     // Nóng sẵn vì listener được bind suốt khi đã có quyền: khung đầu tiên của AOD đọc giá trị hiện tại là đủ. Mới nhất trước.
@@ -96,25 +97,43 @@ class NotificationStateManager(
                         .mapNotNull { sbn ->
                             val ranking = Ranking()
                             (sbn to ranking).takeIf {
-                                rankingMap.getRanking(sbn.key, ranking) && sbn.isShownOnAmbient(ranking)
+                                rankingMap.getRanking(sbn.key, ranking) && sbn.isShownOnAmbient(
+                                    ranking
+                                )
                             }
                         }
                         .sortedByDescending { (sbn, _) -> sbn.postTime }
                         .mapNotNull { (sbn, ranking) ->
-                            sbn.toActiveNotification(content = sbn.lockScreenContent(ranking, lockScreen))
+                            sbn.toActiveNotification(
+                                content = sbn.lockScreenContent(
+                                    ranking,
+                                    lockScreen
+                                )
+                            )
                         }
                     val alert = posted?.let { sbn ->
                         shown.find { it.key == sbn.key }
-                            ?.takeIf { sbn.isAlerting(rankingMap = rankingMap, isNew = sbn.key !in shownKeys) }
+                            ?.takeIf {
+                                sbn.isAlerting(
+                                    rankingMap = rankingMap,
+                                    isNew = sbn.key !in shownKeys
+                                )
+                            }
                     }
                     val shownPackages = shown.mapTo(HashSet()) { it.packageName }
-                    iconCache.keys.retainAll { cacheKey -> cacheKey.substringBefore(ICON_CACHE_SEPARATOR) in shownPackages }
+                    iconCache.keys.retainAll { cacheKey ->
+                        cacheKey.substringBefore(
+                            ICON_CACHE_SEPARATOR
+                        ) in shownPackages
+                    }
                     shownKeys = shown.mapTo(HashSet()) { it.key }
                     _notifications.value = shown
                     _mediaSessionToken.value = active.latestMediaSessionToken(rankingMap)
                     if (alert != null) _alerts.tryEmit(alert)
                 },
-                catch = { e -> Timber.tag(tag).e("Notification update failed: ${e.stackTraceToString()}") },
+                catch = { e ->
+                    Timber.tag(tag).e("Notification update failed: ${e.stackTraceToString()}")
+                },
             )
         }
     }
@@ -122,28 +141,31 @@ class NotificationStateManager(
     // Như màn hình chờ của hệ thống: bỏ thông báo thường trực, tóm tắt nhóm, im lặng, bị Không làm phiền ẩn khỏi màn hình chờ, của chính app, và thông báo nhạc (đã có điều khiển nhạc).
     private fun StatusBarNotification.isShownOnAmbient(ranking: Ranking): Boolean =
         packageName != app.packageName &&
-            !isOngoing &&
-            notification.flags and HIDDEN_FLAGS == 0 &&
-            notification.mediaSessionToken == null &&
-            isVisibleOnLockScreen(ranking) &&
-            ranking.importance >= NotificationManager.IMPORTANCE_DEFAULT &&
-            ranking.suppressedVisualEffects and NotificationManager.Policy.SUPPRESSED_EFFECT_AMBIENT == 0
+                !isOngoing &&
+                notification.flags and HIDDEN_FLAGS == 0 &&
+                notification.mediaSessionToken == null &&
+                isVisibleOnLockScreen(ranking) &&
+                ranking.importance >= NotificationManager.IMPORTANCE_DEFAULT &&
+                ranking.suppressedVisualEffects and NotificationManager.Policy.SUPPRESSED_EFFECT_AMBIENT == 0
 
     // App hoặc user đã ẩn thông báo này trên màn hình khoá (VISIBILITY_SECRET; tuỳ chỉnh theo kênh chỉ đọc được từ Android 12), hoặc app đang bị tạm ngưng.
     private fun StatusBarNotification.isVisibleOnLockScreen(ranking: Ranking): Boolean =
         notification.visibility != Notification.VISIBILITY_SECRET &&
-            (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
-                ranking.lockscreenVisibilityOverride != Notification.VISIBILITY_SECRET) &&
-            !ranking.isSuspended
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                        ranking.lockscreenVisibilityOverride != Notification.VISIBILITY_SECRET) &&
+                !ranking.isSuspended
 
     // Đọc lại mỗi lần cập nhật vì user đổi cài đặt màn hình khoá lúc nào cũng được. Quản lý thiết bị cấm hiện nội dung thì coi như tắt "nội dung nhạy cảm".
     private fun readLockScreenPolicy(): LockScreenPolicy {
         val disabledFeatures = devicePolicyManager?.getKeyguardDisabledFeatures(null) ?: 0
-        val isRedactionForced = disabledFeatures and DevicePolicyManager.KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS != 0
+        val isRedactionForced =
+            disabledFeatures and DevicePolicyManager.KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS != 0
         return LockScreenPolicy(
             isContentShown = isLockScreenSettingOn(LOCK_SCREEN_SHOW_NOTIFICATIONS),
             isSecure = keyguardManager.isDeviceSecure,
-            isPrivateContentShown = !isRedactionForced && isLockScreenSettingOn(LOCK_SCREEN_ALLOW_PRIVATE_NOTIFICATIONS),
+            isPrivateContentShown = !isRedactionForced && isLockScreenSettingOn(
+                LOCK_SCREEN_ALLOW_PRIVATE_NOTIFICATIONS
+            ),
         )
     }
 
@@ -157,11 +179,15 @@ class NotificationStateManager(
         }
 
     // Như màn hình khoá của hệ thống: tắt hiện thông báo thì che hết; máy có khoá bảo mật thì che thông báo VISIBILITY_PRIVATE khi tắt "nội dung nhạy cảm", và che kênh user đặt "ẩn nội dung" (đọc được từ Android 12). Bị che thì dùng bản công khai app tự soạn, không có thì null.
-    private fun StatusBarNotification.lockScreenContent(ranking: Ranking, policy: LockScreenPolicy): NotificationContent? {
+    private fun StatusBarNotification.lockScreenContent(
+        ranking: Ranking,
+        policy: LockScreenPolicy
+    ): NotificationContent? {
         if (!policy.isContentShown) return null
         val isChannelPrivate = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            ranking.lockscreenVisibilityOverride == Notification.VISIBILITY_PRIVATE
-        val isAppPrivate = notification.visibility == Notification.VISIBILITY_PRIVATE && !policy.isPrivateContentShown
+                ranking.lockscreenVisibilityOverride == Notification.VISIBILITY_PRIVATE
+        val isAppPrivate =
+            notification.visibility == Notification.VISIBILITY_PRIVATE && !policy.isPrivateContentShown
         val isRedacted = policy.isSecure && (isChannelPrivate || isAppPrivate)
         val source = if (isRedacted) notification.publicVersion else notification
         return source?.content()
@@ -170,7 +196,9 @@ class NotificationStateManager(
     // Tiêu đề và một dòng nội dung như thông báo thu gọn; app chỉ đặt chữ dài (BigTextStyle) thì lấy chữ đó.
     private fun Notification.content(): NotificationContent = NotificationContent(
         title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim().orEmpty(),
-        text = (extras.getCharSequence(Notification.EXTRA_TEXT) ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
+        text = (extras.getCharSequence(Notification.EXTRA_TEXT) ?: extras.getCharSequence(
+            Notification.EXTRA_BIG_TEXT
+        ))
             ?.toString()
             ?.trim()
             .orEmpty(),
@@ -180,8 +208,8 @@ class NotificationStateManager(
     private fun StatusBarNotification.isAlerting(rankingMap: RankingMap, isNew: Boolean): Boolean {
         val ranking = Ranking()
         return rankingMap.getRanking(key, ranking) &&
-            ranking.matchesInterruptionFilter() &&
-            (isNew || notification.flags and Notification.FLAG_ONLY_ALERT_ONCE == 0)
+                ranking.matchesInterruptionFilter() &&
+                (isNew || notification.flags and Notification.FLAG_ONLY_ALERT_ONCE == 0)
     }
 
     // Thông báo nhạc mới nhất, cách trình phát nhạc trên màn hình khoá của hệ thống chọn phiên nhạc.
@@ -189,8 +217,8 @@ class NotificationStateManager(
         val ranking = Ranking()
         return filter { sbn ->
             sbn.notification.mediaSessionToken != null &&
-                rankingMap.getRanking(sbn.key, ranking) &&
-                sbn.isVisibleOnLockScreen(ranking)
+                    rankingMap.getRanking(sbn.key, ranking) &&
+                    sbn.isVisibleOnLockScreen(ranking)
         }
             .maxByOrNull { sbn -> sbn.postTime }
             ?.notification
@@ -198,7 +226,11 @@ class NotificationStateManager(
     }
 
     private val Notification.mediaSessionToken: MediaSession.Token?
-        get() = BundleCompat.getParcelable(extras, Notification.EXTRA_MEDIA_SESSION, MediaSession.Token::class.java)
+        get() = BundleCompat.getParcelable(
+            extras,
+            Notification.EXTRA_MEDIA_SESSION,
+            MediaSession.Token::class.java
+        )
 
     private fun StatusBarNotification.toActiveNotification(content: NotificationContent?): ActiveNotification? {
         val icon = loadSmallIcon() ?: return null
@@ -230,9 +262,11 @@ class NotificationStateManager(
         private const val ICON_SIZE_DP = 24
         private const val ICON_CACHE_SEPARATOR = '/'
         private const val ALERT_BUFFER_SIZE = 8
-        private const val HIDDEN_FLAGS = Notification.FLAG_FOREGROUND_SERVICE or Notification.FLAG_GROUP_SUMMARY
+        private const val HIDDEN_FLAGS =
+            Notification.FLAG_FOREGROUND_SERVICE or Notification.FLAG_GROUP_SUMMARY
         private const val LOCK_SCREEN_SHOW_NOTIFICATIONS = "lock_screen_show_notifications"
-        private const val LOCK_SCREEN_ALLOW_PRIVATE_NOTIFICATIONS = "lock_screen_allow_private_notifications"
+        private const val LOCK_SCREEN_ALLOW_PRIVATE_NOTIFICATIONS =
+            "lock_screen_allow_private_notifications"
         private const val SETTING_ON = 1
         private const val SETTING_OFF = 0
     }

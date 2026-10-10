@@ -24,8 +24,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.R
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnit
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
+import com.decoutkhanqindev.custom_aod.presentation.theme.Grey9A
+import com.decoutkhanqindev.custom_aod.presentation.theme.Mint
+import com.decoutkhanqindev.custom_aod.presentation.theme.NeutralVariant30
+import com.decoutkhanqindev.custom_aod.presentation.theme.RoundedCornerShape12dp
 
 @Composable
 fun AdLoadingDialog(adUnit: () -> AdUnit) {
@@ -41,8 +43,8 @@ fun AdLoadingDialog(adUnit: () -> AdUnit) {
         ),
     ) {
         Card(
-            shape = AodsShapes.RoundedCornerShape12dp,
-            colors = CardDefaults.cardColors(containerColor = AodsColors.NeutralVariant30),
+            shape = RoundedCornerShape12dp,
+            colors = CardDefaults.cardColors(containerColor = NeutralVariant30),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
             Column(
@@ -54,7 +56,7 @@ fun AdLoadingDialog(adUnit: () -> AdUnit) {
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(40.dp),
-                    color = AodsColors.Mint,
+                    color = Mint,
                     strokeWidth = 3.dp,
                 )
 
@@ -62,7 +64,7 @@ fun AdLoadingDialog(adUnit: () -> AdUnit) {
 
                 Text(
                     text = stringResource(R.string.ad_loading),
-                    color = AodsColors.Grey9A,
+                    color = Grey9A,
                     fontWeight = FontWeight.Medium,
                 )
             }

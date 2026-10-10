@@ -1,6 +1,7 @@
 # Phase 3 — Cross-Feature Review
 
-Final pass after all per-feature PRDs are written. Generate navigation graph, surface shared components, detect conflicts, write master INDEX.
+Final pass after all per-feature PRDs are written. Generate navigation graph, surface shared
+components, detect conflicts, write master INDEX.
 
 ## Process
 
@@ -13,9 +14,11 @@ Final pass after all per-feature PRDs are written. Generate navigation graph, su
 
 ## Navigation Graph (`nav-graph.mmd`)
 
-Mermaid LR flowchart. Nodes = screens (across all features). Edges = navigation derived from entry/exit lists.
+Mermaid LR flowchart. Nodes = screens (across all features). Edges = navigation derived from
+entry/exit lists.
 
 **Constraints:**
+
 - LR flowchart only (no advanced Mermaid features — keeps rendering robust)
 - Node IDs = `feature_slug__screen_name` (snake_case, double-underscore separator)
 - Node labels = screen name (display)
@@ -61,19 +64,23 @@ Example detection:
 → Suggest: shared `LoginButton` component
 ```
 
-Don't over-detect. Generic UI elements (Button, TextField) are framework-level, NOT app-shared. Only surface app-specific reusable elements.
+Don't over-detect. Generic UI elements (Button, TextField) are framework-level, NOT app-shared. Only
+surface app-specific reusable elements.
 
 ## Naming Conflict Detection
 
 Scan all screens across all features:
+
 - Same screen name in 2 features → conflict
 - Suggest disambiguation (e.g., `Detail` → `RunDetail` and `WorkoutDetail`)
 
 ## Cross-Feature Dependencies
 
 Detect explicit cross-feature jumps:
+
 - A screen's exit points to a screen in another feature → dependency
-- Example: `onboarding__first_action --> run_logging__list` means Onboarding depends on RunLogging existing
+- Example: `onboarding__first_action --> run_logging__list` means Onboarding depends on RunLogging
+  existing
 
 List dependencies in INDEX as: `Onboarding → RunLogging`.
 
@@ -124,6 +131,7 @@ Save: `plans/{slug}/prd/INDEX.md`
 ## Validation
 
 Before writing INDEX:
+
 - All PRDs read successfully (no parse errors)
 - nav-graph.mmd renders (basic syntax check — count `flowchart`, `-->`, balanced subgraphs)
 

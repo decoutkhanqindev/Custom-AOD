@@ -6,14 +6,14 @@ import androidx.compose.ui.graphics.Color
  * Primitive color palette — raw values with no semantic meaning.
  * Replace {Prefix} with your project prefix (e.g., App, Acme).
  */
-object {Prefix}PrimitiveColors {
+object {Prefix }PrimitiveColors {
     // Neutral
-    val Black       = Color(0xFF000000)
-    val White       = Color(0xFFFFFFFF)
+    val Black = Color(0xFF000000)
+    val White = Color(0xFFFFFFFF)
     val Transparent = Color(0x00000000)
 
     // Grey scale
-    val Grey50  = Color(0xFFFAFAFA)
+    val Grey50 = Color(0xFFFAFAFA)
     val Grey100 = Color(0xFFF5F5F5)
     val Grey200 = Color(0xFFEEEEEE)
     val Grey300 = Color(0xFFE0E0E0)
@@ -25,7 +25,7 @@ object {Prefix}PrimitiveColors {
     val Grey900 = Color(0xFF212121)
 
     // Blue scale
-    val Blue50  = Color(0xFFE3F2FD)
+    val Blue50 = Color(0xFFE3F2FD)
     val Blue100 = Color(0xFFBBDEFB)
     val Blue200 = Color(0xFF90CAF9)
     val Blue300 = Color(0xFF64B5F6)
@@ -37,7 +37,7 @@ object {Prefix}PrimitiveColors {
     val Blue900 = Color(0xFF0D47A1)
 
     // Purple scale
-    val Purple50  = Color(0xFFF3E5F5)
+    val Purple50 = Color(0xFFF3E5F5)
     val Purple100 = Color(0xFFE1BEE7)
     val Purple200 = Color(0xFFCE93D8)
     val Purple300 = Color(0xFFBA68C8)
@@ -49,7 +49,7 @@ object {Prefix}PrimitiveColors {
     val Purple900 = Color(0xFF4A148C)
 
     // Green scale
-    val Green50  = Color(0xFFE8F5E9)
+    val Green50 = Color(0xFFE8F5E9)
     val Green100 = Color(0xFFC8E6C9)
     val Green200 = Color(0xFFA5D6A7)
     val Green300 = Color(0xFF81C784)
@@ -61,7 +61,7 @@ object {Prefix}PrimitiveColors {
     val Green900 = Color(0xFF1B5E20)
 
     // Red scale
-    val Red50  = Color(0xFFFFEBEE)
+    val Red50 = Color(0xFFFFEBEE)
     val Red100 = Color(0xFFFFCDD2)
     val Red200 = Color(0xFFEF9A9A)
     val Red300 = Color(0xFFE57373)
@@ -73,7 +73,7 @@ object {Prefix}PrimitiveColors {
     val Red900 = Color(0xFFB71C1C)
 
     // Yellow scale
-    val Yellow50  = Color(0xFFFFFDE7)
+    val Yellow50 = Color(0xFFFFFDE7)
     val Yellow100 = Color(0xFFFFF9C4)
     val Yellow200 = Color(0xFFFFF59D)
     val Yellow300 = Color(0xFFFFF176)
@@ -85,7 +85,7 @@ object {Prefix}PrimitiveColors {
     val Yellow900 = Color(0xFFF57F17)
 
     // Orange scale
-    val Orange50  = Color(0xFFFFF3E0)
+    val Orange50 = Color(0xFFFFF3E0)
     val Orange100 = Color(0xFFFFE0B2)
     val Orange200 = Color(0xFFFFCC80)
     val Orange300 = Color(0xFFFFB74D)

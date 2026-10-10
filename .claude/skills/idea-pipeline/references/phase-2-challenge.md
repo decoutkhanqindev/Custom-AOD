@@ -1,20 +1,26 @@
 # Phase 2 — Refine & Adjust
 
-**Purpose**: take the selected candidate and decide the *right shape* before writing PRD/designs. NOT a kill phase. The idea is moving forward — we're tuning scope and approach.
+**Purpose**: take the selected candidate and decide the *right shape* before writing PRD/designs.
+NOT a kill phase. The idea is moving forward — we're tuning scope and approach.
 
-**Scope of Phase 2: feature surface only.** No monetization, pricing, IAP, ads, or subscription decisions. We're locking what to BUILD; charging strategy is a later separate pass once the feature value is proven.
+**Scope of Phase 2: feature surface only.** No monetization, pricing, IAP, ads, or subscription
+decisions. We're locking what to BUILD; charging strategy is a later separate pass once the feature
+value is proven.
 
-Goal: walk out of Phase 2 with clear answers to scope questions (offline vs online, sharing, MVP vs full app, accounts, core-value feature set) so `prd-pipeline` has unambiguous input.
+Goal: walk out of Phase 2 with clear answers to scope questions (offline vs online, sharing, MVP vs
+full app, accounts, core-value feature set) so `prd-pipeline` has unambiguous input.
 
 ## Mantras (Surface These to the User)
 
 **Ship finished > ship perfect. Perfect never exists. Ship and improve is the key.**
 
-- **YAGNI** — You Aren't Gonna Need It. Default-cut every feature that's not directly serving the core value loop. Anything that *might* matter goes to v2.
+- **YAGNI** — You Aren't Gonna Need It. Default-cut every feature that's not directly serving the
+  core value loop. Anything that *might* matter goes to v2.
 - Bias every scope decision toward the smallest version that proves the riskiest assumption.
 - A shipped Lean MVP beats a polished concept that never reaches the Play Store.
 - When the user is tempted to add scope, surface this reminder before accepting the addition.
-- **Core-value-first**: the MVP collapses to ONE starred feature that delivers the irreplaceable user value. Everything else justifies its slot or is cut.
+- **Core-value-first**: the MVP collapses to ONE starred feature that delivers the irreplaceable
+  user value. Everything else justifies its slot or is cut.
 
 ## Approach Analysis
 
@@ -32,13 +38,17 @@ For the selected idea, produce a tight analysis covering:
 - **Substitute behavior**: what does the target user do today instead?
 ```
 
-Keep this under ~20 lines. Do NOT score, do NOT verdict. This is context for the scope choices below.
+Keep this under ~20 lines. Do NOT score, do NOT verdict. This is context for the scope choices
+below.
 
 ## Risk / Reward / Tradeoff Framing (NON-NEGOTIABLE)
 
-**Every scope decision below has consequences.** When asking the user to scope down (cut features, narrow surface, defer flows), each `AskUserQuestion` option's `description` MUST hint at the tradeoff in one short clause.
+**Every scope decision below has consequences.** When asking the user to scope down (cut features,
+narrow surface, defer flows), each `AskUserQuestion` option's `description` MUST hint at the
+tradeoff in one short clause.
 
-For the **post-decision Risk/Reward/Tradeoff block**, after each scope decision is made, emit a 3-bullet recap:
+For the **post-decision Risk/Reward/Tradeoff block**, after each scope decision is made, emit a
+3-bullet recap:
 
 ```markdown
 **Decision: {what was picked}**
@@ -47,11 +57,13 @@ For the **post-decision Risk/Reward/Tradeoff block**, after each scope decision 
 - Tradeoff: {what specific user need is deferred to v2}
 ```
 
-This block is NOT optional — it's the contract that keeps scope-down honest. If the student can't articulate the tradeoff, surface this and let them reconsider.
+This block is NOT optional — it's the contract that keeps scope-down honest. If the student can't
+articulate the tradeoff, surface this and let them reconsider.
 
 ## Scope Decision Points (use AskUserQuestion for EACH)
 
-Walk the student through these decisions one at a time. Each decision narrows the PRD scope. Each option description must hint at the consequence (e.g., "ship in 2-3 weeks but no settings UI").
+Walk the student through these decisions one at a time. Each decision narrows the PRD scope. Each
+option description must hint at the consequence (e.g., "ship in 2-3 weeks but no settings UI").
 
 ### 1. App Surface
 
@@ -112,7 +124,9 @@ After selection, emit Risk/Reward/Tradeoff block.
 
 ### 5. Core-Value Feature Cut/Add Pass
 
-After the four decisions above, present a refined feature list (5–8 items) with the ⭐ core-value feature clearly marked, and use `AskUserQuestion` `multiSelect: true` to flag what stays in MVP vs cuts to v2.
+After the four decisions above, present a refined feature list (5–8 items) with the ⭐ core-value
+feature clearly marked, and use `AskUserQuestion` `multiSelect: true` to flag what stays in MVP vs
+cuts to v2.
 
 **Each option description should hint at what the user loses if cut.**
 
@@ -123,9 +137,11 @@ multiSelect: true
 options: <one per candidate feature, label ≤17 chars, description = user value lost if cut, in 1 line>
 ```
 
-The ⭐ core-value feature is non-optional — flag it pre-checked and warn if user tries to deselect it. If the student wants to **add** a feature not listed, use a follow-up free-text capture.
+The ⭐ core-value feature is non-optional — flag it pre-checked and warn if user tries to deselect
+it. If the student wants to **add** a feature not listed, use a follow-up free-text capture.
 
-After the cut pass, emit a single consolidated Risk/Reward/Tradeoff block summarizing the final MVP feature set:
+After the cut pass, emit a single consolidated Risk/Reward/Tradeoff block summarizing the final MVP
+feature set:
 
 ```markdown
 **Final MVP feature set: {N items locked, M deferred}**
@@ -161,5 +177,6 @@ This block goes straight into `idea-brief.md` so PRD/design phases have unambigu
 - Do NOT issue "kill / refine / advance" verdicts.
 - Do NOT challenge whether the idea should exist — assume it ships, decide its shape.
 - Do NOT skip `AskUserQuestion` for the scope decisions — these MUST be explicit choices.
-- Do NOT ask about monetization, pricing, IAP, ads, or subscription. If user volunteers, capture as `monetization_note:` and move on.
+- Do NOT ask about monetization, pricing, IAP, ads, or subscription. If user volunteers, capture as
+  `monetization_note:` and move on.
 - Do NOT skip the Risk/Reward/Tradeoff block after each decision — that's the contract.

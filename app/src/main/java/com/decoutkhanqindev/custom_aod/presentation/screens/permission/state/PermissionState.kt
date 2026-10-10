@@ -1,8 +1,8 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.permission.state
 
 import androidx.compose.runtime.Immutable
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.hasRequiredPermissions
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.hasRequiredPermissions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

@@ -34,12 +34,12 @@ fun default{Prefix}SkeletonTokens(
 
 ## Variants
 
-| Variant     | height  | shape        | Typical use               |
-|-------------|---------|--------------|---------------------------|
-| text        | 16dp    | small / 4dp  | body text lines           |
-| circular    | dynamic | full         | avatars, icons            |
-| rectangular | dynamic | medium / 8dp | images, cards, banners    |
-| rounded     | dynamic | large / 16dp | pill buttons, chips       |
+| Variant     | height  | shape        | Typical use            |
+|-------------|---------|--------------|------------------------|
+| text        | 16dp    | small / 4dp  | body text lines        |
+| circular    | dynamic | full         | avatars, icons         |
+| rectangular | dynamic | medium / 8dp | images, cards, banners |
+| rounded     | dynamic | large / 16dp | pill buttons, chips    |
 
 ```kotlin
 fun text{Prefix}SkeletonTokens(colors: {Prefix}ColorTokens) =

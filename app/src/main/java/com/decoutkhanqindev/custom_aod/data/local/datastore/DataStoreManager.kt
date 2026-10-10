@@ -40,7 +40,8 @@ class DataStoreManager(
     val isFirstOpen: StateFlow<Boolean?> =
         isFirstOpenKey.asStateFlow(default = DEFAULT_IS_FIRST_OPEN)
 
-    private val isAodEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_ENABLED_KEY)
+    private val isAodEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_ENABLED_KEY)
     val isAodEnabled: StateFlow<Boolean?> =
         isAodEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_ENABLED)
 
@@ -49,7 +50,8 @@ class DataStoreManager(
     val isAodCustomBrightness: StateFlow<Boolean?> =
         isAodCustomBrightnessKey.asStateFlow(default = DEFAULT_IS_AOD_CUSTOM_BRIGHTNESS)
 
-    private val aodBrightnessPercentKey: Preferences.Key<Int> = intPreferencesKey(AOD_BRIGHTNESS_PERCENT_KEY)
+    private val aodBrightnessPercentKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_BRIGHTNESS_PERCENT_KEY)
     val aodBrightnessPercent: StateFlow<Int?> =
         aodBrightnessPercentKey.asStateFlow(default = DEFAULT_AOD_BRIGHTNESS_PERCENT)
 
@@ -58,7 +60,8 @@ class DataStoreManager(
     val isAodProximityEnabled: StateFlow<Boolean?> =
         isAodProximityEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_PROXIMITY_ENABLED)
 
-    private val aodTimeoutMinutesKey: Preferences.Key<Int> = intPreferencesKey(AOD_TIMEOUT_MINUTES_KEY)
+    private val aodTimeoutMinutesKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_TIMEOUT_MINUTES_KEY)
     val aodTimeoutMinutes: StateFlow<Int?> =
         aodTimeoutMinutesKey.asStateFlow(default = DEFAULT_AOD_TIMEOUT_MINUTES)
 
@@ -80,7 +83,8 @@ class DataStoreManager(
     val aodScheduleStartMinute: StateFlow<Int?> =
         aodScheduleStartMinuteKey.asStateFlow(default = DEFAULT_AOD_SCHEDULE_START_MINUTE)
 
-    private val aodScheduleEndMinuteKey: Preferences.Key<Int> = intPreferencesKey(AOD_SCHEDULE_END_MINUTE_KEY)
+    private val aodScheduleEndMinuteKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_SCHEDULE_END_MINUTE_KEY)
     val aodScheduleEndMinute: StateFlow<Int?> =
         aodScheduleEndMinuteKey.asStateFlow(default = DEFAULT_AOD_SCHEDULE_END_MINUTE)
 
@@ -116,11 +120,13 @@ class DataStoreManager(
     val aodClockColor: StateFlow<Int?> =
         aodClockColorKey.asStateFlow(default = DEFAULT_AOD_CLOCK_COLOR)
 
-    private val aodClockSizePercentKey: Preferences.Key<Int> = intPreferencesKey(AOD_CLOCK_SIZE_PERCENT_KEY)
+    private val aodClockSizePercentKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_CLOCK_SIZE_PERCENT_KEY)
     val aodClockSizePercent: StateFlow<Int?> =
         aodClockSizePercentKey.asStateFlow(default = DEFAULT_AOD_CLOCK_SIZE_PERCENT)
 
-    private val isAodLandscapeKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_LANDSCAPE_KEY)
+    private val isAodLandscapeKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_LANDSCAPE_KEY)
     val isAodLandscape: StateFlow<Boolean?> =
         isAodLandscapeKey.asStateFlow(default = DEFAULT_IS_AOD_LANDSCAPE)
 
@@ -128,23 +134,28 @@ class DataStoreManager(
     val aodWallpaper: StateFlow<Int?> =
         aodWallpaperKey.asStateFlow(default = DEFAULT_AOD_WALLPAPER)
 
-    private val aodDoubleTapActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_DOUBLE_TAP_ACTION_KEY)
+    private val aodDoubleTapActionKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_DOUBLE_TAP_ACTION_KEY)
     val aodDoubleTapAction: StateFlow<Int?> =
         aodDoubleTapActionKey.asStateFlow(default = DEFAULT_AOD_DOUBLE_TAP_ACTION)
 
-    private val aodSwipeUpActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_SWIPE_UP_ACTION_KEY)
+    private val aodSwipeUpActionKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_SWIPE_UP_ACTION_KEY)
     val aodSwipeUpAction: StateFlow<Int?> =
         aodSwipeUpActionKey.asStateFlow(default = DEFAULT_AOD_SWIPE_UP_ACTION)
 
-    private val aodSwipeDownActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_SWIPE_DOWN_ACTION_KEY)
+    private val aodSwipeDownActionKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_SWIPE_DOWN_ACTION_KEY)
     val aodSwipeDownAction: StateFlow<Int?> =
         aodSwipeDownActionKey.asStateFlow(default = DEFAULT_AOD_SWIPE_DOWN_ACTION)
 
-    private val aodVolumeUpActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_VOLUME_UP_ACTION_KEY)
+    private val aodVolumeUpActionKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_VOLUME_UP_ACTION_KEY)
     val aodVolumeUpAction: StateFlow<Int?> =
         aodVolumeUpActionKey.asStateFlow(default = DEFAULT_AOD_VOLUME_UP_ACTION)
 
-    private val aodVolumeDownActionKey: Preferences.Key<Int> = intPreferencesKey(AOD_VOLUME_DOWN_ACTION_KEY)
+    private val aodVolumeDownActionKey: Preferences.Key<Int> =
+        intPreferencesKey(AOD_VOLUME_DOWN_ACTION_KEY)
     val aodVolumeDownAction: StateFlow<Int?> =
         aodVolumeDownActionKey.asStateFlow(default = DEFAULT_AOD_VOLUME_DOWN_ACTION)
 
@@ -152,11 +163,13 @@ class DataStoreManager(
     val aodBackAction: StateFlow<Int?> =
         aodBackActionKey.asStateFlow(default = DEFAULT_AOD_BACK_ACTION)
 
-    private val isAodAutoDimEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_AUTO_DIM_ENABLED_KEY)
+    private val isAodAutoDimEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_AUTO_DIM_ENABLED_KEY)
     val isAodAutoDimEnabled: StateFlow<Boolean?> =
         isAodAutoDimEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_AUTO_DIM_ENABLED)
 
-    private val isAodRaiseToWakeEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_RAISE_TO_WAKE_ENABLED_KEY)
+    private val isAodRaiseToWakeEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_RAISE_TO_WAKE_ENABLED_KEY)
     val isAodRaiseToWakeEnabled: StateFlow<Boolean?> =
         isAodRaiseToWakeEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_RAISE_TO_WAKE_ENABLED)
 
@@ -164,11 +177,13 @@ class DataStoreManager(
     val aodMemo: StateFlow<String?> =
         aodMemoKey.asStateFlow(default = DEFAULT_AOD_MEMO)
 
-    private val isAodDateEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_DATE_ENABLED_KEY)
+    private val isAodDateEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_DATE_ENABLED_KEY)
     val isAodDateEnabled: StateFlow<Boolean?> =
         isAodDateEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_DATE_ENABLED)
 
-    private val isAodBatteryEnabledKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_AOD_BATTERY_ENABLED_KEY)
+    private val isAodBatteryEnabledKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_AOD_BATTERY_ENABLED_KEY)
     val isAodBatteryEnabled: StateFlow<Boolean?> =
         isAodBatteryEnabledKey.asStateFlow(default = DEFAULT_IS_AOD_BATTERY_ENABLED)
 
@@ -201,11 +216,13 @@ class DataStoreManager(
     val weatherCode: StateFlow<Int?> =
         weatherCodeKey.asStateFlow(default = DEFAULT_WEATHER_CODE)
 
-    private val isWeatherDayKey: Preferences.Key<Boolean> = booleanPreferencesKey(IS_WEATHER_DAY_KEY)
+    private val isWeatherDayKey: Preferences.Key<Boolean> =
+        booleanPreferencesKey(IS_WEATHER_DAY_KEY)
     val isWeatherDay: StateFlow<Boolean?> =
         isWeatherDayKey.asStateFlow(default = DEFAULT_IS_WEATHER_DAY)
 
-    private val weatherUpdatedAtMillisKey: Preferences.Key<Long> = longPreferencesKey(WEATHER_UPDATED_AT_MILLIS_KEY)
+    private val weatherUpdatedAtMillisKey: Preferences.Key<Long> =
+        longPreferencesKey(WEATHER_UPDATED_AT_MILLIS_KEY)
     val weatherUpdatedAtMillis: StateFlow<Long?> =
         weatherUpdatedAtMillisKey.asStateFlow(default = DEFAULT_WEATHER_UPDATED_AT_MILLIS)
 
@@ -413,10 +430,12 @@ class DataStoreManager(
         private const val IS_AOD_SCHEDULE_ENABLED_KEY = "is_aod_schedule_enabled"
         private const val AOD_SCHEDULE_START_MINUTE_KEY = "aod_schedule_start_minute"
         private const val AOD_SCHEDULE_END_MINUTE_KEY = "aod_schedule_end_minute"
-        private const val IS_AOD_NOTIFICATION_ICONS_ENABLED_KEY = "is_aod_notification_icons_enabled"
+        private const val IS_AOD_NOTIFICATION_ICONS_ENABLED_KEY =
+            "is_aod_notification_icons_enabled"
         private const val IS_AOD_EDGE_GLOW_ENABLED_KEY = "is_aod_edge_glow_enabled"
         private const val IS_AOD_MEDIA_CONTROLS_ENABLED_KEY = "is_aod_media_controls_enabled"
-        private const val IS_AOD_NOTIFICATION_CONTENT_ENABLED_KEY = "is_aod_notification_content_enabled"
+        private const val IS_AOD_NOTIFICATION_CONTENT_ENABLED_KEY =
+            "is_aod_notification_content_enabled"
         private const val AOD_CLOCK_FACE_KEY = "aod_clock_face"
         private const val AOD_CLOCK_FONT_KEY = "aod_clock_font"
         private const val AOD_CLOCK_COLOR_KEY = "aod_clock_color"

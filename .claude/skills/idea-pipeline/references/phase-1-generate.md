@@ -1,8 +1,11 @@
 # Phase 1 — Generate
 
-Produce **exactly 2 candidate ideas**. Keep output tight — student doesn't want to wade through 4-5 options.
+Produce **exactly 2 candidate ideas**. Keep output tight — student doesn't want to wade through 4-5
+options.
 
-**Scope of Phase 1: feature value only.** Do NOT ask about or include monetization, pricing, IAP, ads, or subscription. We're picking the right thing to BUILD; how to charge for it is a separate later pass once value is validated.
+**Scope of Phase 1: feature value only.** Do NOT ask about or include monetization, pricing, IAP,
+ads, or subscription. We're picking the right thing to BUILD; how to charge for it is a separate
+later pass once value is validated.
 
 ## Per-Idea Schema
 
@@ -20,13 +23,15 @@ Produce **exactly 2 candidate ideas**. Keep output tight — student doesn't wan
 ## Generation Heuristics
 
 Bias toward ideas where:
+
 1. **Personal pain** — solo dev has the problem themselves (proxy for taste)
 2. **Narrow niche** — "habit tracker for marathon runners" beats "habit tracker"
 3. **Daily-use shape** — apps used weekly+ retain better than annual
 4. **Offline-first feasibility** — fewer backend dependencies for indie scale
 5. **One sharp core value** — the idea collapses to a single sentence and a single starred feature
 
-The 2 ideas should be **meaningfully different** — different niche, different user behavior, or different core value. Don't ship two near-duplicates.
+The 2 ideas should be **meaningfully different** — different niche, different user behavior, or
+different core value. Don't ship two near-duplicates.
 
 ## Anti-Patterns (avoid)
 
@@ -39,7 +44,8 @@ The 2 ideas should be **meaningfully different** — different niche, different 
 
 ## Output Format
 
-Present **2 candidates** as a numbered list. Then use `AskUserQuestion` (NOT raw prompt) to pick which to advance:
+Present **2 candidates** as a numbered list. Then use `AskUserQuestion` (NOT raw prompt) to pick
+which to advance:
 
 ```
 header: "Pick Idea"
@@ -51,8 +57,12 @@ options:
   - label: "Regenerate", description: "Neither lands, try again"
 ```
 
-Only the selected candidate(s) proceed to Phase 2. If user picks "Regenerate", produce 2 new ideas with adjusted heuristics (note what to change based on their feedback).
+Only the selected candidate(s) proceed to Phase 2. If user picks "Regenerate", produce 2 new ideas
+with adjusted heuristics (note what to change based on their feedback).
 
 ## If User Volunteers Monetization Preferences
 
-If the student mentions pricing/IAP/ads/subscription unprompted, do NOT branch into a monetization decision tree. Capture it as a one-line `monetization_note:` to carry into the brief frontmatter, then continue with feature scoping. Acknowledge with: "Noted — we'll revisit pricing in a later pass once the core value is validated."
+If the student mentions pricing/IAP/ads/subscription unprompted, do NOT branch into a monetization
+decision tree. Capture it as a one-line `monetization_note:` to carry into the brief frontmatter,
+then continue with feature scoping. Acknowledge with: "Noted — we'll revisit pricing in a later pass
+once the core value is validated."

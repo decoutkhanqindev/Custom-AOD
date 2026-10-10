@@ -19,10 +19,10 @@ import com.decoutkhanqindev.custom_aod.data.device.screen.ScreenStateManager
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.MainActivity
-import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WakeResultValue
-import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.WakeResultValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodScheduleUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.currentAodRules
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
 import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.coroutines.CoroutineScope
@@ -114,7 +114,8 @@ class AodService : Service(), Tag {
         if (!session.isShowing) return
 
         // Không có PIN/hình vẽ thì không có keyguard để mở: USER_PRESENT đến ngay sau lần bật màn hình của chính app, lần đó không được đóng AOD.
-        val isJustShown = SystemClock.elapsedRealtime() - session.shownAt < USER_PRESENT_GRACE_MILLIS
+        val isJustShown =
+            SystemClock.elapsedRealtime() - session.shownAt < USER_PRESENT_GRACE_MILLIS
         if (isJustShown && !screenStateManager.isDeviceSecure) return
 
         session.finish()
@@ -139,9 +140,9 @@ class AodService : Service(), Tag {
     private fun launchAod() {
         val intent = Intent(this, AodActivity::class.java).addFlags(
             Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                Intent.FLAG_ACTIVITY_NO_ANIMATION or
-                Intent.FLAG_ACTIVITY_NO_USER_ACTION,
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                    Intent.FLAG_ACTIVITY_NO_ANIMATION or
+                    Intent.FLAG_ACTIVITY_NO_USER_ACTION,
         )
         try {
             startActivity(intent)
@@ -178,7 +179,8 @@ class AodService : Service(), Tag {
 
     private fun startInForeground() {
         val languageCode = LanguageValue.fromCode(dataStoreManager.selectedLangCode.value).code
-        val localizedResources = languageManager.resourcesFor(languageManager.configurationFor(languageCode))
+        val localizedResources =
+            languageManager.resourcesFor(languageManager.configurationFor(languageCode))
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(
             NotificationChannel(
@@ -200,7 +202,11 @@ class AodService : Service(), Tag {
             .setOngoing(true)
             .build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            )
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }

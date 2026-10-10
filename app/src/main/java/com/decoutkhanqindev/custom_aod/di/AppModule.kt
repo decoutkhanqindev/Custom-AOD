@@ -93,7 +93,21 @@ val viewModelModule = module {
     viewModel { CustomizeViewModel(get(), get(), get(), get()) }
     viewModel { PermissionViewModel(get(), get()) }
     viewModel { (isPreview: Boolean) ->
-        AodViewModel(isPreview, get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+        AodViewModel(
+            isPreview,
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
+        )
     }
 }
 

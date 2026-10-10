@@ -24,7 +24,7 @@ class PermissionManager(
 
     fun needsNotificationPermission(): Boolean =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            app.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                app.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
 
     fun hasCalendarPermission(): Boolean =
         app.checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
@@ -38,7 +38,8 @@ class PermissionManager(
 
     fun isMiuiShowWhenLockedAllowed(): Boolean? = isMiuiOpAllowed(OP_MIUI_SHOW_WHEN_LOCKED)
 
-    fun isMiuiBackgroundStartAllowed(): Boolean? = isMiuiOpAllowed(OP_MIUI_BACKGROUND_START_ACTIVITY)
+    fun isMiuiBackgroundStartAllowed(): Boolean? =
+        isMiuiOpAllowed(OP_MIUI_BACKGROUND_START_ACTIVITY)
 
     // Op của Xiaomi không có API công khai và có thể bị đánh số lại theo bản HyperOS: đọc lỗi thì trả null (không rõ).
     @SuppressLint("DiscouragedPrivateApi")

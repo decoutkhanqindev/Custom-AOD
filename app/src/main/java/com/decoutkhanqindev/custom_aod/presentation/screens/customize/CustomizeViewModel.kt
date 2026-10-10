@@ -9,24 +9,23 @@ import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.image.AodImageManager
 import com.decoutkhanqindev.custom_aod.domain.usecase.RefreshWeatherUseCase
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodExtrasUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeAppearanceUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeDecorUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeDraftUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeEffectsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeGuideStepValue
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeInfoUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.model.hasRequiredPermissions
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodAppearance
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodExtras
-import com.decoutkhanqindev.custom_aod.presentation.model.observeAodNotificationOptions
-import com.decoutkhanqindev.custom_aod.presentation.model.requiredAodPermissions
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.observeAodAppearance
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodExtrasUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodExtras
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.observeAodNotificationOptions
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeAppearanceUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeDecorUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeDraftUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeEffectsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeGuideStepValue
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeInfoUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.hasRequiredPermissions
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.requiredAodPermissions
 import com.decoutkhanqindev.custom_aod.presentation.screens.customize.state.CustomizeEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.customize.state.CustomizeIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.customize.state.CustomizeState
-import com.decoutkhanqindev.custom_aod.utils.Tag
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
@@ -42,7 +41,7 @@ class CustomizeViewModel(
     private val refreshWeatherUseCase: RefreshWeatherUseCase,
 ) : BaseViewModel<CustomizeState, CustomizeIntent, CustomizeEffect>(
     initialState = CustomizeState(),
-), Tag {
+) {
 
     private var initialDraft = CustomizeDraftUiModel()
     private val undoStack = ArrayDeque<CustomizeDraftUiModel>()
@@ -70,7 +69,9 @@ class CustomizeViewModel(
             is CustomizeIntent.Permission -> onPermissionIntent(intent)
             is CustomizeIntent.Guide -> onGuideIntent(intent)
             is CustomizeIntent.ConfirmCustomization -> confirmCustomization()
-            is CustomizeIntent.SkipCustomization -> viewModelScope.launch { navigateNext() }
+            is CustomizeIntent.SkipCustomization ->
+                viewModelScope.launch { sendEffect(CustomizeEffect.Navigation.NavigateToMain) }
+
             is CustomizeIntent.NavigateBack ->
                 viewModelScope.launch { sendEffect(CustomizeEffect.Navigation.NavigateBack) }
         }
@@ -88,8 +89,22 @@ class CustomizeViewModel(
 
     private fun onAppearanceIntent(intent: CustomizeIntent.Appearance) {
         when (intent) {
-            is CustomizeIntent.Appearance.ChangeClockFace -> editAppearance { copy(clock = clock.copy(face = intent.face)) }
-            is CustomizeIntent.Appearance.ChangeClockFont -> editAppearance { copy(clock = clock.copy(font = intent.font)) }
+            is CustomizeIntent.Appearance.ChangeClockFace -> editAppearance {
+                copy(
+                    clock = clock.copy(
+                        face = intent.face
+                    )
+                )
+            }
+
+            is CustomizeIntent.Appearance.ChangeClockFont -> editAppearance {
+                copy(
+                    clock = clock.copy(
+                        font = intent.font
+                    )
+                )
+            }
+
             is CustomizeIntent.Appearance.ChangeClockColor ->
                 editAppearance { copy(clock = clock.copy(color = intent.color)) }
 
@@ -103,13 +118,32 @@ class CustomizeViewModel(
 
     private fun onDecorIntent(intent: CustomizeIntent.Decor) {
         when (intent) {
-            is CustomizeIntent.Decor.SelectWallpaper -> editDecor { copy(wallpaper = intent.wallpaper, background = null) }
+            is CustomizeIntent.Decor.SelectWallpaper -> editDecor {
+                copy(
+                    wallpaper = intent.wallpaper,
+                    background = null
+                )
+            }
+
             is CustomizeIntent.Decor.OpenBackgroundPicker ->
                 viewModelScope.launch { sendEffect(CustomizeEffect.Decor.OpenBackgroundPicker) }
 
             is CustomizeIntent.Decor.BackgroundPickerResult -> onBackgroundPickerResult(intent.uri)
-            is CustomizeIntent.Decor.RemoveBackground -> editDecor { copy(wallpaper = null, background = null) }
-            is CustomizeIntent.Decor.ShowDrawingPad -> updateState { copy(decor = decor.copy(isDrawingPadVisible = true)) }
+            is CustomizeIntent.Decor.RemoveBackground -> editDecor {
+                copy(
+                    wallpaper = null,
+                    background = null
+                )
+            }
+
+            is CustomizeIntent.Decor.ShowDrawingPad -> updateState {
+                copy(
+                    decor = decor.copy(
+                        isDrawingPadVisible = true
+                    )
+                )
+            }
+
             is CustomizeIntent.Decor.DismissDrawingPad ->
                 updateState { copy(decor = decor.copy(isDrawingPadVisible = false)) }
 
@@ -119,7 +153,14 @@ class CustomizeViewModel(
             }
 
             is CustomizeIntent.Decor.RemoveDrawing -> editDecor { copy(drawing = null) }
-            is CustomizeIntent.Decor.ShowMemoEditor -> updateState { copy(decor = decor.copy(isMemoEditorVisible = true)) }
+            is CustomizeIntent.Decor.ShowMemoEditor -> updateState {
+                copy(
+                    decor = decor.copy(
+                        isMemoEditorVisible = true
+                    )
+                )
+            }
+
             is CustomizeIntent.Decor.DismissMemoEditor ->
                 updateState { copy(decor = decor.copy(isMemoEditorVisible = false)) }
 
@@ -133,7 +174,11 @@ class CustomizeViewModel(
     private fun onInfoIntent(intent: CustomizeIntent.Info) {
         when (intent) {
             is CustomizeIntent.Info.ToggleNotificationIcons ->
-                toggleInfo(PermissionValue.NOTIFICATION_ACCESS, intent.isEnabled) { copy(isNotificationIconsEnabled = it) }
+                toggleInfo(PermissionValue.NOTIFICATION_ACCESS, intent.isEnabled) {
+                    copy(
+                        isNotificationIconsEnabled = it
+                    )
+                }
 
             is CustomizeIntent.Info.ToggleNotificationContent ->
                 toggleInfo(PermissionValue.NOTIFICATION_ACCESS, intent.isEnabled) {
@@ -141,23 +186,36 @@ class CustomizeViewModel(
                 }
 
             is CustomizeIntent.Info.ToggleCalendar ->
-                toggleInfo(PermissionValue.CALENDAR, intent.isEnabled) { copy(isCalendarEnabled = it) }
+                toggleInfo(
+                    PermissionValue.CALENDAR,
+                    intent.isEnabled
+                ) { copy(isCalendarEnabled = it) }
 
             is CustomizeIntent.Info.ToggleWeather ->
-                toggleInfo(PermissionValue.LOCATION, intent.isEnabled) { copy(isWeatherEnabled = it) }
+                toggleInfo(
+                    PermissionValue.LOCATION,
+                    intent.isEnabled
+                ) { copy(isWeatherEnabled = it) }
 
             is CustomizeIntent.Info.ToggleWeatherFahrenheit ->
                 edit { copy(info = info.copy(isWeatherFahrenheit = intent.isEnabled)) }
 
             is CustomizeIntent.Info.ToggleMediaControls ->
-                toggleInfo(PermissionValue.NOTIFICATION_ACCESS, intent.isEnabled) { copy(isMediaControlsEnabled = it) }
+                toggleInfo(PermissionValue.NOTIFICATION_ACCESS, intent.isEnabled) {
+                    copy(
+                        isMediaControlsEnabled = it
+                    )
+                }
         }
     }
 
     private fun onEffectsIntent(intent: CustomizeIntent.Effects) {
         when (intent) {
             is CustomizeIntent.Effects.ToggleEdgeGlow ->
-                toggleWithPermission(PermissionValue.NOTIFICATION_ACCESS, intent.isEnabled) { isEnabled ->
+                toggleWithPermission(
+                    PermissionValue.NOTIFICATION_ACCESS,
+                    intent.isEnabled
+                ) { isEnabled ->
                     copy(effects = effects.copy(isEdgeGlowEnabled = isEnabled))
                 }
 
@@ -199,7 +257,12 @@ class CustomizeViewModel(
     private fun onGuideIntent(intent: CustomizeIntent.Guide) {
         when (intent) {
             is CustomizeIntent.Guide.ShowGuide ->
-                updateState { copy(guideStep = CustomizeGuideStepValue.entries.first(), selectedTab = null) }
+                updateState {
+                    copy(
+                        guideStep = CustomizeGuideStepValue.entries.first(),
+                        selectedTab = null
+                    )
+                }
 
             is CustomizeIntent.Guide.ShowNextGuideStep -> {
                 val next = state.value.guideStep?.next
@@ -407,12 +470,13 @@ class CustomizeViewModel(
             updateState { copy(isApplying = true, selectedTab = null) }
             val draft = state.value.draft
             save(draft, initialDraft)
-            updateState { copy(isApplying = false) }
             navigateNext()
+            updateState { copy(isApplying = false) }
         }
     }
 
-    // Đủ quyền bắt buộc thì vào thẳng Main, không thì sang màn quyền; Bỏ qua thì không ghi gì, giữ nguyên cài đặt.
+    // Áp dụng xong: đủ quyền bắt buộc thì vào thẳng Main, không thì sang màn quyền. Bỏ qua không đi qua đây: không ghi gì và vào thẳng Main
+    // (thiếu quyền thì Main hiện bottom sheet nhắc), vì user đã muốn bỏ qua mà còn bắt cấp quyền thì dễ bỏ app.
     private suspend fun navigateNext() {
         val isReady = permissionManager.requiredAodPermissions().hasRequiredPermissions
         sendEffect(if (isReady) CustomizeEffect.Navigation.NavigateToMain else CustomizeEffect.Navigation.NavigateToPermission)
@@ -430,7 +494,10 @@ class CustomizeViewModel(
         saveDrawing(draft.decor.drawing, initial.decor.drawing)
     }
 
-    private fun saveAppearance(draft: CustomizeAppearanceUiModel, initial: CustomizeAppearanceUiModel) {
+    private fun saveAppearance(
+        draft: CustomizeAppearanceUiModel,
+        initial: CustomizeAppearanceUiModel
+    ) {
         with(dataStoreManager) {
             if (draft.clock.face != initial.clock.face) saveAodClockFace(draft.clock.face.code)
             if (draft.clock.font != initial.clock.font) saveAodClockFont(draft.clock.font.code)
@@ -464,7 +531,10 @@ class CustomizeViewModel(
         }
     }
 
-    private suspend fun saveBackground(draft: CustomizeDecorUiModel, initial: CustomizeDecorUiModel) {
+    private suspend fun saveBackground(
+        draft: CustomizeDecorUiModel,
+        initial: CustomizeDecorUiModel
+    ) {
         if (draft.wallpaper == initial.wallpaper && draft.background === initial.background) return
         val background = draft.background
         val wallpaper = draft.wallpaper

@@ -26,7 +26,11 @@ tasks.register("validateDesignTokens") {
         // Patterns to detect
         val patterns = listOf(
             Triple("Color hex", Regex("""Color\(0x[0-9A-Fa-f]+\)"""), "error"),
-            Triple("Color named", Regex("""(?<!\w)Color\.(Black|White|Red|Green|Blue|Yellow)"""), "warning"),
+            Triple(
+                "Color named",
+                Regex("""(?<!\w)Color\.(Black|White|Red|Green|Blue|Yellow)"""),
+                "warning"
+            ),
             Triple("Dp hardcode", Regex("""(?<!\w)\d+\.dp\b"""), "warning"),
             Triple("Sp hardcode", Regex("""(?<!\w)\d+\.sp\b"""), "warning"),
             Triple("Shape hardcode", Regex("""RoundedCornerShape\(\d+"""), "warning"),

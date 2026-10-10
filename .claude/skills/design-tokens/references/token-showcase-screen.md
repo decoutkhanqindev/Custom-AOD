@@ -1,10 +1,12 @@
 # Token Showcase Screen
 
-MANDATORY: After creating token-backed components, generate a showcase screen that displays all components for visual preview.
+MANDATORY: After creating token-backed components, generate a showcase screen that displays all
+components for visual preview.
 
 ## Purpose
 
 The showcase screen lets the user:
+
 1. See all generated components rendered with their tokens
 2. Verify light/dark theme switching
 3. Preview component variants (filled, outlined, text buttons, etc.)
@@ -63,6 +65,7 @@ fun {Prefix}TokenShowcaseScreen(
 ## Section Templates
 
 ### Color Palette
+
 ```kotlin
 @Composable
 private fun ColorPaletteShowcase() {
@@ -98,6 +101,7 @@ private fun ColorSwatchRow(label: String, bg: Color, fg: Color) {
 ```
 
 ### Typography Scale
+
 ```kotlin
 @Composable
 private fun TypographyShowcase() {
@@ -113,6 +117,7 @@ private fun TypographyShowcase() {
 ```
 
 ### Button Variants
+
 ```kotlin
 @Composable
 private fun ButtonShowcase() {
@@ -131,6 +136,7 @@ private fun ButtonShowcase() {
 ```
 
 ### Cards
+
 ```kotlin
 @Composable
 private fun CardShowcase() {
@@ -148,19 +154,25 @@ private fun CardShowcase() {
 ## Input-Source Specific Showcase
 
 ### From Screenshot/PNG
+
 When tokens derived from a screenshot, the showcase screen MUST:
+
 1. Display the source image at the top for side-by-side comparison
 2. Recreate key UI elements visible in the screenshot using generated tokens
 3. Add "Source vs Recreated" labels
 
 ### From Figma
+
 When tokens derived from Figma, the showcase screen MUST:
+
 1. Mirror Figma frame layout where possible
 2. Match component naming from Figma component library
 3. Include a "Figma Mapping" section showing token ↔ Figma variable names
 
 ### From Stitch (Google)
+
 When tokens derived from Stitch, the showcase screen MUST:
+
 1. Use `generate_screen_from_text` to create the Stitch preview first
 2. Build the Compose showcase to match the Stitch-generated screen
 3. Include side-by-side comparison section
@@ -186,6 +198,7 @@ private fun TokenShowcaseDark() {
 ## File Location
 
 Place in the UI module's showcase package:
+
 ```
 {ui-module}/src/main/kotlin/.../component/showcase/{Prefix}TokenShowcaseScreen.kt
 ```
@@ -193,6 +206,7 @@ Place in the UI module's showcase package:
 ## Delegation to compose-implementer
 
 When delegating to `compose-implementer` agent, include in prompt:
+
 ```
 Task: Create TokenShowcaseScreen aggregating all built components + recreated screens.
 Components to showcase: {list of created component names from Phase 1}

@@ -1,25 +1,26 @@
 # Component Implementation Requirements
 
-After generating token files, MUST create composable components that consume those tokens. This is NOT optional.
+After generating token files, MUST create composable components that consume those tokens. This is
+NOT optional.
 
 ## Token-to-Component Mapping
 
 Each token type maps to required component(s):
 
-| Token Generated | Required Components | Priority |
-|----------------|-------------------|----------|
-| ColorTokens | `{Prefix}Surface`, `{Prefix}Background` | P0 |
-| ColorTokens + TypographyTokens | `{Prefix}Text`, `{Prefix}Label` | P0 |
-| ButtonTokens | `{Prefix}FilledButton`, `{Prefix}OutlinedButton`, `{Prefix}TextButton` | P0 |
-| CardTokens | `{Prefix}Card`, `{Prefix}OutlinedCard` | P1 |
-| TextFieldTokens | `{Prefix}TextField`, `{Prefix}OutlinedTextField` | P1 |
-| DialogTokens | `{Prefix}Dialog` | P1 |
-| BottomSheetTokens | `{Prefix}BottomSheet` | P2 |
-| SnackbarTokens | `{Prefix}Snackbar` | P2 |
-| TopBarTokens | `{Prefix}TopBar` | P2 |
-| BadgeChipTokens | `{Prefix}Badge`, `{Prefix}Chip` | P2 |
-| DividerTokens | `{Prefix}Divider` | P2 |
-| SkeletonTokens | `{Prefix}SkeletonRow` | P2 |
+| Token Generated                | Required Components                                                    | Priority |
+|--------------------------------|------------------------------------------------------------------------|----------|
+| ColorTokens                    | `{Prefix}Surface`, `{Prefix}Background`                                | P0       |
+| ColorTokens + TypographyTokens | `{Prefix}Text`, `{Prefix}Label`                                        | P0       |
+| ButtonTokens                   | `{Prefix}FilledButton`, `{Prefix}OutlinedButton`, `{Prefix}TextButton` | P0       |
+| CardTokens                     | `{Prefix}Card`, `{Prefix}OutlinedCard`                                 | P1       |
+| TextFieldTokens                | `{Prefix}TextField`, `{Prefix}OutlinedTextField`                       | P1       |
+| DialogTokens                   | `{Prefix}Dialog`                                                       | P1       |
+| BottomSheetTokens              | `{Prefix}BottomSheet`                                                  | P2       |
+| SnackbarTokens                 | `{Prefix}Snackbar`                                                     | P2       |
+| TopBarTokens                   | `{Prefix}TopBar`                                                       | P2       |
+| BadgeChipTokens                | `{Prefix}Badge`, `{Prefix}Chip`                                        | P2       |
+| DividerTokens                  | `{Prefix}Divider`                                                      | P2       |
+| SkeletonTokens                 | `{Prefix}SkeletonRow`                                                  | P2       |
 
 **Rule**: P0 = always created. P1 = created if tokens exist. P2 = created if comprehensive scope.
 
@@ -57,6 +58,7 @@ fun {Prefix}FilledButton(
 ## P0 Component Templates
 
 ### {Prefix}Surface
+
 ```kotlin
 @Composable
 fun {Prefix}Surface(
@@ -79,6 +81,7 @@ fun {Prefix}Surface(
 ```
 
 ### {Prefix}Text
+
 ```kotlin
 @Composable
 fun {Prefix}Text(
@@ -103,6 +106,7 @@ fun {Prefix}Text(
 ```
 
 ### {Prefix}Background
+
 ```kotlin
 @Composable
 fun {Prefix}Background(
@@ -122,6 +126,7 @@ fun {Prefix}Background(
 ## File Placement
 
 Components go in the UI module (discovered via convention protocol), NOT the theme module:
+
 - Theme module → token data classes + defaults + CompositionLocals
 - UI module → composable components that consume tokens
 

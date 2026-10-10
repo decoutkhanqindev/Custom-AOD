@@ -1,6 +1,7 @@
 # Text Field Tokens
 
-Token class for text field component styling. Covers filled and outlined variants with all input states.
+Token class for text field component styling. Covers filled and outlined variants with all input
+states.
 
 ```kotlin
 @Immutable
@@ -77,12 +78,12 @@ fun default{Prefix}TextFieldTokens(
 
 ## State Matrix
 
-| State    | indicatorColor    | indicatorWidth | labelColor        | containerColor              |
-|----------|-------------------|----------------|-------------------|-----------------------------|
-| default  | onSurfaceVariant  | 1dp            | onSurfaceVariant  | surfaceContainerHighest     |
-| focused  | primary           | 2dp            | primary           | surfaceContainerHighest     |
-| error    | error             | 2dp            | error             | surfaceContainerHighest     |
-| disabled | onSurface 0.38f   | 1dp            | onSurface 0.38f   | onSurface 0.04f             |
+| State    | indicatorColor   | indicatorWidth | labelColor       | containerColor          |
+|----------|------------------|----------------|------------------|-------------------------|
+| default  | onSurfaceVariant | 1dp            | onSurfaceVariant | surfaceContainerHighest |
+| focused  | primary          | 2dp            | primary          | surfaceContainerHighest |
+| error    | error            | 2dp            | error            | surfaceContainerHighest |
+| disabled | onSurface 0.38f  | 1dp            | onSurface 0.38f  | onSurface 0.04f         |
 
 ## Usage
 

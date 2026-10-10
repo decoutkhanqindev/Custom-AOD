@@ -1,6 +1,7 @@
 package com.decoutkhanqindev.custom_aod.presentation.base
 
 import androidx.lifecycle.ViewModel
+import com.decoutkhanqindev.custom_aod.utils.Tag
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-abstract class BaseViewModel<S, I, E>(initialState: S) : ViewModel() {
+abstract class BaseViewModel<S, I, E>(initialState: S) : ViewModel(), Tag {
 
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<S> = _state.asStateFlow()

@@ -1,15 +1,15 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 
 import android.graphics.Bitmap
-import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ChargingRuleValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockFontValue
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ScheduleTimeValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.ClockColorValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.ClockFaceValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.ClockFontValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodActionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.ChargingRuleValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.ScheduleTimeValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 
 sealed interface MainIntent {
     sealed interface Options : MainIntent {
@@ -56,7 +56,9 @@ sealed interface MainIntent {
     sealed interface Interaction : MainIntent {
         data class ShowGestureActionPicker(val gesture: AodGestureValue) : Interaction
         data object DismissGestureActionPicker : Interaction
-        data class ChangeGestureAction(val gesture: AodGestureValue, val action: AodActionValue) : Interaction
+        data class ChangeGestureAction(val gesture: AodGestureValue, val action: AodActionValue) :
+            Interaction
+
         data class ToggleAutoDim(val isEnabled: Boolean) : Interaction
         data class ToggleRaiseToWake(val isEnabled: Boolean) : Interaction
     }

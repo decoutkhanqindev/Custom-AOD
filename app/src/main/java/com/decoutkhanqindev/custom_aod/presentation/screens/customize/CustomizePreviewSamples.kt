@@ -6,18 +6,18 @@ import android.graphics.Path
 import androidx.compose.runtime.Immutable
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
-import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodInteractionUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodNotificationsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeDraftUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.MediaUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.NotificationContentUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.NotificationIconUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.WeatherConditionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WeatherUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.AodNotificationsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.CalendarEventUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.MediaUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.NotificationContentUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.NotificationIconUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.WeatherConditionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.WeatherUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodActionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodInteractionUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeDraftUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -45,7 +45,8 @@ data class CustomizePreviewSamples(
 
         // Thao tác và phím âm lượng của AOD tắt hết để không chặn thao tác của màn tùy chỉnh.
         private val PreviewInteraction = AodInteractionUiModel(
-            actions = AodGestureValue.entries.associateWith { AodActionValue.NONE }.toImmutableMap(),
+            actions = AodGestureValue.entries.associateWith { AodActionValue.NONE }
+                .toImmutableMap(),
             isAutoDimEnabled = false,
             isRaiseToWakeEnabled = false,
         )
@@ -53,12 +54,22 @@ data class CustomizePreviewSamples(
         // Hình đơn giản màu trắng: AOD tự tô lại theo màu chữ như icon thông báo thật.
         private fun sampleIcons(): ImmutableList<Bitmap> = IconShape.entries.map { shape ->
             createBitmap(ICON_SIZE, ICON_SIZE).applyCanvas {
-                val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.WHITE }
+                val paint =
+                    Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.WHITE }
                 val size = ICON_SIZE.toFloat()
                 val inset = size / 6
                 when (shape) {
                     IconShape.CIRCLE -> drawCircle(size / 2, size / 2, size / 2 - inset, paint)
-                    IconShape.SQUARE -> drawRoundRect(inset, inset, size - inset, size - inset, inset, inset, paint)
+                    IconShape.SQUARE -> drawRoundRect(
+                        inset,
+                        inset,
+                        size - inset,
+                        size - inset,
+                        inset,
+                        inset,
+                        paint
+                    )
+
                     IconShape.TRIANGLE -> drawPath(
                         Path().apply {
                             moveTo(size / 2, inset)
@@ -106,7 +117,12 @@ data class CustomizePreviewSamples(
             notifications = AodNotificationsUiModel(
                 icons = if (info.isNotificationIconsEnabled) {
                     samples.icons
-                        .mapIndexed { index, icon -> NotificationIconUiModel(packageName = "sample.$index", icon = icon) }
+                        .mapIndexed { index, icon ->
+                            NotificationIconUiModel(
+                                packageName = "sample.$index",
+                                icon = icon
+                            )
+                        }
                         .toImmutableList()
                 } else {
                     persistentListOf()

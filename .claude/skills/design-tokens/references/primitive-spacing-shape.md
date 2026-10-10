@@ -82,12 +82,12 @@ Note: `RoundedCornerShape(50)` uses percent — produces a pill/circle shape.
 
 Shadow/tonal elevation in `dp`. Used with `Modifier.shadow()` or `Card(elevation = ...)`.
 
-| Token  | Value | Token  | Value  |
-|--------|-------|--------|--------|
-| `None` | 0.dp  | `Lg`   | 8.dp   |
-| `Xs`   | 1.dp  | `Xl`   | 12.dp  |
-| `Sm`   | 2.dp  | `Xxl`  | 16.dp  |
-| `Md`   | 4.dp  | `Xxxl` | 24.dp  |
+| Token  | Value | Token  | Value |
+|--------|-------|--------|-------|
+| `None` | 0.dp  | `Lg`   | 8.dp  |
+| `Xs`   | 1.dp  | `Xl`   | 12.dp |
+| `Sm`   | 2.dp  | `Xxl`  | 16.dp |
+| `Md`   | 4.dp  | `Xxxl` | 24.dp |
 
 ---
 
@@ -95,13 +95,13 @@ Shadow/tonal elevation in `dp`. Used with `Modifier.shadow()` or `Card(elevation
 
 Square icon dimensions. Pass to `Modifier.size()`.
 
-| Token      | Value  | Token      | Value  |
-|------------|--------|------------|--------|
-| `Xxs`      | 8.dp   | `Xxl`      | 48.dp  |
-| `Xs`       | 12.dp  | `Xxxl`     | 64.dp  |
-| `Sm`       | 16.dp  | `Huge`     | 80.dp  |
-| `Md`       | 24.dp  | `Enormous` | 120.dp |
-| `Lg`       | 32.dp  | `Xl`       | 40.dp  |
+| Token | Value | Token      | Value  |
+|-------|-------|------------|--------|
+| `Xxs` | 8.dp  | `Xxl`      | 48.dp  |
+| `Xs`  | 12.dp | `Xxxl`     | 64.dp  |
+| `Sm`  | 16.dp | `Huge`     | 80.dp  |
+| `Md`  | 24.dp | `Enormous` | 120.dp |
+| `Lg`  | 32.dp | `Xl`       | 40.dp  |
 
 ---
 
@@ -109,13 +109,13 @@ Square icon dimensions. Pass to `Modifier.size()`.
 
 Stroke/border width in `dp`. Use with `Modifier.border()` or `BorderStroke`.
 
-| Token    | Value |
-|----------|-------|
-| `None`   | 0.dp  |
+| Token      | Value  |
+|------------|--------|
+| `None`     | 0.dp   |
 | `Hairline` | 0.5.dp |
-| `Thin`   | 1.dp  |
-| `Medium` | 2.dp  |
-| `Thick`  | 4.dp  |
+| `Thin`     | 1.dp   |
+| `Medium`   | 2.dp   |
+| `Thick`    | 4.dp   |
 
 ```kotlin
 object {Prefix}PrimitiveBorder {
@@ -132,4 +132,5 @@ object {Prefix}PrimitiveBorder {
 ## Notes
 
 - All tokens are raw values — map to semantic roles in a separate alias layer
-- Template files: `.claude/skills/design-tokens/templates/PrimitiveSpacingTemplate.kt`, `PrimitiveShapeTemplate.kt`
+- Template files: `.claude/skills/design-tokens/templates/PrimitiveSpacingTemplate.kt`,
+  `PrimitiveShapeTemplate.kt`

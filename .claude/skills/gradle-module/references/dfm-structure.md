@@ -1,8 +1,11 @@
 # Dynamic Feature Module Structure
 
-For features that may be deferred (on-demand / conditional / instant) and that own a nav route. Reverse-depends on the application module — cannot be a dependency of any other module.
+For features that may be deferred (on-demand / conditional / instant) and that own a nav route.
+Reverse-depends on the application module — cannot be a dependency of any other module.
 
-> The templates below are **vanilla AGP defaults**. Adapt to the project's actual conventions discovered in Step 0 of SKILL.md (convention plugins, version-catalog aliases, namespace pattern, sibling deps, JVM/SDK levels, DI/nav stack).
+> The templates below are **vanilla AGP defaults**. Adapt to the project's actual conventions
+> discovered in Step 0 of SKILL.md (convention plugins, version-catalog aliases, namespace pattern,
+> sibling deps, JVM/SDK levels, DI/nav stack).
 
 ## File Layout (illustrative)
 
@@ -19,7 +22,8 @@ For features that may be deferred (on-demand / conditional / instant) and that o
     └── res/values/strings.xml
 ```
 
-If the project groups dynamic features under a folder (e.g. `feature/<name>`), mirror that path. If it places them flat at the root, mirror that.
+If the project groups dynamic features under a folder (e.g. `feature/<name>`), mirror that path. If
+it places them flat at the root, mirror that.
 
 ## 1. `build.gradle.kts` (vanilla template)
 
@@ -88,9 +92,12 @@ dependencies {
 }
 ```
 
-**Convention plugins**: if the project ships `acme.android.feature` (or similar dynamic-feature convention), apply that one plugin and drop the manual blocks it covers.
+**Convention plugins**: if the project ships `acme.android.feature` (or similar dynamic-feature
+convention), apply that one plugin and drop the manual blocks it covers.
 
-**Application module name**: discover the actual application module path from `settings.gradle.kts` and `dynamicFeatures = setOf(...)` in the application's `build.gradle.kts`. Common values are `":app"`, `":application"`, `":main"`. Don't hardcode `:app`.
+**Application module name**: discover the actual application module path from `settings.gradle.kts`
+and `dynamicFeatures = setOf(...)` in the application's `build.gradle.kts`. Common values are
+`":app"`, `":application"`, `":main"`. Don't hardcode `:app`.
 
 ## 2. `AndroidManifest.xml` (install-time default)
 
@@ -125,22 +132,31 @@ The `dist:title` in the manifest references this string — required by the mani
 
 ## 4. Package contents
 
-Generate stubs that match the project's existing DFM patterns. Sample one existing dynamic feature before authoring. Look for:
+Generate stubs that match the project's existing DFM patterns. Sample one existing dynamic feature
+before authoring. Look for:
+
 - ViewModel base class
 - Route / Screen composable convention
-- DI registration (Hilt automatically wires DFM components in many setups; Koin needs explicit module registration; Dagger uses subcomponents)
+- DI registration (Hilt automatically wires DFM components in many setups; Koin needs explicit
+  module registration; Dagger uses subcomponents)
 - Nav graph extension functions vs route registries
 - Route data type (sealed class, `@Serializable`, string constants)
 
-Mirror what's there. If greenfield (no DFMs yet but user picked DFM), use the simplest viable: plain `ViewModel`, `@Composable Route(...)` + `@Composable Screen(...)`, `NavGraphBuilder.<feature>NavGraph()` extension.
+Mirror what's there. If greenfield (no DFMs yet but user picked DFM), use the simplest viable: plain
+`ViewModel`, `@Composable Route(...)` + `@Composable Screen(...)`,
+`NavGraphBuilder.<feature>NavGraph()` extension.
 
-**Note**: registering the feature's DI module / nav graph in the application module is **project-specific** and out of scope for this skill. Report what the user must do next based on the patterns observed.
+**Note**: registering the feature's DI module / nav graph in the application module is *
+*project-specific** and out of scope for this skill. Report what the user must do next based on the
+patterns observed.
 
 ## 5. Wiring
 
 - `settings.gradle.kts` → `include(":<path-to-feature>")` matching the project's path style.
-- Application module's `build.gradle.kts` → add the path to `dynamicFeatures += setOf(...)` (or `dynamicFeatures = setOf(...)` depending on existing style).
-- **Do NOT** add `implementation(project(":<feature>"))` to the application module — DFMs are wired via `dynamicFeatures`, not regular `implementation`.
+- Application module's `build.gradle.kts` → add the path to `dynamicFeatures += setOf(...)` (or
+  `dynamicFeatures = setOf(...)` depending on existing style).
+- **Do NOT** add `implementation(project(":<feature>"))` to the application module — DFMs are wired
+  via `dynamicFeatures`, not regular `implementation`.
 
 ## 6. Verify
 
@@ -148,4 +164,5 @@ Mirror what's there. If greenfield (no DFMs yet but user picked DFM), use the si
 ./gradlew :<path-to-feature>:compileDebugKotlin
 ```
 
-If full `assembleDebug` requires environment-specific files (e.g. `google-services.json`, signing keys), prefer `compileDebugKotlin` for sanity-checking the skeleton.
+If full `assembleDebug` requires environment-specific files (e.g. `google-services.json`, signing
+keys), prefer `compileDebugKotlin` for sanity-checking the skeleton.

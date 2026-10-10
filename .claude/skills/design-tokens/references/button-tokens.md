@@ -68,30 +68,30 @@ fun default{Prefix}ButtonTokens(
 
 ### Filled
 
-| State    | containerColor        | contentColor         |
-|----------|-----------------------|----------------------|
-| default  | primary               | onPrimary            |
-| hovered  | primary + 8% white    | onPrimary            |
-| pressed  | primary + 12% white   | onPrimary            |
-| disabled | onSurface 0.12f       | onSurface 0.38f      |
+| State    | containerColor      | contentColor    |
+|----------|---------------------|-----------------|
+| default  | primary             | onPrimary       |
+| hovered  | primary + 8% white  | onPrimary       |
+| pressed  | primary + 12% white | onPrimary       |
+| disabled | onSurface 0.12f     | onSurface 0.38f |
 
 ### Outlined
 
-| State    | borderColor           | contentColor         |
-|----------|-----------------------|----------------------|
-| default  | outline               | primary              |
-| focused  | primary               | primary              |
-| pressed  | primary               | primary 0.88f        |
-| disabled | onSurface 0.12f       | onSurface 0.38f      |
+| State    | borderColor     | contentColor    |
+|----------|-----------------|-----------------|
+| default  | outline         | primary         |
+| focused  | primary         | primary         |
+| pressed  | primary         | primary 0.88f   |
+| disabled | onSurface 0.12f | onSurface 0.38f |
 
 ### Tonal
 
-| State    | containerColor           | contentColor             |
-|----------|--------------------------|--------------------------|
-| default  | secondaryContainer       | onSecondaryContainer     |
-| hovered  | secondaryContainer+8%    | onSecondaryContainer     |
-| pressed  | secondaryContainer+12%   | onSecondaryContainer     |
-| disabled | onSurface 0.12f          | onSurface 0.38f          |
+| State    | containerColor         | contentColor         |
+|----------|------------------------|----------------------|
+| default  | secondaryContainer     | onSecondaryContainer |
+| hovered  | secondaryContainer+8%  | onSecondaryContainer |
+| pressed  | secondaryContainer+12% | onSecondaryContainer |
+| disabled | onSurface 0.12f        | onSurface 0.38f      |
 
 ## Usage
 

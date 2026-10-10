@@ -18,7 +18,11 @@ class CalendarRepositoryImpl(
 ) : CalendarRepository, Tag {
 
     // Đọc lỗi (vd quyền READ_CALENDAR bị thu hồi sau khi đã bật) thì coi như hôm nay không có sự kiện: đồng hồ không giữ sự kiện cũ.
-    override suspend fun getEvents(fromMillis: Long, toMillis: Long, limit: Int): List<CalendarEvent> =
+    override suspend fun getEvents(
+        fromMillis: Long,
+        toMillis: Long,
+        limit: Int
+    ): List<CalendarEvent> =
         withContextCatching(
             context = Dispatchers.IO,
             block = { queryEvents(fromMillis = fromMillis, toMillis = toMillis, limit = limit) },
@@ -35,7 +39,13 @@ class CalendarRepositoryImpl(
                 ContentUris.appendId(builder, toMillis)
             }
             .build()
-        return app.contentResolver.query(uri, PROJECTION, SELECTION, arrayOf(fromMillis.toString()), SORT_ORDER)
+        return app.contentResolver.query(
+            uri,
+            PROJECTION,
+            SELECTION,
+            arrayOf(fromMillis.toString()),
+            SORT_ORDER
+        )
             ?.use { cursor ->
                 buildList {
                     while (size < limit && cursor.moveToNext()) {
@@ -75,8 +85,9 @@ class CalendarRepositoryImpl(
 
         // Chỉ lịch đang hiện trong ứng dụng Lịch, bỏ sự kiện user đã từ chối và sự kiện đã kết thúc.
         private const val SELECTION = "${CalendarContract.Instances.VISIBLE} = 1" +
-            " AND ${CalendarContract.Instances.SELF_ATTENDEE_STATUS} != ${CalendarContract.Attendees.ATTENDEE_STATUS_DECLINED}" +
-            " AND ${CalendarContract.Instances.END} > ?"
-        private const val SORT_ORDER = "${CalendarContract.Instances.ALL_DAY} DESC, ${CalendarContract.Instances.BEGIN} ASC"
+                " AND ${CalendarContract.Instances.SELF_ATTENDEE_STATUS} != ${CalendarContract.Attendees.ATTENDEE_STATUS_DECLINED}" +
+                " AND ${CalendarContract.Instances.END} > ?"
+        private const val SORT_ORDER =
+            "${CalendarContract.Instances.ALL_DAY} DESC, ${CalendarContract.Instances.BEGIN} ASC"
     }
 }

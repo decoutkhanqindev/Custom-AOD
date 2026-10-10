@@ -90,21 +90,21 @@ fun default{Prefix}ChipTokens(
 
 ## Chip Variants
 
-| Variant    | containerColor      | borderColor | selectedContainerColor  |
-|------------|---------------------|-------------|-------------------------|
-| assist     | transparent         | outline     | n/a                     |
-| filter     | transparent         | outline     | secondaryContainer      |
-| input      | transparent         | outline     | secondaryContainer      |
-| suggestion | transparent         | outline     | n/a                     |
+| Variant    | containerColor | borderColor | selectedContainerColor |
+|------------|----------------|-------------|------------------------|
+| assist     | transparent    | outline     | n/a                    |
+| filter     | transparent    | outline     | secondaryContainer     |
+| input      | transparent    | outline     | secondaryContainer     |
+| suggestion | transparent    | outline     | n/a                    |
 
 ## State Matrix (Chip)
 
-| State     | containerColor       | labelColor           | borderColor        |
-|-----------|----------------------|----------------------|--------------------|
-| default   | transparent          | onSurfaceVariant     | outline            |
-| selected  | secondaryContainer   | onSecondaryContainer | none               |
-| pressed   | secondaryContainer+12%| onSecondaryContainer| none               |
-| disabled  | transparent          | onSurface 0.38f      | onSurface 0.12f    |
+| State    | containerColor         | labelColor           | borderColor     |
+|----------|------------------------|----------------------|-----------------|
+| default  | transparent            | onSurfaceVariant     | outline         |
+| selected | secondaryContainer     | onSecondaryContainer | none            |
+| pressed  | secondaryContainer+12% | onSecondaryContainer | none            |
+| disabled | transparent            | onSurface 0.38f      | onSurface 0.12f |
 
 ## Usage
 

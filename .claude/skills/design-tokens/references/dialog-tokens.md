@@ -65,21 +65,21 @@ fun default{Prefix}DialogTokens(
 
 ## Variants
 
-| Variant    | containerColor         | iconColor   | Notes                        |
-|------------|------------------------|-------------|------------------------------|
-| alert      | surfaceContainerHigh   | error       | destructive confirm action   |
-| confirm    | surfaceContainerHigh   | primary     | standard two-action          |
-| info       | surfaceContainerHigh   | secondary   | read-only, single dismiss    |
-| fullscreen | surface                | n/a         | no scrim, fills screen       |
+| Variant    | containerColor       | iconColor | Notes                      |
+|------------|----------------------|-----------|----------------------------|
+| alert      | surfaceContainerHigh | error     | destructive confirm action |
+| confirm    | surfaceContainerHigh | primary   | standard two-action        |
+| info       | surfaceContainerHigh | secondary | read-only, single dismiss  |
+| fullscreen | surface              | n/a       | no scrim, fills screen     |
 
 ## State Matrix
 
-| State    | scrimOpacity | containerElevation | actionColor         |
-|----------|--------------|--------------------|---------------------|
-| entering | 0f → 0.32f   | 0dp → 8dp          | primary             |
-| visible  | 0.32f        | 8dp                | primary             |
-| exiting  | 0.32f → 0f   | 8dp → 0dp          | primary             |
-| disabled | 0.32f        | 8dp                | onSurface 0.38f     |
+| State    | scrimOpacity | containerElevation | actionColor     |
+|----------|--------------|--------------------|-----------------|
+| entering | 0f → 0.32f   | 0dp → 8dp          | primary         |
+| visible  | 0.32f        | 8dp                | primary         |
+| exiting  | 0.32f → 0f   | 8dp → 0dp          | primary         |
+| disabled | 0.32f        | 8dp                | onSurface 0.38f |
 
 ## Usage
 

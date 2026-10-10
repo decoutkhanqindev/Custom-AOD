@@ -33,18 +33,23 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingFooter
-import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingHeader
-import com.decoutkhanqindev.custom_aod.presentation.components.AodsOnboardingTopBar
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
-import com.decoutkhanqindev.custom_aod.presentation.model.OnboardingStepValue
+import com.decoutkhanqindev.custom_aod.presentation.components.onboarding.AppOnboardingFooter
+import com.decoutkhanqindev.custom_aod.presentation.components.onboarding.AppOnboardingHeader
+import com.decoutkhanqindev.custom_aod.presentation.components.onboarding.AppOnboardingTopBar
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
+import com.decoutkhanqindev.custom_aod.presentation.model.onboarding.OnboardingStepValue
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageState
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsShapes
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
+import com.decoutkhanqindev.custom_aod.presentation.theme.GreyED
+import com.decoutkhanqindev.custom_aod.presentation.theme.HeadlineSmall
+import com.decoutkhanqindev.custom_aod.presentation.theme.Mint
+import com.decoutkhanqindev.custom_aod.presentation.theme.MintAlpha12
+import com.decoutkhanqindev.custom_aod.presentation.theme.Neutral12
+import com.decoutkhanqindev.custom_aod.presentation.theme.NeutralVariant30
+import com.decoutkhanqindev.custom_aod.presentation.theme.RoundedCornerShape16dp
+import com.decoutkhanqindev.custom_aod.presentation.theme.Theme
+import com.decoutkhanqindev.custom_aod.presentation.theme.TitleMedium
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +62,7 @@ fun LanguageContent(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             if (state.isFirstOpen) {
-                AodsOnboardingTopBar(step = OnboardingStepValue.LANGUAGE)
+                AppOnboardingTopBar(step = OnboardingStepValue.LANGUAGE)
             } else {
                 TopAppBar(
                     title = { Text(text = stringResource(R.string.language)) },
@@ -73,7 +78,7 @@ fun LanguageContent(
             }
         },
         bottomBar = {
-            AodsOnboardingFooter(
+            AppOnboardingFooter(
                 actionLabel = stringResource(if (state.isFirstOpen) R.string.action_continue else R.string.action_done),
                 isActionEnabled = state.isConfirmEnabled,
                 onAction = { onIntent(LanguageIntent.ConfirmLanguage) },
@@ -89,7 +94,7 @@ fun LanguageContent(
         ) {
             if (state.isFirstOpen) {
                 item(key = OnboardingStepValue.LANGUAGE.name) {
-                    AodsOnboardingHeader(
+                    AppOnboardingHeader(
                         title = stringResource(R.string.language_title),
                         subtitle = stringResource(R.string.language_subtitle),
                         modifier = Modifier
@@ -123,14 +128,14 @@ private fun LanguageOption(
 ) {
     val containerColor by animateColorAsState(
         targetValue = if (isSelected) {
-            AodsColors.MintAlpha12
+            MintAlpha12
         } else {
-            AodsColors.Neutral12
+            Neutral12
         },
         label = "LanguageOptionContainer",
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) AodsColors.Mint else AodsColors.NeutralVariant30,
+        targetValue = if (isSelected) Mint else NeutralVariant30,
         label = "LanguageOptionBorder",
     )
     val borderWidth by animateDpAsState(
@@ -142,16 +147,16 @@ private fun LanguageOption(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
-            .clip(AodsShapes.RoundedCornerShape16dp)
+            .clip(RoundedCornerShape16dp)
             .background(containerColor)
-            .border(width = borderWidth, color = borderColor, shape = AodsShapes.RoundedCornerShape16dp)
+            .border(width = borderWidth, color = borderColor, shape = RoundedCornerShape16dp)
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = language.language.flag,
-            style = AodsTypography.HeadlineSmall,
+            style = HeadlineSmall,
         )
 
         Text(
@@ -159,8 +164,8 @@ private fun LanguageOption(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
-            color = AodsColors.GreyED,
-            style = AodsTypography.TitleMedium,
+            color = GreyED,
+            style = TitleMedium,
         )
 
         RadioButton(selected = isSelected, onClick = null)
@@ -170,12 +175,15 @@ private fun LanguageOption(
 @Preview(widthDp = 360, heightDp = 720)
 @Composable
 private fun LanguageContentFirstOpenPreview() {
-    AodsTheme {
+    Theme {
         LanguageContent(
             state = LanguageState(
                 isFirstOpen = true,
                 languages = persistentListOf(
-                    LanguageUiModel(language = LanguageValue.VIETNAMESE, displayName = "Tiếng Việt"),
+                    LanguageUiModel(
+                        language = LanguageValue.VIETNAMESE,
+                        displayName = "Tiếng Việt"
+                    ),
                     LanguageUiModel(language = LanguageValue.ENGLISH, displayName = "English"),
                 ),
                 selectedLanguage = LanguageValue.VIETNAMESE,
@@ -188,11 +196,14 @@ private fun LanguageContentFirstOpenPreview() {
 @Preview(widthDp = 360, heightDp = 640)
 @Composable
 private fun LanguageContentFromMainPreview() {
-    AodsTheme {
+    Theme {
         LanguageContent(
             state = LanguageState(
                 languages = persistentListOf(
-                    LanguageUiModel(language = LanguageValue.VIETNAMESE, displayName = "Tiếng Việt"),
+                    LanguageUiModel(
+                        language = LanguageValue.VIETNAMESE,
+                        displayName = "Tiếng Việt"
+                    ),
                     LanguageUiModel(language = LanguageValue.ENGLISH, displayName = "English"),
                 ),
                 appliedLanguage = LanguageValue.ENGLISH,

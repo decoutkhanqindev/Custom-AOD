@@ -27,11 +27,31 @@ android {
             "ADMOB_TEST_DEVICE_IDS",
             "\"${localProperties.getProperty("admob.test.device.ids", "")}\""
         )
-        buildConfigField("String", "ADMOB_BANNER_TEST_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
-        buildConfigField("String", "ADMOB_NATIVE_TEST_ID", "\"ca-app-pub-3940256099942544/2247696110\"")
-        buildConfigField("String", "ADMOB_INTERSTITIAL_TEST_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
-        buildConfigField("String", "ADMOB_REWARDED_TEST_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
-        buildConfigField("String", "ADMOB_APP_OPEN_TEST_ID", "\"ca-app-pub-3940256099942544/9257395921\"")
+        buildConfigField(
+            "String",
+            "ADMOB_BANNER_TEST_ID",
+            "\"ca-app-pub-3940256099942544/9214589741\""
+        )
+        buildConfigField(
+            "String",
+            "ADMOB_NATIVE_TEST_ID",
+            "\"ca-app-pub-3940256099942544/2247696110\""
+        )
+        buildConfigField(
+            "String",
+            "ADMOB_INTERSTITIAL_TEST_ID",
+            "\"ca-app-pub-3940256099942544/1033173712\""
+        )
+        buildConfigField(
+            "String",
+            "ADMOB_REWARDED_TEST_ID",
+            "\"ca-app-pub-3940256099942544/5224354917\""
+        )
+        buildConfigField(
+            "String",
+            "ADMOB_APP_OPEN_TEST_ID",
+            "\"ca-app-pub-3940256099942544/9257395921\""
+        )
     }
 
     signingConfigs {
@@ -53,11 +73,19 @@ android {
                 "proguard-rules.pro"
             )
             // TODO: Thay bằng ad unit id thật của từng placement (debug giữ test id của Google)
-            buildConfigField("String", "INTER_SPLASH_ALL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField(
+                "String",
+                "INTER_SPLASH_ALL_ID",
+                "\"ca-app-pub-3940256099942544/1033173712\""
+            )
         }
 
         debug {
-            buildConfigField("String", "INTER_SPLASH_ALL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField(
+                "String",
+                "INTER_SPLASH_ALL_ID",
+                "\"ca-app-pub-3940256099942544/1033173712\""
+            )
         }
     }
 

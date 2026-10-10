@@ -40,9 +40,11 @@ class AodActivity : ComponentActivity() {
 
         isPreview = intent.getBooleanExtra(EXTRA_PREVIEW, false)
         val isCustomBrightness =
-            dataStoreManager.isAodCustomBrightness.value ?: DataStoreManager.DEFAULT_IS_AOD_CUSTOM_BRIGHTNESS
+            dataStoreManager.isAodCustomBrightness.value
+                ?: DataStoreManager.DEFAULT_IS_AOD_CUSTOM_BRIGHTNESS
         val brightnessPercent =
-            dataStoreManager.aodBrightnessPercent.value ?: DataStoreManager.DEFAULT_AOD_BRIGHTNESS_PERCENT
+            dataStoreManager.aodBrightnessPercent.value
+                ?: DataStoreManager.DEFAULT_AOD_BRIGHTNESS_PERCENT
         normalBrightness = if (isCustomBrightness) {
             brightnessPercent / MAX_BRIGHTNESS_PERCENT
         } else {
@@ -137,7 +139,12 @@ class AodActivity : ComponentActivity() {
         private const val DIM_BRIGHTNESS = 0.01f
 
         fun preview(context: Context) {
-            context.startActivity(Intent(context, AodActivity::class.java).putExtra(EXTRA_PREVIEW, true))
+            context.startActivity(
+                Intent(context, AodActivity::class.java).putExtra(
+                    EXTRA_PREVIEW,
+                    true
+                )
+            )
         }
     }
 }

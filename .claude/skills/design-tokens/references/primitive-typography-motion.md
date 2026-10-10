@@ -10,31 +10,32 @@ Raw type, animation, and alpha tokens — no semantic meaning, no theme awarenes
 
 All values in `sp`. Import `androidx.compose.ui.unit.sp`.
 
-| Token    | Value  |
-|----------|--------|
-| `Xs`     | 10.sp  |
-| `Sm`     | 12.sp  |
-| `Md`     | 14.sp  |
-| `Lg`     | 16.sp  |
-| `Xl`     | 18.sp  |
-| `Xxl`    | 20.sp  |
-| `Xxxl`   | 24.sp  |
-| `Huge`   | 28.sp  |
-| `Giant`  | 32.sp  |
-| `Display`| 40.sp  |
-| `Hero`   | 48.sp  |
+| Token     | Value |
+|-----------|-------|
+| `Xs`      | 10.sp |
+| `Sm`      | 12.sp |
+| `Md`      | 14.sp |
+| `Lg`      | 16.sp |
+| `Xl`      | 18.sp |
+| `Xxl`     | 20.sp |
+| `Xxxl`    | 24.sp |
+| `Huge`    | 28.sp |
+| `Giant`   | 32.sp |
+| `Display` | 40.sp |
+| `Hero`    | 48.sp |
 
 ### Line Heights
 
-**MUST be `TextUnit` (`.em` or `.sp`) — not `Float`. `Float` will not compile in `TextStyle.lineHeight`.**
+**MUST be `TextUnit` (`.em` or `.sp`) — not `Float`. `Float` will not compile
+in `TextStyle.lineHeight`.**
 
-| Token         | Value    | Notes              |
-|---------------|----------|--------------------|
-| `Tight`       | 1.1.em   | Dense/display text |
-| `Snug`        | 1.25.em  | Headings           |
-| `Normal`      | 1.4.em   | Body default       |
-| `Relaxed`     | 1.6.em   | Long-form content  |
-| `Loose`       | 1.8.em   | High legibility    |
+| Token     | Value   | Notes              |
+|-----------|---------|--------------------|
+| `Tight`   | 1.1.em  | Dense/display text |
+| `Snug`    | 1.25.em | Headings           |
+| `Normal`  | 1.4.em  | Body default       |
+| `Relaxed` | 1.6.em  | Long-form content  |
+| `Loose`   | 1.8.em  | High legibility    |
 
 ```kotlin
 import androidx.compose.ui.unit.em
@@ -72,28 +73,30 @@ object {Prefix}PrimitiveTypography {
 All values in milliseconds (`Int`). Use with `tween()`, `spring()`, `animateXAsState`.
 Names align with `motion-tokens.md` semantic layer.
 
-| Token              | Value | Use case                     |
-|--------------------|-------|------------------------------|
-| `DurationInstant`  | 0     | No animation / immediate     |
-| `DurationFast`     | 100   | Hover, focus states          |
-| `DurationNormal`   | 200   | Default transitions          |
-| `DurationSlow`     | 300   | Dialogs, sheets              |
-| `DurationSlower`   | 400   | Page transitions             |
-| `DurationSlowest`  | 500   | Emphasis / intro animations  |
+| Token             | Value | Use case                    |
+|-------------------|-------|-----------------------------|
+| `DurationInstant` | 0     | No animation / immediate    |
+| `DurationFast`    | 100   | Hover, focus states         |
+| `DurationNormal`  | 200   | Default transitions         |
+| `DurationSlow`    | 300   | Dialogs, sheets             |
+| `DurationSlower`  | 400   | Page transitions            |
+| `DurationSlowest` | 500   | Emphasis / intro animations |
 
 ### Easing Curves
 
-Import `androidx.compose.animation.core.CubicBezierEasing` and `androidx.compose.animation.core.LinearEasing`.
+Import `androidx.compose.animation.core.CubicBezierEasing` and
+`androidx.compose.animation.core.LinearEasing`.
 
-| Token          | Curve                              | Use case                          |
-|----------------|------------------------------------|-----------------------------------|
-| `EaseLinear`   | `LinearEasing`                     | Progress bars, looping            |
-| `EaseIn`       | `CubicBezierEasing(0.4f,0f,1f,1f)` | Accelerate INTO target (exit)     |
-| `EaseOut`      | `CubicBezierEasing(0f,0f,0.2f,1f)` | Decelerate OUT from source (enter)|
-| `EaseInOut`    | `CubicBezierEasing(0.4f,0f,0.2f,1f)` | Shared axis transitions        |
-| `EaseEmphasis` | `CubicBezierEasing(0.2f,0f,0f,1f)` | M3 emphasized — large motion     |
+| Token          | Curve                                | Use case                           |
+|----------------|--------------------------------------|------------------------------------|
+| `EaseLinear`   | `LinearEasing`                       | Progress bars, looping             |
+| `EaseIn`       | `CubicBezierEasing(0.4f,0f,1f,1f)`   | Accelerate INTO target (exit)      |
+| `EaseOut`      | `CubicBezierEasing(0f,0f,0.2f,1f)`   | Decelerate OUT from source (enter) |
+| `EaseInOut`    | `CubicBezierEasing(0.4f,0f,0.2f,1f)` | Shared axis transitions            |
+| `EaseEmphasis` | `CubicBezierEasing(0.2f,0f,0f,1f)`   | M3 emphasized — large motion       |
 
-Note: **EaseIn = element accelerates as it moves toward its destination (typically exit/dismiss). EaseOut = element decelerates as it arrives (typically enter/appear). Matches Material 3 spec.**
+Note: **EaseIn = element accelerates as it moves toward its destination (typically exit/dismiss).
+EaseOut = element decelerates as it arrives (typically enter/appear). Matches Material 3 spec.**
 
 ```kotlin
 import androidx.compose.animation.core.CubicBezierEasing
@@ -138,6 +141,7 @@ object {Prefix}PrimitiveOpacity {
 
 ## Notes
 
-- Line heights: `TextUnit` only — `.em` or `.sp`. Raw `Float` will not compile in `TextStyle.lineHeight`.
+- Line heights: `TextUnit` only — `.em` or `.sp`. Raw `Float` will not compile in
+  `TextStyle.lineHeight`.
 - Durations: `const val Int` — compatible with `tween(durationMillis = ...)`.
 - Easing: M3-aligned. `EaseEmphasis` = M3 "emphasized" curve for large spatial transitions.

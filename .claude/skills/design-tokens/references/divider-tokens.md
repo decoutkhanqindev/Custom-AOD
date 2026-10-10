@@ -30,11 +30,11 @@ fun default{Prefix}DividerTokens(
 
 ## Variants
 
-| Variant      | startIndent | endIndent | Use case                         |
-|--------------|-------------|-----------|----------------------------------|
-| fullBleed    | 0dp         | 0dp       | full-width section separator     |
-| inset        | 16dp        | 0dp       | list items with leading icon     |
-| middleInset  | 16dp        | 16dp      | centered content rows            |
+| Variant     | startIndent | endIndent | Use case                     |
+|-------------|-------------|-----------|------------------------------|
+| fullBleed   | 0dp         | 0dp       | full-width section separator |
+| inset       | 16dp        | 0dp       | list items with leading icon |
+| middleInset | 16dp        | 16dp      | centered content rows        |
 
 ```kotlin
 val {Prefix}DividerInsetDefaults = {Prefix}DividerDefaults.copy(startIndent = 16.dp)

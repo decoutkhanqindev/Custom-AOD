@@ -9,7 +9,7 @@ import com.decoutkhanqindev.custom_aod.presentation.screens.customize.CustomizeP
 import com.decoutkhanqindev.custom_aod.presentation.screens.customize.state.CustomizeState
 
 @Composable
-internal fun rememberCustomizePreview(state: CustomizeState): AodState {
+fun rememberCustomizePreview(state: CustomizeState): AodState {
     val samples = rememberCustomizePreviewSamples()
 
     return remember(state.draft, state.nowMillis, state.effects.isGlowPreviewing, samples) {

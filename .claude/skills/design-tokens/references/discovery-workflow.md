@@ -11,23 +11,30 @@ Instructions for Claude to guide users through design token discovery before gen
 5. Confirm all values with user before proceeding to generation
 
 **Validation rules:**
+
 - `prefix`: must match `^[A-Z][a-zA-Z0-9]*$` — re-ask if invalid
 - `namespace`: must match `^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$` — re-ask if invalid
 
-**M2 guard:** If detection finds `material3=false`, warn: "This skill generates Material 3 tokens. Your project uses Material 2. Add M3 dependency first or abort." Do NOT generate M3 code for M2 projects.
+**M2 guard:** If detection finds `material3=false`, warn: "This skill generates Material 3 tokens.
+Your project uses Material 2. Add M3 dependency first or abort." Do NOT generate M3 code for M2
+projects.
 
-**Existing file conflict:** For `existing-enhance` projects, check for existing token files in target module. List found files and ask: "Overwrite, skip, or generate alongside with different names?"
+**Existing file conflict:** For `existing-enhance` projects, check for existing token files in
+target module. List found files and ask: "Overwrite, skip, or generate alongside with different
+names?"
 
 ## Question Flow
 
 ### Stage 1: CONTEXT (~1 min)
 
 **Q1: Project state?**
+
 - `new` — Starting a new project from scratch
 - `existing-refactor` — Refactoring existing theme to token system
 - `existing-enhance` — Adding tokens alongside existing theme
 
 **Q2: Design maturity?**
+
 - `finalized` — Have final designs/specs/Figma
 - `direction-only` — Know the visual direction, no exact specs
 - `starting-fresh` — No design decisions made yet
@@ -35,21 +42,25 @@ Instructions for Claude to guide users through design token discovery before gen
 ### Stage 2: SCOPE (~2 min)
 
 **Q3: Token scope?**
+
 - `minimal` — Colors + Spacing + Shapes only (~5 files)
 - `standard` — + Typography + Elevation (~7 files)
 - `comprehensive` — + Motion + Opacity + Border + Component specs (~15 files)
 
 **Q4: Theme variants?**
+
 - `single` — One theme only
 - `light-dark` — Light and dark themes
 - `multi-scheme` — Dynamic color / multiple branded themes
 
 **Q5: Material integration?**
+
 - `m3-default` — Use Material 3 defaults, extend with tokens
 - `m3-custom` — Custom Material 3 color scheme with tokens
 - `independent` — Standalone tokens, minimal M3 dependency
 
 **Q6: Current theme state?** *(SKIP if Q1 = `new`)*
+
 - `none` — No theme setup at all
 - `basic-material` — Default MaterialTheme only
 - `partial-local` — Some CompositionLocals / custom tokens exist
@@ -58,16 +69,19 @@ Instructions for Claude to guide users through design token discovery before gen
 ### Stage 3: GROUNDING (~1 min)
 
 **Q7: Brand colors?**
+
 - `have-hex-values` — Have exact hex codes ready
 - `reference-file` — Colors in a design file/Figma link
 - `use-m3-defaults` — Start with Material 3 default palette
 
 **Q8: Spacing feel?** *(SKIP if Q3 = `minimal` AND user wants defaults)*
+
 - `tight-4dp` — 4dp base unit (compact UI)
 - `balanced-8dp` — 8dp base unit (standard)
 - `no-preference` — Use 8dp default
 
 **Q9: Typography approach?** *(SKIP if Q3 = `minimal`)*
+
 - `system-fonts` — System default fonts only
 - `custom-fonts` — Custom/Google fonts
 - `minimal` — Minimal type scale (3-4 sizes)
@@ -75,6 +89,7 @@ Instructions for Claude to guide users through design token discovery before gen
 ### Stage 4: VALIDATION (~30 sec)
 
 **Q10: Confidence level?**
+
 - `ready` — Proceed to detection + generation
 - `want-recommendations` — Claude suggests based on answers
 - `need-help` — Claude walks through each decision

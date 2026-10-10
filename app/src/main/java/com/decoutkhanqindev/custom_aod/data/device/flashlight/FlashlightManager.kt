@@ -28,7 +28,8 @@ class FlashlightManager(
     private val torchCameraId: String? by lazy {
         try {
             cameraManager.cameraIdList.firstOrNull { cameraId ->
-                cameraManager.getCameraCharacteristics(cameraId).get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+                cameraManager.getCameraCharacteristics(cameraId)
+                    .get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
             }
         } catch (e: CameraAccessException) {
             Timber.tag(tag).e("Could not read the cameras: ${e.stackTraceToString()}")

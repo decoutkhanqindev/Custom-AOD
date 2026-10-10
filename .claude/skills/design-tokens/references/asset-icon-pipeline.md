@@ -20,46 +20,49 @@ Is it a logo or brand asset?
 ## Icons
 
 ### Material Icons Mapping
+
 Common Figma/Stitch icon names → Material equivalents:
 
-| Source Name | Material Icon |
-|------------|---------------|
-| home, house | `Icons.Default.Home` |
-| search, magnifier | `Icons.Default.Search` |
-| settings, gear, cog | `Icons.Default.Settings` |
-| person, user, avatar | `Icons.Default.Person` |
-| arrow-back, chevron-left | `Icons.AutoMirrored.Default.ArrowBack` |
+| Source Name                  | Material Icon                             |
+|------------------------------|-------------------------------------------|
+| home, house                  | `Icons.Default.Home`                      |
+| search, magnifier            | `Icons.Default.Search`                    |
+| settings, gear, cog          | `Icons.Default.Settings`                  |
+| person, user, avatar         | `Icons.Default.Person`                    |
+| arrow-back, chevron-left     | `Icons.AutoMirrored.Default.ArrowBack`    |
 | arrow-forward, chevron-right | `Icons.AutoMirrored.Default.ArrowForward` |
-| close, x | `Icons.Default.Close` |
-| menu, hamburger | `Icons.Default.Menu` |
-| add, plus | `Icons.Default.Add` |
-| edit, pencil | `Icons.Default.Edit` |
-| delete, trash | `Icons.Default.Delete` |
-| favorite, heart | `Icons.Default.Favorite` |
-| share | `Icons.Default.Share` |
-| notification, bell | `Icons.Default.Notifications` |
-| check, checkmark | `Icons.Default.Check` |
-| info, info-circle | `Icons.Default.Info` |
-| warning, alert | `Icons.Default.Warning` |
-| error | `Icons.Default.Error` |
-| star | `Icons.Default.Star` |
-| lock | `Icons.Default.Lock` |
-| mail, email | `Icons.Default.Email` |
-| phone, call | `Icons.Default.Phone` |
-| camera | `Icons.Default.CameraAlt` |
-| download | `Icons.Default.Download` |
-| upload | `Icons.Default.Upload` |
-| filter | `Icons.Default.FilterList` |
-| sort | `Icons.Default.Sort` |
-| refresh | `Icons.Default.Refresh` |
-| copy | `Icons.Default.ContentCopy` |
-| link | `Icons.Default.Link` |
-| calendar, date | `Icons.Default.DateRange` |
-| clock, time | `Icons.Default.Schedule` |
-| location, map-pin | `Icons.Default.LocationOn` |
+| close, x                     | `Icons.Default.Close`                     |
+| menu, hamburger              | `Icons.Default.Menu`                      |
+| add, plus                    | `Icons.Default.Add`                       |
+| edit, pencil                 | `Icons.Default.Edit`                      |
+| delete, trash                | `Icons.Default.Delete`                    |
+| favorite, heart              | `Icons.Default.Favorite`                  |
+| share                        | `Icons.Default.Share`                     |
+| notification, bell           | `Icons.Default.Notifications`             |
+| check, checkmark             | `Icons.Default.Check`                     |
+| info, info-circle            | `Icons.Default.Info`                      |
+| warning, alert               | `Icons.Default.Warning`                   |
+| error                        | `Icons.Default.Error`                     |
+| star                         | `Icons.Default.Star`                      |
+| lock                         | `Icons.Default.Lock`                      |
+| mail, email                  | `Icons.Default.Email`                     |
+| phone, call                  | `Icons.Default.Phone`                     |
+| camera                       | `Icons.Default.CameraAlt`                 |
+| download                     | `Icons.Default.Download`                  |
+| upload                       | `Icons.Default.Upload`                    |
+| filter                       | `Icons.Default.FilterList`                |
+| sort                         | `Icons.Default.Sort`                      |
+| refresh                      | `Icons.Default.Refresh`                   |
+| copy                         | `Icons.Default.ContentCopy`               |
+| link                         | `Icons.Default.Link`                      |
+| calendar, date               | `Icons.Default.DateRange`                 |
+| clock, time                  | `Icons.Default.Schedule`                  |
+| location, map-pin            | `Icons.Default.LocationOn`                |
 
 ### Custom SVG → VectorDrawable
+
 When icon doesn't match Material:
+
 1. Export from Figma: select icon → Export → SVG
 2. Convert: Android Studio → File → New → Vector Asset → Local SVG
 3. Or CLI: `android-svg-to-vd -i icon.svg -o res/drawable/ic_name.xml`
@@ -67,6 +70,7 @@ When icon doesn't match Material:
 5. Use: `painterResource(R.drawable.ic_name)`
 
 ### Unknown Icons (placeholder)
+
 ```kotlin
 Icon(
     imageVector = Icons.Default.Star, // TODO: Replace with actual icon
@@ -78,6 +82,7 @@ Icon(
 ## Images
 
 ### Placeholder Box (recommended for recreation)
+
 ```kotlin
 // Photo/illustration placeholder
 Box(
@@ -100,6 +105,7 @@ Box(
 ```
 
 ### Avatar Placeholder
+
 ```kotlin
 Box(
     modifier = Modifier
@@ -117,6 +123,7 @@ Box(
 ```
 
 ### AsyncImage (when Coil available)
+
 ```kotlin
 AsyncImage(
     model = "https://picsum.photos/300/200",
@@ -130,16 +137,17 @@ AsyncImage(
 
 ## Figma Image Layers
 
-| Figma Layer Type | Compose |
-|-----------------|---------|
-| Rectangle with image fill (fill mode) | `Image(contentScale = ContentScale.Crop)` |
-| Rectangle with image fill (fit mode) | `Image(contentScale = ContentScale.Fit)` |
-| Ellipse with image fill | `Image(Modifier.clip(CircleShape))` |
-| Background image full-bleed | `Box { Image(Modifier.matchParentSize(), contentScale = Crop); content }` |
+| Figma Layer Type                      | Compose                                                                   |
+|---------------------------------------|---------------------------------------------------------------------------|
+| Rectangle with image fill (fill mode) | `Image(contentScale = ContentScale.Crop)`                                 |
+| Rectangle with image fill (fit mode)  | `Image(contentScale = ContentScale.Fit)`                                  |
+| Ellipse with image fill               | `Image(Modifier.clip(CircleShape))`                                       |
+| Background image full-bleed           | `Box { Image(Modifier.matchParentSize(), contentScale = Crop); content }` |
 
 ## Stitch Image Elements
 
 Stitch HTML `<img>` tags → Compose:
+
 - `<img src="...">` → Placeholder Box (don't fetch external URLs)
 - `<img>` with fixed dimensions → `Box(Modifier.size(w.dp, h.dp))` with placeholder
 - `<img style="border-radius: 50%">` → Circular placeholder

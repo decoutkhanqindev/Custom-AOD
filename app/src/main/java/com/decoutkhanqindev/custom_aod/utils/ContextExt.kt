@@ -21,7 +21,6 @@ import com.decoutkhanqindev.custom_aod.presentation.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
@@ -50,46 +49,64 @@ fun Context.openSettingsPage(vararg intents: Intent): Boolean {
     }
 }
 
-fun Context.openOverlaySettings() {
-    openSettingsPage(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, packageUri()))
+// Mở trang cấp quyền rồi tự kéo app về khi quyền được cấp (cùng cách với openWifiSettings). Quyền đã có sẵn lúc mở thì chỉ mở trang:
+// user vào để xem hoặc tắt, kéo về sau 1 giây sẽ giật họ ra khỏi trang.
+private fun Context.openPermissionPage(isGranted: () -> Boolean, open: () -> Boolean) {
+    val wasGranted = isGranted()
+    if (open() && !wasGranted) returnAppWhen(condition = isGranted)
+}
+
+fun Context.openOverlaySettings(isGranted: () -> Boolean) {
+    openPermissionPage(isGranted) {
+        openSettingsPage(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, packageUri()))
+    }
 }
 
 // Quyền runtime bị từ chối hai lần thì hệ thống không hiện hộp thoại nữa: chỉ cấp được ở trang Thông tin ứng dụng.
-fun Context.openAppSettings() {
-    openSettingsPage(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri()))
+fun Context.openAppSettings(isGranted: () -> Boolean) {
+    openPermissionPage(isGranted) {
+        openSettingsPage(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri()))
+    }
 }
 
-fun Context.openNotificationSettings() {
-    openSettingsPage(
-        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(
-            Settings.EXTRA_APP_PACKAGE,
-            packageName
-        ),
-    )
+fun Context.openNotificationSettings(isGranted: () -> Boolean) {
+    openPermissionPage(isGranted) {
+        openSettingsPage(
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(
+                Settings.EXTRA_APP_PACKAGE,
+                packageName
+            ),
+        )
+    }
 }
 
 // Android 11+ có trang bật riêng cho từng listener; ROM không có trang đó thì mở danh sách "Truy cập thông báo".
-fun Context.openNotificationListenerSettings(listener: ComponentName) {
-    try {
-        startActivity(
-            Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS)
-                .putExtra(
-                    Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
-                    listener.flattenToString()
-                ),
-        )
-    } catch (e: ActivityNotFoundException) {
-        openSettingsPage(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+fun Context.openNotificationListenerSettings(listener: ComponentName, isGranted: () -> Boolean) {
+    openPermissionPage(isGranted) {
+        try {
+            startActivity(
+                Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS)
+                    .putExtra(
+                        Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
+                        listener.flattenToString()
+                    ),
+            )
+            true
+        } catch (e: ActivityNotFoundException) {
+            openSettingsPage(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
     }
 }
 
 // Trang "Quyền khác" của Xiaomi (MIUI / HyperOS); máy hãng khác không có trang này nên rơi về Thông tin ứng dụng.
-fun Context.openMiuiPermissionSettings() {
-    openSettingsPage(
-        Intent(MIUI_PERMISSION_EDITOR_ACTION)
-            .setClassName(MIUI_SECURITY_CENTER_PACKAGE, MIUI_PERMISSION_EDITOR_ACTIVITY)
-            .putExtra(MIUI_EXTRA_PACKAGE_NAME, packageName),
-    )
+fun Context.openMiuiPermissionSettings(isGranted: () -> Boolean) {
+    openPermissionPage(isGranted) {
+        openSettingsPage(
+            Intent(MIUI_PERMISSION_EDITOR_ACTION)
+                .setClassName(MIUI_SECURITY_CENTER_PACKAGE, MIUI_PERMISSION_EDITOR_ACTIVITY)
+                .putExtra(MIUI_EXTRA_PACKAGE_NAME, packageName),
+        )
+    }
 }
 
 fun Context.openWifiSettings(isConnected: () -> Boolean) {

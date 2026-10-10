@@ -3,10 +3,12 @@
 ## Source 1: Figma Tokens JSON
 
 ### Supported Formats
+
 - **Figma Tokens plugin** (Tokens Studio): W3C DTCG format
 - **Figma Variables API** export: JSON with `resolvedValue` fields
 
 ### W3C DTCG Format Example
+
 ```json
 {
   "color": {
@@ -23,16 +25,18 @@
 ```
 
 ### Mapping Rules
-| JSON `$type` | Kotlin Type | Target Layer |
-|-------------|-------------|-------------|
-| `color` | `Color(0xFF...)` | Primitive object |
-| `dimension` | `X.dp` | Primitive object |
-| `duration` | `Int` (ms) | Primitive object |
-| `fontWeight` | `FontWeight.X` | Typography tokens |
-| `fontSize` | `X.sp` | Typography tokens |
-| `borderRadius` | `RoundedCornerShape(X.dp)` | Primitive shape |
+
+| JSON `$type`   | Kotlin Type                | Target Layer      |
+|----------------|----------------------------|-------------------|
+| `color`        | `Color(0xFF...)`           | Primitive object  |
+| `dimension`    | `X.dp`                     | Primitive object  |
+| `duration`     | `Int` (ms)                 | Primitive object  |
+| `fontWeight`   | `FontWeight.X`             | Typography tokens |
+| `fontSize`     | `X.sp`                     | Typography tokens |
+| `borderRadius` | `RoundedCornerShape(X.dp)` | Primitive shape   |
 
 ### Script Usage
+
 ```bash
 python3 parse-figma-tokens.py --input tokens.json --output ./out/ \
   --prefix App --package com.example.app.theme
@@ -45,18 +49,21 @@ Outputs: one `.kt` file per token group (colors, spacing, shapes, etc.)
 Extract dominant colors from design mockups, screenshots, or brand assets.
 
 ### How It Works
+
 1. Image resized to 200x200 (performance)
 2. Pillow `quantize()` extracts top N colors
 3. Colors sorted by luminance (dark → light)
 4. Scale names assigned: `{Name}900` (darkest) → `{Name}50` (lightest)
 
 ### Script Usage
+
 ```bash
 python3 extract-colors-from-image.py --input mockup.png --colors 10 \
   --name "Brand" --prefix App
 ```
 
 ### Output Example
+
 ```kotlin
 object AppPrimitiveBrand {
     val Brand900 = Color(0xFF1A1A2E)
@@ -68,6 +75,7 @@ object AppPrimitiveBrand {
 ```
 
 ### Tips
+
 - Use screenshots of key screens for app-specific palettes
 - Use brand logos/assets for brand color extraction
 - Adjust `--colors` count: 5 for minimal, 10 for standard, 20 for detailed
@@ -77,12 +85,14 @@ object AppPrimitiveBrand {
 User describes desired tokens in natural language. Claude generates code using templates.
 
 ### Workflow
+
 1. User specifies: colors (hex/names), spacing scale, typography choices
 2. Claude loads `references/code-templates.md`
 3. Claude generates complete Primitive → Semantic → Component chain
 4. User reviews, adjusts naming/values
 
 ### Example Prompts
+
 - "Create a warm earth-tone palette: terracotta #E07A5F, sage #81B29A, cream #F4F1DE"
 - "Add a new spacing scale based on 8dp grid with 6 sizes"
 - "Create component tokens for a new AppSnackbar component"
@@ -92,6 +102,7 @@ User describes desired tokens in natural language. Claude generates code using t
 Sketch color palettes export as JSON via plugins (Sketch2JSON, Design Tokens).
 
 ### Format
+
 ```json
 {
   "colors": [
@@ -101,4 +112,5 @@ Sketch color palettes export as JSON via plugins (Sketch2JSON, Design Tokens).
 }
 ```
 
-Same pipeline as Figma: parse JSON → generate Kotlin via `parse-figma-tokens.py` with `--format sketch` flag.
+Same pipeline as Figma: parse JSON → generate Kotlin via `parse-figma-tokens.py` with
+`--format sketch` flag.

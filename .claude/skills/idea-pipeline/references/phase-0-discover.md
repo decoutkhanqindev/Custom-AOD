@@ -1,6 +1,7 @@
 # Phase 0 — Discover (conditional)
 
-Run ONLY when student says "I don't have an idea", "help me find one", or skill detects free-text input lacks a concrete concept. Otherwise jump to Phase 1.
+Run ONLY when student says "I don't have an idea", "help me find one", or skill detects free-text
+input lacks a concrete concept. Otherwise jump to Phase 1.
 
 ## Output
 
@@ -31,9 +32,11 @@ options:
 Run ONLY the selected path; don't run all.
 
 ### 1. Personal Pain
+
 Surface annoyances of the past 7 days.
 
 Prompts:
+
 - "What did you complain about this week (out loud or in your head)?"
 - "What task did you redo because the existing app didn't quite work?"
 - "What did you wish your phone could do at 11pm last night?"
@@ -41,9 +44,11 @@ Prompts:
 For each pain → frame as 1-line seed.
 
 ### 2. Hobby-Driven
+
 Existing skill/passion as moat — domain knowledge competitors lack.
 
 Prompts:
+
 - "What do you spend weekend hours on that isn't coding?"
 - "Where do friends ask you for advice?"
 - "Which subreddit / forum / Discord do you read daily?"
@@ -51,36 +56,47 @@ Prompts:
 Output: 5–10 seeds where domain expertise is the wedge.
 
 ### 3. Niche-of-Niche
+
 Pick broad category → narrow to subniche where 1 person can win.
 
 Process:
+
 - Student names broad category (fitness / finance / productivity / language)
 - Drill down 2 levels (fitness → running → marathon prep → sub-3:30 marathoners)
 - Generate seeds at deepest level
 
 ### 4. Reskin-with-Wedge
-Saturated category + sharp differentiator. Not "another habit tracker" — "habit tracker that ONLY does X".
+
+Saturated category + sharp differentiator. Not "another habit tracker" — "habit tracker that ONLY
+does X".
 
 Process:
+
 - Pick saturated category (todo / habit / meditation / journaling)
-- Identify 1 axis competitors don't optimize (offline-only / privacy-first / no streaks / single-tap / paid-only)
+- Identify 1 axis competitors don't optimize (offline-only / privacy-first / no streaks /
+  single-tap / paid-only)
 - Combine — "X for Y, but with Z"
 
 ### 5. Trending Play Store (WebFetch)
+
 Discover currently-rising categories. Use sources from `discovery-sources.md`.
 
 Process:
+
 - WebFetch Play Store top-charts page (1 retry on fail)
 - Extract category labels appearing 3+ times in top 100
 - For each, ask "what's missing in the current top 5?"
 - Frame seeds as the gap
 
-**Fallback** — if WebFetch fails twice, prompt: "Which app categories did you notice growing on Play Store recently?" Use student answers as substitute.
+**Fallback** — if WebFetch fails twice, prompt: "Which app categories did you notice growing on Play
+Store recently?" Use student answers as substitute.
 
 ### 6. Daily-Tool Gap
+
 Recurring task done badly with current apps.
 
 Prompts:
+
 - "What do you open 5+ times a day that's slow / clunky / over-featured?"
 - "What do you do in a browser that should be a native app?"
 - "What 'pro' app could be replaced with a simple, focused tool?"
@@ -88,10 +104,13 @@ Prompts:
 Output: seeds attacking specific pain in established tool.
 
 ### 7. Sunset-Tool Revival
+
 Formerly popular category, now dead or stagnant. Refresh with modern tech.
 
 Process:
-- Brainstorm 5 app categories that peaked 3-5 years ago (RSS readers, podcast managers, voice memos, simple drawing pads, mood trackers, dictionary apps, weather widgets)
+
+- Brainstorm 5 app categories that peaked 3-5 years ago (RSS readers, podcast managers, voice memos,
+  simple drawing pads, mood trackers, dictionary apps, weather widgets)
 - For each, identify why interest faded — and whether the underlying need still exists
 - Frame seeds as "modern minimal {category}"
 

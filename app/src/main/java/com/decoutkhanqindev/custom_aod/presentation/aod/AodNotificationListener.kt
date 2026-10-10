@@ -51,8 +51,11 @@ class AodNotificationListener : NotificationListenerService(), Tag {
     }
 
     companion object {
-        fun openAccessSettings(context: Context) {
-            context.openNotificationListenerSettings(ComponentName(context, AodNotificationListener::class.java))
+        fun openAccessSettings(context: Context, isGranted: () -> Boolean) {
+            context.openNotificationListenerSettings(
+                listener = ComponentName(context, AodNotificationListener::class.java),
+                isGranted = isGranted,
+            )
         }
     }
 }

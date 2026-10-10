@@ -29,8 +29,9 @@ class DeviceLocationManager(
         return withContextCatching(
             context = Dispatchers.IO,
             block = {
-                val location = withTimeoutOrNull(LOCATION_TIMEOUT_MILLIS) { requestCurrentLocation() }
-                    ?: lastKnownLocation()
+                val location =
+                    withTimeoutOrNull(LOCATION_TIMEOUT_MILLIS) { requestCurrentLocation() }
+                        ?: lastKnownLocation()
                 location?.let { Coordinates(latitude = it.latitude, longitude = it.longitude) }
             },
             catch = { e ->
@@ -47,7 +48,11 @@ class DeviceLocationManager(
         return suspendCancellableCoroutine { continuation ->
             val cancellationSignal = CancellationSignal()
             continuation.invokeOnCancellation { cancellationSignal.cancel() }
-            locationManager.getCurrentLocation(provider, cancellationSignal, app.mainExecutor) { location ->
+            locationManager.getCurrentLocation(
+                provider,
+                cancellationSignal,
+                app.mainExecutor
+            ) { location ->
                 if (continuation.isActive) continuation.resume(location)
             }
         }
@@ -62,7 +67,7 @@ class DeviceLocationManager(
     // Fused (có Google Play services) gộp Wi-Fi và mạng di động; không có thì dùng nhà cung cấp mạng. Quyền gần đúng không dùng được GPS.
     private fun preferredProvider(): String? = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            locationManager.isProviderEnabled(LocationManager.FUSED_PROVIDER) -> LocationManager.FUSED_PROVIDER
+                locationManager.isProviderEnabled(LocationManager.FUSED_PROVIDER) -> LocationManager.FUSED_PROVIDER
 
         locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) -> LocationManager.NETWORK_PROVIDER
         else -> null

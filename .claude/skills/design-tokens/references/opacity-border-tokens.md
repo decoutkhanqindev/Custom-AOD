@@ -103,11 +103,11 @@ HorizontalDivider(
 
 ## State Overlay Matrix
 
-| State | Overlay Alpha | Border Change |
-|-------|--------------|---------------|
-| Default | 0f | As designed |
-| Hover | 0.08f | No change |
-| Focused | 0f | +2dp focus ring |
-| Pressed | 0.12f | No change |
-| Dragged | 0.16f | No change |
+| State    | Overlay Alpha | Border Change        |
+|----------|---------------|----------------------|
+| Default  | 0f            | As designed          |
+| Hover    | 0.08f         | No change            |
+| Focused  | 0f            | +2dp focus ring      |
+| Pressed  | 0.12f         | No change            |
+| Dragged  | 0.16f         | No change            |
 | Disabled | Content 0.38f | 0.12f opacity border |

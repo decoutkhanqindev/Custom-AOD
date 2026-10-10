@@ -1,23 +1,25 @@
 # Composable Splitting Checks
 
-Decide when to extract sub-composables. Goal: smaller recompose scope, clearer concerns, testable previews.
+Decide when to extract sub-composables. Goal: smaller recompose scope, clearer concerns, testable
+previews.
 
 ## When to split
 
-| Trigger | Action |
-|---------|--------|
-| Function > 80 LOC | Split into 2–3 sub-composables |
-| 3+ visual sections (header / body / footer) | Each section → its own `@Composable` |
-| Mixed concerns (state hoisting + layout + side effects) | Hoist state outward; pure stateless leaf |
-| Repeated sub-layout (`Row { Icon; Text }` x4) | Extract into `private @Composable fun ItemRow(...)` |
-| Hot recomposition path mixed with cold UI | Isolate hot leaf so cold parents stay cached |
-| Stateful + stateless variants needed for previews | Stateful wrapper + stateless content pair |
+| Trigger                                                 | Action                                              |
+|---------------------------------------------------------|-----------------------------------------------------|
+| Function > 80 LOC                                       | Split into 2–3 sub-composables                      |
+| 3+ visual sections (header / body / footer)             | Each section → its own `@Composable`                |
+| Mixed concerns (state hoisting + layout + side effects) | Hoist state outward; pure stateless leaf            |
+| Repeated sub-layout (`Row { Icon; Text }` x4)           | Extract into `private @Composable fun ItemRow(...)` |
+| Hot recomposition path mixed with cold UI               | Isolate hot leaf so cold parents stay cached        |
+| Stateful + stateless variants needed for previews       | Stateful wrapper + stateless content pair           |
 
 ## Patterns
 
 ### 1. Section split (most common)
 
 Before:
+
 ```kotlin
 @Composable fun ProfileContent(state: ProfileState, onIntent: (ProfileIntent) -> Unit) {
     Column {
@@ -29,6 +31,7 @@ Before:
 ```
 
 After:
+
 ```kotlin
 @Composable fun ProfileContent(state: ProfileState, onIntent: (ProfileIntent) -> Unit) {
     Column {
@@ -121,8 +124,10 @@ If parent passes lots of layout-shaped data, prefer slot lambdas:
 
 ## Naming
 
-- Match the project prefix from CLAUDE.md for shared design-system components (`presentation/components/`), plain PascalCase + `private` for file-local helpers.
-- Suffix conventions: `Section`, `Row`, `Header`, `Footer`, `Card`, `Item`, `Content` (paired with stateful wrapper).
+- Shared app-level components (`presentation/components/`): `AppXxx` names; screen-local
+  components (`screens/<screen>/components/`): plain PascalCase; `private` for file-local helpers.
+- Suffix conventions: `Section`, `Row`, `Header`, `Footer`, `Card`, `Item`, `Content` (paired with
+  stateful wrapper).
 - File-local helpers stay `private` in the same `.kt`.
 
 ## Output format for findings

@@ -28,10 +28,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.decoutkhanqindev.custom_aod.R
-import com.decoutkhanqindev.custom_aod.presentation.components.AodsLottie
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTheme
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsTypography
+import com.decoutkhanqindev.custom_aod.presentation.components.AppLottie
+import com.decoutkhanqindev.custom_aod.presentation.theme.Black
+import com.decoutkhanqindev.custom_aod.presentation.theme.BodyMedium
+import com.decoutkhanqindev.custom_aod.presentation.theme.BodySmall
+import com.decoutkhanqindev.custom_aod.presentation.theme.Grey9A
+import com.decoutkhanqindev.custom_aod.presentation.theme.GreyED
+import com.decoutkhanqindev.custom_aod.presentation.theme.HeadlineMedium
+import com.decoutkhanqindev.custom_aod.presentation.theme.Mint
+import com.decoutkhanqindev.custom_aod.presentation.theme.Neutral12
+import com.decoutkhanqindev.custom_aod.presentation.theme.Theme
 
 @Composable
 fun SplashContent() {
@@ -41,7 +47,7 @@ fun SplashContent() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AodsColors.Black),
+            .background(Black),
     ) {
         Column(
             modifier = Modifier
@@ -50,7 +56,7 @@ fun SplashContent() {
                 .padding(bottom = 128.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AodsLottie(
+            AppLottie(
                 resId = R.raw.lottie_device_edge_light,
                 modifier = Modifier.size(300.dp),
             )
@@ -59,26 +65,26 @@ fun SplashContent() {
                 visibleState = titleState,
                 modifier = Modifier.offset(y = (-32).dp),
                 enter = fadeIn(animationSpec = tween(durationMillis = enterDuration)) +
-                    expandVertically(
-                        animationSpec = tween(durationMillis = enterDuration),
-                        expandFrom = Alignment.Top,
-                    ),
+                        expandVertically(
+                            animationSpec = tween(durationMillis = enterDuration),
+                            expandFrom = Alignment.Top,
+                        ),
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(R.string.app_name),
-                        color = AodsColors.GreyED,
+                        color = GreyED,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
-                        style = AodsTypography.HeadlineMedium,
+                        style = HeadlineMedium,
                     )
 
                     Text(
                         text = stringResource(R.string.splash_tagline),
                         modifier = Modifier.padding(top = 8.dp),
-                        color = AodsColors.Grey9A,
+                        color = Grey9A,
                         textAlign = TextAlign.Center,
-                        style = AodsTypography.BodyMedium,
+                        style = BodyMedium,
                     )
                 }
             }
@@ -95,22 +101,22 @@ fun SplashContent() {
         ) {
             Text(
                 text = stringResource(R.string.loading),
-                color = AodsColors.Grey9A,
-                style = AodsTypography.BodyMedium,
+                color = Grey9A,
+                style = BodyMedium,
             )
 
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
-                color = AodsColors.Mint,
-                trackColor = AodsColors.Neutral12,
+                color = Mint,
+                trackColor = Neutral12,
             )
 
             Text(
                 text = stringResource(R.string.may_contain_ads),
-                color = AodsColors.Grey9A,
+                color = Grey9A,
                 fontStyle = FontStyle.Italic,
                 textAlign = TextAlign.Center,
-                style = AodsTypography.BodySmall,
+                style = BodySmall,
             )
         }
     }
@@ -119,7 +125,7 @@ fun SplashContent() {
 @Preview(widthDp = 360, heightDp = 720)
 @Composable
 private fun SplashContentPreview() {
-    AodsTheme {
+    Theme {
         SplashContent()
     }
 }

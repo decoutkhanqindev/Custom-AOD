@@ -62,7 +62,7 @@ class NetworkManager(
 
     private fun NetworkCapabilities.hasInternetAccess(): Boolean =
         hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-            hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
 
     companion object {
         private const val NETWORK_LOST_DEBOUNCE_MILLIS = 500L

@@ -15,24 +15,23 @@ import com.decoutkhanqindev.custom_aod.domain.usecase.GetUpcomingEventsUseCase
 import com.decoutkhanqindev.custom_aod.domain.usecase.ObserveWeatherUseCase
 import com.decoutkhanqindev.custom_aod.domain.usecase.RefreshWeatherUseCase
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
-import com.decoutkhanqindev.custom_aod.presentation.model.AodActionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodGestureValue
-import com.decoutkhanqindev.custom_aod.presentation.model.AodScheduleUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.BatteryUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.CalendarEventUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
-import com.decoutkhanqindev.custom_aod.presentation.model.currentAodAppearance
-import com.decoutkhanqindev.custom_aod.presentation.model.currentAodExtras
-import com.decoutkhanqindev.custom_aod.presentation.model.currentAodInteraction
-import com.decoutkhanqindev.custom_aod.presentation.model.currentAodNotificationOptions
-import com.decoutkhanqindev.custom_aod.presentation.model.currentAodRules
-import com.decoutkhanqindev.custom_aod.presentation.model.glowColorArgb
-import com.decoutkhanqindev.custom_aod.presentation.model.toAodNotificationsUiModel
-import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.currentAodAppearance
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.BatteryUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.CalendarEventUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.glowColorArgb
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.toAodNotificationsUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.info.toUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodActionValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodGestureValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.AodScheduleUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.currentAodExtras
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.currentAodInteraction
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.currentAodNotificationOptions
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.settings.currentAodRules
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.aod.state.AodState
-import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import com.decoutkhanqindev.custom_aod.utils.collectLatestCatching
 import kotlinx.collections.immutable.toImmutableList
@@ -65,10 +64,11 @@ class AodViewModel(
     private val getUpcomingEventsUseCase: GetUpcomingEventsUseCase,
 ) : BaseViewModel<AodState, AodIntent, AodEffect>(
     initialState = initialState(dataStoreManager, batteryStateManager),
-), Tag {
+) {
 
     private val isProximityEnabled =
-        dataStoreManager.isAodProximityEnabled.value ?: DataStoreManager.DEFAULT_IS_AOD_PROXIMITY_ENABLED
+        dataStoreManager.isAodProximityEnabled.value
+            ?: DataStoreManager.DEFAULT_IS_AOD_PROXIMITY_ENABLED
     private val timeoutMinutes =
         dataStoreManager.aodTimeoutMinutes.value ?: DataStoreManager.DEFAULT_AOD_TIMEOUT_MINUTES
     private val rules = dataStoreManager.currentAodRules()
@@ -183,7 +183,13 @@ class AodViewModel(
         viewModelScope.launch {
             notificationStateManager.notifications.collectCatching(
                 block = { notifications ->
-                    updateState { copy(notifications = notifications.toAodNotificationsUiModel(notificationOptions)) }
+                    updateState {
+                        copy(
+                            notifications = notifications.toAodNotificationsUiModel(
+                                notificationOptions
+                            )
+                        )
+                    }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
             )
@@ -302,8 +308,14 @@ class AodViewModel(
                 endOfDayMillis = CalendarEventUiModel.endOfDayMillis(nowMillis),
                 limit = CalendarEventUiModel.MAX_EVENTS,
             )
-                .onSuccess { events -> updateState { copy(events = events.map { it.toUiModel() }.toImmutableList()) } }
-                .onFailure { e -> Timber.tag(tag).w("Could not load calendar events: ${e.message}") }
+                .onSuccess { events ->
+                    updateState {
+                        copy(events = events.map { it.toUiModel() }.toImmutableList())
+                    }
+                }
+                .onFailure { e ->
+                    Timber.tag(tag).w("Could not load calendar events: ${e.message}")
+                }
         }
     }
 
@@ -311,7 +323,10 @@ class AodViewModel(
         if (nowMillis >= nextEventsReloadMillis) {
             loadEvents()
         } else {
-            updateState { copy(events = events.filter { event -> event.endMillis > nowMillis }.toImmutableList()) }
+            updateState {
+                copy(events = events.filter { event -> event.endMillis > nowMillis }
+                    .toImmutableList())
+            }
         }
     }
 
@@ -440,7 +455,10 @@ class AodViewModel(
             extras = dataStoreManager.currentAodExtras(),
             wallpaper = WallpaperValue.fromCode(dataStoreManager.aodWallpaper.value),
             battery = batteryStateManager.readLevelPercent()?.let { percent ->
-                BatteryUiModel(percent = percent, isCharging = batteryStateManager.readIsCharging() == true)
+                BatteryUiModel(
+                    percent = percent,
+                    isCharging = batteryStateManager.readIsCharging() == true
+                )
             },
             shiftXDp = randomShiftX(),
             shiftYDp = randomShiftY(),

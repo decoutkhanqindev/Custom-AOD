@@ -58,20 +58,20 @@ fun default{Prefix}BottomSheetTokens(
 
 ## Variants
 
-| Variant    | scrimOpacity | containerElevation | Notes                          |
-|------------|--------------|--------------------|--------------------------------|
-| modal      | 0.32f        | 1dp                | blocks interaction with scrim  |
-| persistent | 0f           | 0dp tonal          | no scrim, content shifts up    |
+| Variant    | scrimOpacity | containerElevation | Notes                         |
+|------------|--------------|--------------------|-------------------------------|
+| modal      | 0.32f        | 1dp                | blocks interaction with scrim |
+| persistent | 0f           | 0dp tonal          | no scrim, content shifts up   |
 
 ## State Matrix
 
-| State        | containerColor      | dragHandleColor               | scrimOpacity  |
-|--------------|---------------------|-------------------------------|---------------|
-| hidden       | surfaceContainerLow | onSurfaceVariant 0.4          | 0f            |
-| peeked       | surfaceContainerLow | onSurfaceVariant 0.4          | 0.16f         |
-| halfExpanded | surfaceContainerLow | onSurfaceVariant 0.4          | 0.24f         |
-| expanded     | surfaceContainerLow | onSurfaceVariant 0.4          | 0.32f         |
-| dragging     | surfaceContainerLow | onSurfaceVariant 0.6 (active) | interpolated  |
+| State        | containerColor      | dragHandleColor               | scrimOpacity |
+|--------------|---------------------|-------------------------------|--------------|
+| hidden       | surfaceContainerLow | onSurfaceVariant 0.4          | 0f           |
+| peeked       | surfaceContainerLow | onSurfaceVariant 0.4          | 0.16f        |
+| halfExpanded | surfaceContainerLow | onSurfaceVariant 0.4          | 0.24f        |
+| expanded     | surfaceContainerLow | onSurfaceVariant 0.4          | 0.32f        |
+| dragging     | surfaceContainerLow | onSurfaceVariant 0.6 (active) | interpolated |
 
 ## Usage
 

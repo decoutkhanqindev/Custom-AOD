@@ -52,7 +52,11 @@ class AodImageManager(
         block = {
             val bitmap = decodeScaled(uri)
             try {
-                writeAtomically(file = backgroundFile, bitmap = bitmap, format = Bitmap.CompressFormat.JPEG)
+                writeAtomically(
+                    file = backgroundFile,
+                    bitmap = bitmap,
+                    format = Bitmap.CompressFormat.JPEG
+                )
             } finally {
                 bitmap.recycle()
             }
@@ -78,7 +82,11 @@ class AodImageManager(
     suspend fun saveBackground(bitmap: Bitmap): Boolean = withContextCatching(
         context = Dispatchers.IO,
         block = {
-            writeAtomically(file = backgroundFile, bitmap = bitmap, format = Bitmap.CompressFormat.JPEG)
+            writeAtomically(
+                file = backgroundFile,
+                bitmap = bitmap,
+                format = Bitmap.CompressFormat.JPEG
+            )
             _hasBackground.value = true
             true
         },
@@ -137,7 +145,9 @@ class AodImageManager(
                     file.delete()
                     hasFile.value = false
                 },
-                catch = { e -> Timber.tag(tag).e("Could not remove ${file.name}: ${e.stackTraceToString()}") },
+                catch = { e ->
+                    Timber.tag(tag).e("Could not remove ${file.name}: ${e.stackTraceToString()}")
+                },
             )
         }
     }

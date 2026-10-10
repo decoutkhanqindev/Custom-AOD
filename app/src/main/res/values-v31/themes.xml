@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!--
-    Từ Android 12, task mới mở có splash kèm icon app. Với AOD icon sẽ loé lên trước đồng hồ,
-    nên splash để đen.
-  -->
-  <style name="Theme.App.Aod" parent="Base.Theme.App.Aod">
-    <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
-    <item name="android:windowSplashScreenBackground">@android:color/black</item>
-  </style>
+    <!--
+      Từ Android 12, task mới mở có splash kèm icon app. Với AOD icon sẽ loé lên trước đồng hồ,
+      nên splash để đen.
+    -->
+    <style name="Theme.App.Aod" parent="Base.Theme.App.Aod">
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+        <item name="android:windowSplashScreenBackground">@android:color/black</item>
+    </style>
 </resources>

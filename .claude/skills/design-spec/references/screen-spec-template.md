@@ -1,6 +1,7 @@
 # Screen Spec Template
 
-Use this exact structure when writing each `plans/{slug}/design/{NN-feature-slug}/{NN-screen-slug}.md`.
+Use this exact structure when writing each
+`plans/{slug}/design/{NN-feature-slug}/{NN-screen-slug}.md`.
 
 **REMINDER**: NO Kotlin, NO Compose, NO `@Preview`. Markdown spec only.
 
@@ -29,20 +30,22 @@ level: "{beginner | intermediate}"
 Tree describing visual zones (header / body / footer / floating).
 
 ```
+
 Frame (360 × 800 portrait)
 ├── StatusBar zone (system, 24dp)
 ├── Header (64dp)
-│   ├── BackArrow (left, optional)
-│   └── Title ("{Title text}")
+│ ├── BackArrow (left, optional)
+│ └── Title ("{Title text}")
 ├── Body (scrollable, 16dp horizontal padding)
-│   ├── HeroBlock (full-width, 240dp tall)
-│   │   ├── Image (full-bleed, top)
-│   │   └── HeadlineStack (centered, padded 32dp)
-│   ├── Card (radius md, elevation 1) × N
-│   └── ...
+│ ├── HeroBlock (full-width, 240dp tall)
+│ │ ├── Image (full-bleed, top)
+│ │ └── HeadlineStack (centered, padded 32dp)
+│ ├── Card (radius md, elevation 1) × N
+│ └── ...
 └── Footer (88dp, pinned)
-    ├── PrimaryButton (full-width minus 32dp)
-    └── SkipLink (centered, 16dp below button)
+├── PrimaryButton (full-width minus 32dp)
+└── SkipLink (centered, 16dp below button)
+
 ```
 
 ## 4. Components (with states) [required]
@@ -121,7 +124,9 @@ Intent only, no durations. Defer specific timings to implementation.
 4–8 sentences, self-contained, paste-ready into Stitch / Figma AI / Claude artifacts. Combines screen identity + layout + components + tokens + tone + motion.
 
 ```
+
 {Self-contained paragraph here.}
+
 ```
 
 ## 11. Open Questions [optional]
@@ -135,16 +140,20 @@ Intent only, no durations. Defer specific timings to implementation.
 ## Fill Rules
 
 - All 11 sections required (10 body + frontmatter)
-- Use `N/A` instead of omitting an inapplicable state or copy field — the structure must remain consistent
+- Use `N/A` instead of omitting an inapplicable state or copy field — the structure must remain
+  consistent
 - Component states list 6 items each — skill validates count
 - Copy strings are FINAL strings — no `{placeholder}`, no `$variable`, no lorem ipsum
 - Tokens reference style-foundation.md by name; do not duplicate values
-- AI-tool render block must stand alone (paste it into a fresh tool with no other context — should yield recognizable output)
+- AI-tool render block must stand alone (paste it into a fresh tool with no other context — should
+  yield recognizable output)
 
 ## Beginner Mode Defaults
 
 When `level: beginner`:
-- Pre-fill component states with sensible defaults from a base library (e.g., Button states use M3 patterns)
+
+- Pre-fill component states with sensible defaults from a base library (e.g., Button states use M3
+  patterns)
 - Offer 3 copy options per visible string, student picks
 - Default screen-enter motion = `crossfade` (safe choice)
 - Default reference = "Material 3 baseline patterns, polished"

@@ -1,12 +1,12 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.customize.state
 
 import android.graphics.Bitmap
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockColorValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockFaceValue
-import com.decoutkhanqindev.custom_aod.presentation.model.ClockFontValue
-import com.decoutkhanqindev.custom_aod.presentation.model.CustomizeTabValue
-import com.decoutkhanqindev.custom_aod.presentation.model.PermissionValue
-import com.decoutkhanqindev.custom_aod.presentation.model.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.ClockColorValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.ClockFaceValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.ClockFontValue
+import com.decoutkhanqindev.custom_aod.presentation.model.aod.appearance.WallpaperValue
+import com.decoutkhanqindev.custom_aod.presentation.model.customize.CustomizeTabValue
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 
 sealed interface CustomizeIntent {
     sealed interface Panel : CustomizeIntent {

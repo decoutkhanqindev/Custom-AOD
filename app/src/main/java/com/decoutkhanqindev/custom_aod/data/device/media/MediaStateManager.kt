@@ -84,7 +84,8 @@ class MediaStateManager(
         val actions = state?.actions ?: 0L
         return MediaPlayback(
             title = title,
-            artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST)?.takeIf { it.isNotBlank() },
+            artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST)
+                ?.takeIf { it.isNotBlank() },
             isPlaying = (state?.state ?: PlaybackState.STATE_NONE) in PLAYING_STATES,
             canSkipToPrevious = actions and PlaybackState.ACTION_SKIP_TO_PREVIOUS != 0L,
             canSkipToNext = actions and PlaybackState.ACTION_SKIP_TO_NEXT != 0L,

@@ -130,12 +130,14 @@ val Local{PREFIX}{COMPONENT} = staticCompositionLocalOf { default{PREFIX}{COMPON
 ## Template 6: AppTheme Registration
 
 ### Add to CompositionLocalProvider
+
 ```kotlin
 // In AppTheme composable function:
 Local{PREFIX}{NAME} provides default{PREFIX}{NAME},
 ```
 
 ### Add to AppTheme object
+
 ```kotlin
 // In AppTheme object:
 val {accessorName}: {PREFIX}{NAME}Tokens
@@ -143,6 +145,7 @@ val {accessorName}: {PREFIX}{NAME}Tokens
 ```
 
 ## Checklist After Generation
+
 1. [ ] File placed in `theme/src/main/kotlin/.../theme/`
 2. [ ] Package declaration matches directory
 3. [ ] CompositionLocal registered in AppTheme composable

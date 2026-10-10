@@ -4,12 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.decoutkhanqindev.custom_aod.data.local.datastore.DataStoreManager
 import com.decoutkhanqindev.custom_aod.data.local.locale.LanguageManager
 import com.decoutkhanqindev.custom_aod.presentation.base.BaseViewModel
-import com.decoutkhanqindev.custom_aod.presentation.model.LanguageValue
-import com.decoutkhanqindev.custom_aod.presentation.model.toUiModel
+import com.decoutkhanqindev.custom_aod.presentation.model.language.LanguageValue
+import com.decoutkhanqindev.custom_aod.presentation.model.language.toUiModel
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageEffect
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageIntent
 import com.decoutkhanqindev.custom_aod.presentation.screens.language.state.LanguageState
-import com.decoutkhanqindev.custom_aod.utils.Tag
 import com.decoutkhanqindev.custom_aod.utils.collectCatching
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,7 +21,7 @@ class LanguageViewModel(
     private val languageManager: LanguageManager,
 ) : BaseViewModel<LanguageState, LanguageIntent, LanguageEffect>(
     initialState = LanguageState(isFirstOpen = isFirstOpen),
-), Tag {
+) {
 
     init {
         loadLanguages()
@@ -55,7 +54,8 @@ class LanguageViewModel(
         updateState {
             copy(
                 languages = languages,
-                selectedLanguage = if (isFirstOpen) deviceLanguage ?: LanguageValue.DEFAULT else selectedLanguage,
+                selectedLanguage = if (isFirstOpen) deviceLanguage
+                    ?: LanguageValue.DEFAULT else selectedLanguage,
             )
         }
     }
@@ -66,7 +66,10 @@ class LanguageViewModel(
                 block = { code ->
                     val appliedLanguage = LanguageValue.fromCode(code)
                     updateState {
-                        copy(appliedLanguage = appliedLanguage, selectedLanguage = selectedLanguage ?: appliedLanguage)
+                        copy(
+                            appliedLanguage = appliedLanguage,
+                            selectedLanguage = selectedLanguage ?: appliedLanguage
+                        )
                     }
                 },
                 catch = { e -> Timber.tag(tag).e(e.stackTraceToString()) },
@@ -79,7 +82,8 @@ class LanguageViewModel(
         val language = state.value.selectedLanguage ?: return
         dataStoreManager.saveSelectedLangCode(language.code)
         if (isFirstOpen) dataStoreManager.saveIsFirstOpen(false)
-        val effect = if (isFirstOpen) LanguageEffect.NavigateToCustomize else LanguageEffect.NavigateBack
+        val effect =
+            if (isFirstOpen) LanguageEffect.NavigateToCustomize else LanguageEffect.NavigateBack
         viewModelScope.launch { sendEffect(effect) }
     }
 }

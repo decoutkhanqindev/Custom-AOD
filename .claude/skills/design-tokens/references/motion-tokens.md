@@ -74,19 +74,19 @@ AnimatedVisibility(
 
 ## Easing Guide
 
-| Easing | Use For | M3 Name |
-|--------|---------|---------|
-| `easeStandard` | General transitions | Standard |
-| `easeDecelerate` | Elements entering screen | Decelerate |
-| `easeAccelerate` | Elements leaving screen | Accelerate |
-| `EaseEmphasis` | Hero animations, attention | Emphasized |
-| `EaseLinear` | Progress indicators, loading | Linear |
+| Easing           | Use For                      | M3 Name    |
+|------------------|------------------------------|------------|
+| `easeStandard`   | General transitions          | Standard   |
+| `easeDecelerate` | Elements entering screen     | Decelerate |
+| `easeAccelerate` | Elements leaving screen      | Accelerate |
+| `EaseEmphasis`   | Hero animations, attention   | Emphasized |
+| `EaseLinear`     | Progress indicators, loading | Linear     |
 
 ## Common Durations
 
-| Duration | Use For |
-|----------|---------|
-| Short (100ms) | Ripple, state change, toggle |
-| Medium (200ms) | Fade, color change, expand |
-| Long (300ms) | Slide, modal enter, page transition |
-| Emphasis (400ms) | Shared element, hero animation |
+| Duration         | Use For                             |
+|------------------|-------------------------------------|
+| Short (100ms)    | Ripple, state change, toggle        |
+| Medium (200ms)   | Fade, color change, expand          |
+| Long (300ms)     | Slide, modal enter, page transition |
+| Emphasis (400ms) | Shared element, hero animation      |

@@ -1,6 +1,7 @@
 package com.decoutkhanqindev.custom_aod.presentation.screens.main.state
 
 import androidx.annotation.StringRes
+import com.decoutkhanqindev.custom_aod.presentation.model.permission.PermissionValue
 
 sealed interface MainEffect {
     sealed interface Service : MainEffect {
@@ -17,7 +18,7 @@ sealed interface MainEffect {
         data object OpenMiuiPermissionSettings : Permission
         data object OpenNotificationSettings : Permission
         data object OpenNotificationAccessSettings : Permission
-        data object OpenAppSettings : Permission
+        data class OpenAppSettings(val permission: PermissionValue) : Permission
         data object RequestNotificationPermission : Permission
         data object RequestCalendarPermission : Permission
         data object RequestLocationPermission : Permission

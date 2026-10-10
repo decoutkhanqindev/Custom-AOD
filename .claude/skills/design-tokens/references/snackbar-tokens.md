@@ -62,22 +62,22 @@ fun default{Prefix}SnackbarTokens(
 
 Each variant overrides `containerColor` + `contentColor`:
 
-| Variant | containerColor         | contentColor             |
-|---------|------------------------|--------------------------|
-| default | surfaceContainerHigh   | onSurface                |
-| info    | secondaryContainer     | onSecondaryContainer     |
-| success | Color(0xFF1B5E20) tonal | Color(0xFFE8F5E9)       |
-| warning | tertiaryContainer      | onTertiaryContainer      |
-| error   | errorContainer         | onErrorContainer         |
+| Variant | containerColor          | contentColor         |
+|---------|-------------------------|----------------------|
+| default | surfaceContainerHigh    | onSurface            |
+| info    | secondaryContainer      | onSecondaryContainer |
+| success | Color(0xFF1B5E20) tonal | Color(0xFFE8F5E9)    |
+| warning | tertiaryContainer       | onTertiaryContainer  |
+| error   | errorContainer          | onErrorContainer     |
 
 ## State Matrix
 
-| State    | containerColor       | actionColor         | dismissIconColor    |
-|----------|----------------------|---------------------|---------------------|
-| default  | surfaceContainerHigh | primary             | onSurfaceVariant    |
-| hovered  | surfaceContainerHigh | primary.copy(0.92f) | onSurfaceVariant    |
-| pressed  | surfaceContainerHigh | primary.copy(0.88f) | onSurface           |
-| disabled | n/a (auto-dismiss)   | n/a                 | n/a                 |
+| State    | containerColor       | actionColor         | dismissIconColor |
+|----------|----------------------|---------------------|------------------|
+| default  | surfaceContainerHigh | primary             | onSurfaceVariant |
+| hovered  | surfaceContainerHigh | primary.copy(0.92f) | onSurfaceVariant |
+| pressed  | surfaceContainerHigh | primary.copy(0.88f) | onSurface        |
+| disabled | n/a (auto-dismiss)   | n/a                 | n/a              |
 
 ## Usage
 

@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.AdUnitState
 import com.decoutkhanqindev.custom_aod.ads.ad_unit.BannerAdUnit
 import com.decoutkhanqindev.custom_aod.presentation.components.shimmerLoading
-import com.decoutkhanqindev.custom_aod.presentation.theme.AodsColors
+import com.decoutkhanqindev.custom_aod.presentation.theme.NeutralVariant30
 
 @Composable
 fun BannerAdView(
@@ -64,7 +64,7 @@ fun BannerAdView(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .shimmerLoading(backgroundColor = AodsColors.NeutralVariant30),
+                    .shimmerLoading(backgroundColor = NeutralVariant30),
             )
         }
     }

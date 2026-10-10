@@ -70,7 +70,12 @@ class AodTileService : TileService(), Tag {
         val start = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startActivityAndCollapse(
-                    PendingIntent.getActivity(this, OPEN_APP_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE),
+                    PendingIntent.getActivity(
+                        this,
+                        OPEN_APP_REQUEST_CODE,
+                        intent,
+                        PendingIntent.FLAG_IMMUTABLE
+                    ),
                 )
             } else {
                 // Bản nhận Intent chỉ ném lỗi từ Android 14, còn bản nhận PendingIntent thì chưa có dưới API 34.

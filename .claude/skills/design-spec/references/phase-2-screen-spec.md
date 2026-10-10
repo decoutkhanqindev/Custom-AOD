@@ -1,8 +1,10 @@
 # Phase 2 — Per-Screen Spec (loop)
 
-Read all PRDs from `plans/{slug}/prd/{NN}-*.md`. For each screen across all features, emit one spec at `plans/{slug}/design/{NN-feature-slug}/{NN-screen-slug}.md`.
+Read all PRDs from `plans/{slug}/prd/{NN}-*.md`. For each screen across all features, emit one spec
+at `plans/{slug}/design/{NN-feature-slug}/{NN-screen-slug}.md`.
 
 **ABSOLUTE RULES:**
+
 - **NO Kotlin / Compose / `@Preview` / DSL snippets in any output**
 - **Component-states list MANDATORY — refuse to write incomplete spec**
 - **Real copy only — no lorem ipsum, no `{placeholder}` text**
@@ -40,7 +42,9 @@ screens:
 
 ## Loop
 
-For each screen, emit `plans/{slug}/design/{NN_feature}-{feature_slug}/{NN_screen}-{screen-slug-kebab}.md` (zero-padded indices).
+For each screen, emit
+`plans/{slug}/design/{NN_feature}-{feature_slug}/{NN_screen}-{screen-slug-kebab}.md` (zero-padded
+indices).
 
 Use `references/screen-spec-template.md` as exact template.
 
@@ -81,7 +85,8 @@ Each component listed once with states inline (NOT 6 separate sections per compo
   - error: N/A
 ```
 
-States that don't apply → write `N/A` explicitly. Don't omit. Skill validation counts 6 states per component; fewer = refuse.
+States that don't apply → write `N/A` explicitly. Don't omit. Skill validation counts 6 states per
+component; fewer = refuse.
 
 ### Copy Section
 
@@ -98,11 +103,13 @@ States that don't apply → write `N/A` explicitly. Don't omit. Skill validation
 
 EVERY copy field is real text. NO `{placeholder}`, NO lorem ipsum.
 
-Beginner mode: offer 3 copy options per visible string, student picks. Intermediate: write blank, student fills.
+Beginner mode: offer 3 copy options per visible string, student picks. Intermediate: write blank,
+student fills.
 
 ### AI-Tool Render Block
 
 Self-contained paragraph that any text-to-UI tool can consume cold. Includes:
+
 - Screen identity (1 sentence)
 - Layout summary (1 sentence)
 - Key components (list)
